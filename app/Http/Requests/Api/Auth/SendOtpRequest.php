@@ -26,8 +26,6 @@ class SendOtpRequest extends FormRequest
     {
         return [
             'phone.required' => 'Phone number is required.',
-
-            'phone.regex' => 'Enter a valid Indian mobile number.',
         ];
     }
 
@@ -35,7 +33,7 @@ class SendOtpRequest extends FormRequest
     {
         return [
             'phone' => [
-                'description' => 'Valid Indian mobile number.',
+                'description' => 'Valid 10-digit Indian mobile number.',
                 'example' => '9876543210',
             ],
         ];

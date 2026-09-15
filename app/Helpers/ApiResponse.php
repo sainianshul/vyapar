@@ -31,7 +31,6 @@ class ApiResponse
         ];
 
         if (!empty($errors)) {
-
             $response['errors'] = $errors;
         }
 

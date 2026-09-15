@@ -5,21 +5,14 @@ namespace App\Services;
 use App\Exceptions\Auth\InvalidOtpException;
 use App\Exceptions\Auth\TooManyOtpRequestsException;
 use App\Exceptions\Auth\UserBlockedException;
-use App\Helpers\ActivityLogger;
-use App\Models\Activity;
-use App\Models\LoginHistory;
-use App\Models\NurseProfile;
 use App\Models\OtpVerification;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 
 class AuthService
 {
     private const OTP_COOLDOWN_SECONDS = 60;
-
     private const OTP_EXPIRY_MINUTES = 10;
-
     private const OTP_MAX_ATTEMPTS = 3;
 
     public function sendOtp(string $phone)
@@ -39,217 +32,121 @@ class AuthService
         OtpVerification::clearPhoneOtps($phone);
 
         $otp = (string) random_int(100000, 999999);
-
         $expiryTime = now()->addMinutes(self::OTP_EXPIRY_MINUTES);
 
-        //store otp in database
+        // store otp in database (plain text)
         OtpVerification::create([
             'phone' => $phone,
-            'otp' => bcrypt($otp),
+            'otp' => $otp,
             'expires_at' => $expiryTime,
             'status' => OtpVerification::STATUS_ACTIVE,
         ]);
 
         $isRegistered = User::where('phone', $phone)->exists();
 
-        // Dispatch SMS
-        $smsService = app(\App\Contracts\SmsServiceInterface::class);
-        $message = "Welcome to VcanCares! Your OTP for verification is {$otp}. Do not share this with anyone.";
-        $smsService->send($phone, $message);
-
+        // TODO: Dispatch actual SMS via gateway here in production
+        // $message = "Welcome to VVyaparMitra! Your OTP for verification is {$otp}. Do not share this with anyone.";
+        
         return [
             'otp' => $otp,
             'is_registered' => $isRegistered,
         ];
     }
 
-    public function verifyOtp(
-        array $data,
-        string $ip,
-        string $userAgent
-    ) {
-
-        $otpRecord = OtpVerification::getValidOtp(
-            $data['phone']
-        );
+    public function verifyOtp(array $data, string $ip, string $userAgent)
+    {
+        $otpRecord = OtpVerification::getValidOtp($data['phone']);
 
         if (!$otpRecord) {
-
-            throw new InvalidOtpException(
-                'OTP expired or invalid.'
-            );
+            throw new InvalidOtpException('OTP expired or invalid.');
         }
 
-        if (
-            $otpRecord->attempts >=
-            self::OTP_MAX_ATTEMPTS
-        ) {
-
+        if ($otpRecord->attempts >= self::OTP_MAX_ATTEMPTS) {
             $otpRecord->deactivate();
-
-            throw new InvalidOtpException(
-                'Too many invalid attempts.'
-            );
+            throw new InvalidOtpException('Too many invalid attempts.');
         }
 
-        $isValidOtp = Hash::check(
-            $data['otp'],
-            $otpRecord->otp
-        );
+        $isValidOtp = ($data['otp'] === $otpRecord->otp);
 
         if (!$isValidOtp) {
-
             $otpRecord->incrementOtpAttempts();
-
-            throw new InvalidOtpException(
-                'Invalid OTP.'
-            );
+            throw new InvalidOtpException('Invalid OTP.');
         }
 
         $otpRecord->markAsUsed();
 
-        $user = User::where(
-            'phone',
-            $data['phone']
-        )->first();
-
+        $user = User::where('phone', $data['phone'])->first();
         $isNewUser = false;
+
         if (!$user) {
             $isNewUser = true;
 
-            $user = DB::transaction(
-                function () use ($data) {
-
-                    $user = User::create([
-
-                        'name' =>
-                            $data['name'],
-
-                        'phone' =>
-                            $data['phone'],
-
-                        'role' =>
-                            $data['role'],
-
-                        'status' =>
-                            User::STATUS_ACTIVE,
-
-                        'phone_verified_at' =>
-                            now(),
-
-                        'fcm_token' =>
-                            $data['fcm_token'] ?? null,
-                    ]);
-
-                    // Nurse Profile
-    
-                    if (
-                        $user->role ===
-                        User::ROLE_NURSE
-                    ) {
-
-                        NurseProfile::create([
-
-                            'user_id' =>
-                                $user->id,
-
-                            'status' =>
-                                NurseProfile::STATUS_PENDING,
-
-                            'onboarding_step' =>
-                                NurseProfile::STEP_BASIC_PROFILE,
-                        ]);
-                    }
-
-                    return $user;
-                }
-            );
+            $user = DB::transaction(function () use ($data) {
+                return User::create([
+                    'name' => $data['name'],
+                    'phone' => $data['phone'],
+                    'role' => User::ROLE_USER, // default role for new registrations
+                    'status' => User::STATUS_ACTIVE,
+                    'phone_verified_at' => now(),
+                    'created_by' => User::CREATED_BY_SELF,
+                    'latitude' => $data['latitude'] ?? null,
+                    'longitude' => $data['longitude'] ?? null,
+                ]);
+            });
         }
 
-        if (isset($isNewUser) && $isNewUser) {
-            ActivityLogger::log(
-                Activity::ACTION_REGISTER,
-                'User registered successfully.',
-                $user
-            );
-        }
-
-        if (
-            $user->status ===
-            User::STATUS_BLOCKED
-        ) {
-
+        if ($user->status === User::STATUS_BLOCKED) {
             throw new UserBlockedException(
-                $user->blocked_reason
-                ?? 'Your account has been blocked.'
+                $user->blocked_reason ?? 'Your account has been blocked.'
             );
         }
-
-        $user->tokens()->delete();
 
         $user->update([
-
             'last_login_at' => now(),
-
             'phone_verified_at' => now(),
-
-            'fcm_token' =>
-                $data['fcm_token']
-                ?? $user->fcm_token,
+            'location_updated_at' => (isset($data['latitude']) && isset($data['longitude'])) ? now() : $user->location_updated_at,
+            'latitude' => $data['latitude'] ?? $user->latitude,
+            'longitude' => $data['longitude'] ?? $user->longitude,
         ]);
 
-        $this->saveLoginHistory(
-            user: $user,
-            ip: $ip,
-            userAgent: $userAgent
-        );
-
-        $token = $this->generateToken(
-            $user
-        );
-
-        ActivityLogger::log(
-            Activity::ACTION_LOGIN,
-            'User logged in via API.',
-            $user,
-            ['ip' => $ip, 'user_agent' => $userAgent]
-        );
+        $token = $this->generateDeviceToken($user, $data, $ip, $userAgent);
 
         return [
-
             'token' => $token,
             'user' => $user,
+            'is_new_user' => $isNewUser,
         ];
     }
 
     public function logout(User $user)
     {
-        ActivityLogger::log(
-            Activity::ACTION_LOGOUT,
-            'User logged out.',
-            $user
-        );
+        // Delete ONLY current device token
         $user->currentAccessToken()?->delete();
     }
 
     public function logoutAllDevices(User $user)
     {
+        // Delete ALL tokens
         $user->tokens()->delete();
     }
 
-    private function generateToken(User $user)
+    private function generateDeviceToken(User $user, array $data, string $ip, string $userAgent)
     {
-        return $user->createToken('auth-token')->plainTextToken;
-    }
+        // Create token
+        $tokenResult = $user->createToken('auth-token');
+        
+        // Update the token with device info
+        $accessToken = $tokenResult->accessToken;
+        $accessToken->device_id = $data['device_id'] ?? null;
+        $accessToken->device_name = $data['device_name'] ?? null;
+        $accessToken->device_type = $data['device_type'] ?? null;
+        $accessToken->fcm_token = $data['fcm_token'] ?? null;
+        $accessToken->latitude = $data['latitude'] ?? null;
+        $accessToken->longitude = $data['longitude'] ?? null;
+        $accessToken->ip_address = $ip;
+        $accessToken->user_agent = $userAgent;
+        $accessToken->save();
 
-    private function saveLoginHistory(User $user, string $ip, string $userAgent)
-    {
-        LoginHistory::create([
-            'user_id' => $user->id,
-            'ip_address' => $ip,
-            'user_agent' => $userAgent,
-            'logged_in_at' => now(),
-            'status' => LoginHistory::STATUS_ACTIVE,
-        ]);
+        return $tokenResult->plainTextToken;
     }
 }

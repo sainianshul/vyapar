@@ -12,8 +12,7 @@ class CommentController extends Controller
     {
         $validated = $request->validate([
             'commentable_type' => 'required|string|in:' . implode(',', [
-                Comment::TYPE_USER, Comment::TYPE_NURSE, Comment::TYPE_PATIENT, 
-                Comment::TYPE_CARE_TYPE, Comment::TYPE_LOGIN_HISTORY, Comment::TYPE_LOGS, Comment::TYPE_REQUEST_BID, Comment::TYPE_CARE_REQUEST, Comment::TYPE_BOOKING
+                Comment::TYPE_USER,
             ]),
             'commentable_id' => 'required|integer',
             'body' => 'required|string|max:2000',
@@ -32,9 +31,6 @@ class CommentController extends Controller
 
     public function destroy(Request $request, Comment $comment)
     {
-        // Optional: authorize user is the creator or an admin
-        // if ($comment->created_by !== auth()->id()) { abort(403); }
-
         $comment->delete();
 
         if ($request->ajax()) {

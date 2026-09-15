@@ -7,14 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class Comment extends Model
 {
     public const TYPE_USER = 'user';
-    public const TYPE_NURSE = 'nurse';
-    public const TYPE_PATIENT = 'patient';
-    public const TYPE_CARE_TYPE = 'care_type';
-    public const TYPE_LOGIN_HISTORY = 'login_history';
-    public const TYPE_LOGS = 'logs';
-    public const TYPE_REQUEST_BID = 'request_bid';
-    public const TYPE_CARE_REQUEST = 'care_request';
-    public const TYPE_BOOKING = 'booking';
 
     protected $fillable = [
         'commentable_type',

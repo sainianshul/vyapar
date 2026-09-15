@@ -13,7 +13,6 @@ class OtpVerification extends Model
     protected $fillable = [
         'phone',
         'otp',
-        'purpose',
         'attempts',
         'is_used',
         'expires_at',
@@ -27,19 +26,6 @@ class OtpVerification extends Model
         'expires_at' => 'datetime',
     ];
 
-    public static function getStatusList()
-    {
-        return [
-            self::STATUS_INACTIVE => 'Inactive',
-            self::STATUS_ACTIVE => 'Active',
-        ];
-    }
-
-    public function getStatusTextAttribute()
-    {
-        return self::getStatusList()[$this->status] ?? 'Unknown';
-    }
-
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('status', self::STATUS_ACTIVE);
@@ -52,8 +38,7 @@ class OtpVerification extends Model
 
     public static function clearPhoneOtps(string $phone)
     {
-        self::where('phone', $phone)
-            ->delete();
+        self::where('phone', $phone)->delete();
     }
 
     public static function getValidOtp(string $phone)
@@ -85,13 +70,4 @@ class OtpVerification extends Model
             'status' => self::STATUS_INACTIVE,
         ]);
     }
-
-    public static function findByPhone(
-        string $phone
-    ) {
-
-        return self::where('phone', $phone)
-            ->first();
-    }
-
 }

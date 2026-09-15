@@ -16,42 +16,49 @@ class VerifyOtpRequest extends FormRequest
 
     public function rules(): array
     {
-        $userExists = User::where(
-            'phone',
-            $this->phone
-        )->exists();
+        $userExists = User::where('phone', $this->phone)->exists();
 
         return [
             'phone' => [
                 'required',
                 new IndianPhoneNumber,
             ],
-
             'otp' => [
                 'required',
                 'digits:6',
             ],
-
             'name' => [
                 Rule::requiredIf(!$userExists),
                 'nullable',
                 'string',
                 'max:100',
             ],
-
-            'role' => [
-                Rule::requiredIf(!$userExists),
-                'nullable',
-                'integer',
-                Rule::in([
-                    User::ROLE_USER,
-                    User::ROLE_NURSE,
-                ]),
-            ],
-
-            'fcm_token' => [
+            'device_id' => [
                 'required',
                 'string',
+                'max:100',
+            ],
+            'device_name' => [
+                'nullable',
+                'string',
+                'max:100',
+            ],
+            'device_type' => [
+                'nullable',
+                'integer',
+                Rule::in([1, 2, 3]), // 1=ANDROID, 2=IOS, 3=WEB
+            ],
+            'fcm_token' => [
+                'nullable',
+                'string',
+            ],
+            'latitude' => [
+                'nullable',
+                'numeric',
+            ],
+            'longitude' => [
+                'nullable',
+                'numeric',
             ],
         ];
     }
@@ -60,18 +67,11 @@ class VerifyOtpRequest extends FormRequest
     {
         return [
             'phone.required' => 'Phone number is required.',
-
-            'phone.regex' => 'Enter a valid Indian mobile number.',
-
             'otp.required' => 'OTP is required.',
-
             'otp.digits' => 'OTP must be 6 digits.',
-
             'name.required' => 'Name is required for new users.',
-
-            'role.required' => 'Role is required for new users.',
-
-            'role.in' => 'Invalid role selected.',
+            'device_id.required' => 'Device ID is required.',
+            'device_type.in' => 'Device type must be 1 (Android), 2 (iOS), or 3 (Web).',
         ];
     }
 
@@ -82,25 +82,37 @@ class VerifyOtpRequest extends FormRequest
                 'description' => 'Valid Indian mobile number.',
                 'example' => '9876543210',
             ],
-
             'otp' => [
                 'description' => '6 digit OTP.',
                 'example' => '123456',
             ],
-
             'name' => [
                 'description' => 'Required only for new users.',
-                'example' => 'Anshul',
+                'example' => 'John Doe',
             ],
-
-            'role' => [
-                'description' => 'Required only for new users. 1 = User, 2 = Nurse',
+            'device_id' => [
+                'description' => 'Unique device identifier.',
+                'example' => 'abc-123-def',
+            ],
+            'device_name' => [
+                'description' => 'Name of the device.',
+                'example' => 'Samsung Galaxy S24',
+            ],
+            'device_type' => [
+                'description' => '1 = ANDROID, 2 = IOS, 3 = WEB',
                 'example' => 1,
             ],
-
             'fcm_token' => [
-                'description' => 'Firebase Cloud Messaging token.',
+                'description' => 'Firebase Cloud Messaging token for push notifications.',
                 'example' => 'fcm_xxxxxxxxx',
+            ],
+            'latitude' => [
+                'description' => 'Current latitude of the user.',
+                'example' => '28.7041',
+            ],
+            'longitude' => [
+                'description' => 'Current longitude of the user.',
+                'example' => '77.1025',
             ],
         ];
     }

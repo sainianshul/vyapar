@@ -1,7 +1,5 @@
 <?php
 
-use App\Enums\UserRole;
-use App\Enums\UserStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,55 +10,34 @@ return new class extends Migration {
      */
     public function up(): void
     {
-
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-
-            $table->string('name');
-
-            $table->string('phone', 15)
-                ->nullable()
-                ->unique();
-
-            $table->string('email')
-                ->nullable()
-                ->unique();
-
+            $table->string('name')->nullable();
+            $table->string('phone', 15)->unique();
+            $table->string('email')->nullable()->unique();
             $table->string('password')->nullable();
-
-            $table->unsignedTinyInteger('role')->default(0);
-
+            $table->string('pincode', 10)->nullable()->index();
+            $table->string('city', 100)->nullable();
+            $table->decimal('latitude', 10, 7)->nullable();
+            $table->decimal('longitude', 10, 7)->nullable();
             $table->string('profile_photo')->nullable();
-
+            
+            // Roles: 1=Admin, 2=Manager, 3=User
+            $table->unsignedTinyInteger('role')->default(3)->index();
+            
+            // Status: 1=Active, 2=Blocked, 3=Suspended
+            $table->unsignedTinyInteger('status')->default(1)->index();
             $table->text('blocked_reason')->nullable();
-
-            $table->text('fcm_token')->nullable();
-
+            
             $table->timestamp('phone_verified_at')->nullable();
-
-            $table->timestamp('email_verified_at')->nullable();
-
-            $table->timestamp('last_login_at')->nullable();
-
-            $table->rememberToken();
-
+            $table->timestamp('location_updated_at')->nullable();
+            $table->timestamp('last_login_at')->nullable()->index();
+            
             $table->timestamps();
-
             $table->softDeletes();
-
-            $table->index('role');
-
-            $table->unsignedTinyInteger('status')->default(1);
-
-            $table->index(['role', 'status']);
-
-            $table->index('last_login_at');
-        });
-
-        Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
+            
+            // 0 = Self registered, otherwise ID of the user (admin/manager) who created this user
+            $table->unsignedBigInteger('created_by')->default(0)->index();
         });
 
         Schema::create('sessions', function (Blueprint $table) {
@@ -79,7 +56,6 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
     }
 };
