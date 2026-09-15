@@ -39,6 +39,8 @@ Route::prefix('admin')->group(function () {
         // Comments (Admin Notes)
         Route::post('comments', [\App\Http\Controllers\Admin\CommentController::class, 'store'])->name('comments.store');
         Route::delete('comments/{comment}', [\App\Http\Controllers\Admin\CommentController::class, 'destroy'])->name('comments.destroy');
+        // Categories CRUD
+        Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
 
         // Add future routes here for Nurses, Patients, Error Logs, etc.
     });
