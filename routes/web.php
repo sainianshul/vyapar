@@ -6,12 +6,13 @@ Route::get('/', function () {
     return redirect()->route('admin.dashboard');
 });
 
-Route::prefix('admin')->name('admin.')->group(function () {
-
-    // Auth Routes
+Route::prefix('admin')->group(function () {
+    // Auth Routes (Named login instead of admin.login)
     Route::get('login', [\App\Http\Controllers\Admin\AuthController::class, 'showLogin'])->name('login');
     Route::post('login', [\App\Http\Controllers\Admin\AuthController::class, 'login'])->name('login.post');
     Route::post('logout', [\App\Http\Controllers\Admin\AuthController::class, 'logout'])->name('logout');
+
+    Route::name('admin.')->group(function () {
 
     Route::middleware(['auth'])->group(function () {
         Route::get('/', function () {
@@ -40,5 +41,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::delete('comments/{comment}', [\App\Http\Controllers\Admin\CommentController::class, 'destroy'])->name('comments.destroy');
 
         // Add future routes here for Nurses, Patients, Error Logs, etc.
+    });
     });
 });
