@@ -25,7 +25,7 @@
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     <a href="#" class="dropdown-item">Profile</a>
                     <div class="dropdown-divider"></div>
-                    <form method="POST" action="{{ route('admin.logout') }}">
+                    <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="dropdown-item">Logout</button>
                     </form>

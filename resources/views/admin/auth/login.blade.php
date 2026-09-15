@@ -35,7 +35,7 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('admin.login.post') }}" autocomplete="off" novalidate>
+                    <form method="POST" action="{{ route('login.post') }}" autocomplete="off" novalidate>
                         @csrf
 
                         <div class="mb-3">
