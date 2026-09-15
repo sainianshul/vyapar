@@ -21,12 +21,11 @@ class UserDataTable extends DataTable
                 });
             })
             ->editColumn('name', function (User $user) {
-                $strikeClass = $user->trashed() ? 'text-decoration-line-through text-muted' : 'fw-semibold';
                 return '
                     <div class="d-flex align-items-center">
                         <span class="avatar avatar-sm me-2">' . $user->avatar_html . '</span>
                         <div>
-                            <div class="' . $strikeClass . '">' . e($user->name ?? 'Unknown') . '</div>
+                            <div class="fw-semibold">' . e($user->name ?? 'Unknown') . '</div>
                         </div>
                     </div>
                 ';
