@@ -39,13 +39,9 @@
                         <td class="text-secondary">{{ $category->id }}</td>
                         <td>
                             <div class="d-flex align-items-center gap-2">
-                                @if($category->icon)
-                                    <img src="{{ Storage::url($category->icon) }}" alt="" class="rounded" width="32" height="32" style="object-fit:cover;">
-                                @else
-                                    <span class="avatar avatar-sm rounded bg-primary-lt">
-                                        <i class="ti ti-category"></i>
-                                    </span>
-                                @endif
+                                <span class="avatar avatar-sm rounded bg-primary-lt">
+                                    <i class="ti ti-category"></i>
+                                </span>
                                 <div>
                                     <div class="fw-semibold">
                                         @if($category->level > 0)

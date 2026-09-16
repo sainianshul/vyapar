@@ -29,14 +29,10 @@ class CategoryController extends Controller
 
     public function store(StoreCategoryRequest $request)
     {
-        $data = $request->safe()->except(['icon', 'image']);
+        $data = $request->safe()->except(['image']);
         $data['is_active'] = $request->boolean('is_active');
         $data['sort_order'] = $data['sort_order'] ?? 0;
 
-        // Handle icon upload
-        if ($request->hasFile('icon')) {
-            $data['icon'] = $request->file('icon')->store('categories/icons', 'public');
-        }
 
         // Handle image upload
         if ($request->hasFile('image')) {
@@ -57,22 +53,9 @@ class CategoryController extends Controller
 
     public function update(UpdateCategoryRequest $request, Category $category)
     {
-        $data = $request->safe()->except(['icon', 'image', 'remove_icon', 'remove_image']);
+        $data = $request->safe()->except(['image', 'remove_image']);
         $data['is_active'] = $request->boolean('is_active');
 
-        // Handle icon removal
-        if ($request->boolean('remove_icon') && $category->icon) {
-            Storage::disk('public')->delete($category->icon);
-            $data['icon'] = null;
-        }
-
-        // Handle icon upload (new file replaces old)
-        if ($request->hasFile('icon')) {
-            if ($category->icon) {
-                Storage::disk('public')->delete($category->icon);
-            }
-            $data['icon'] = $request->file('icon')->store('categories/icons', 'public');
-        }
 
         // Handle image removal
         if ($request->boolean('remove_image') && $category->image) {
@@ -111,9 +94,7 @@ class CategoryController extends Controller
         }
 
         // Delete uploaded files
-        if ($category->icon) {
-            Storage::disk('public')->delete($category->icon);
-        }
+
         if ($category->image) {
             Storage::disk('public')->delete($category->image);
         }

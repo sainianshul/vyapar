@@ -25,11 +25,9 @@ class UpdateCategoryRequest extends FormRequest
                 Rule::notIn([$categoryId]),
             ],
             'description' => ['nullable', 'string', 'max:1000'],
-            'icon'        => ['nullable', 'image', 'mimes:png,jpg,jpeg,svg,webp', 'max:512'],
             'image'       => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:2048'],
             'sort_order'  => ['nullable', 'integer', 'min:0'],
             'is_active'   => ['nullable'],
-            'remove_icon'  => ['nullable', 'boolean'],
             'remove_image' => ['nullable', 'boolean'],
         ];
     }
