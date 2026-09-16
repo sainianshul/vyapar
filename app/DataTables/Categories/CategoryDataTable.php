@@ -16,16 +16,11 @@ class CategoryDataTable extends DataTable
                       ->orWhere('slug', 'like', "%{$keyword}%");
             })
             ->editColumn('name', function (Category $category) {
-                $prefix = $category->level > 0 ? str_repeat('— ', $category->level) : '';
                 return '
                     <div class="d-flex align-items-center">
                         <span class="avatar avatar-sm me-2">' . $category->icon_html . '</span>
-                        <div>
-                            <div class="fw-semibold">
-                                <span class="text-muted">' . e($prefix) . '</span>
-                                ' . e($category->name) . '
-                            </div>
-                            <div class="text-secondary small">' . e($category->slug) . '</div>
+                        <div class="fw-semibold">
+                            ' . e($category->name) . '
                         </div>
                     </div>
                 ';
