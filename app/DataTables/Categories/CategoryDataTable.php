@@ -32,20 +32,28 @@ class CategoryDataTable extends DataTable
             })
             ->addColumn('parent', function (Category $category) {
                 if ($category->parent) {
-                    return '<span class="badge bg-blue-lt">' . e($category->parent->name) . '</span>';
+                    return e($category->parent->name);
                 }
                 return '<span class="text-muted">—</span>';
             })
             ->editColumn('sort_order', function (Category $category) {
                 return '<span class="text-secondary">' . $category->sort_order . '</span>';
             })
-            ->editColumn('product_count', function (Category $category) {
-                return '<span class="text-secondary">' . $category->product_count . '</span>';
+            ->addColumn('is_featured', function (Category $category) {
+                $color = $category->is_featured ? 'yellow' : 'secondary';
+                $text = $category->is_featured ? 'Yes' : 'No';
+                $icon = $category->is_featured ? 'ti ti-star-filled' : 'ti ti-star';
+                return '
+                    <a href="javascript:void(0)" class="badge badge-outline text-' . $color . ' featured-modal-btn text-decoration-none" data-id="' . $category->id . '" data-featured="' . $category->is_featured . '">
+                        <i class="' . $icon . ' me-1"></i>' . $text . '
+                    </a>
+                ';
             })
+
             ->addColumn('status', function (Category $category) {
                 $color = $category->status_color;
                 return '
-                    <a href="javascript:void(0)" class="badge bg-' . $color . '-lt status-modal-btn text-decoration-none" data-id="' . $category->id . '" data-status="' . $category->is_active . '">
+                    <a href="javascript:void(0)" class="badge badge-outline text-' . $color . ' status-modal-btn text-decoration-none" data-id="' . $category->id . '" data-status="' . $category->is_active . '">
                         <i class="' . $category->status_icon . ' me-1"></i>' . e($category->status_name) . '
                     </a>
                 ';
@@ -74,7 +82,7 @@ class CategoryDataTable extends DataTable
                 'name',
                 'parent',
                 'sort_order',
-                'product_count',
+                'is_featured',
                 'status',
                 'actions',
             ]);

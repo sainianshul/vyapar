@@ -31,6 +31,7 @@ class CategoryController extends Controller
     {
         $data = $request->safe()->except(['image']);
         $data['is_active'] = $request->boolean('is_active');
+        $data['is_featured'] = $request->boolean('is_featured');
         $data['sort_order'] = $data['sort_order'] ?? 0;
 
 
@@ -55,6 +56,7 @@ class CategoryController extends Controller
     {
         $data = $request->safe()->except(['image', 'remove_image']);
         $data['is_active'] = $request->boolean('is_active');
+        $data['is_featured'] = $request->boolean('is_featured');
 
 
         // Handle image removal
@@ -93,12 +95,6 @@ class CategoryController extends Controller
             ], 422);
         }
 
-        // Delete uploaded files
-
-        if ($category->image) {
-            Storage::disk('public')->delete($category->image);
-        }
-
         $category->delete();
 
         return response()->json([
@@ -118,6 +114,20 @@ class CategoryController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Status updated successfully.'
+        ]);
+    }
+
+    public function updateFeatured(Request $request, Category $category)
+    {
+        $request->validate([
+            'is_featured' => 'required|boolean',
+        ]);
+
+        $category->update(['is_featured' => $request->is_featured]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Featured status updated successfully.'
         ]);
     }
 

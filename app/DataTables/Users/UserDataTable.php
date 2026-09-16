@@ -39,7 +39,7 @@ class UserDataTable extends DataTable
             ->addColumn('status', function (User $user) {
                 $color = $user->status_color;
                 return '
-                    <a href="javascript:void(0)" class="badge bg-' . $color . '-lt status-modal-btn text-decoration-none" data-id="' . $user->id . '" data-status="' . $user->status . '">
+                    <a href="javascript:void(0)" class="badge badge-outline text-' . $color . ' status-modal-btn text-decoration-none" data-id="' . $user->id . '" data-status="' . $user->status . '">
                         <i class="' . $user->status_icon . ' me-1"></i>' . e($user->status_name) . '
                     </a>
                 ';

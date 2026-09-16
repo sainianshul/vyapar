@@ -28,6 +28,7 @@ class UpdateCategoryRequest extends FormRequest
             'image'       => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:2048'],
             'sort_order'  => ['nullable', 'integer', 'min:0'],
             'is_active'   => ['nullable'],
+            'is_featured' => ['nullable'],
             'remove_image' => ['nullable', 'boolean'],
         ];
     }

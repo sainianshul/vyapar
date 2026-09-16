@@ -73,7 +73,7 @@
                             <th>Category Info</th>
                             <th>Parent Category</th>
                             <th>Sort Order</th>
-                            <th>Products</th>
+                            <th>Featured</th>
                             <th>Status</th>
                             <th class="text-end">Actions</th>
                         </tr>
@@ -120,6 +120,34 @@
         </div>
     </div>
 
+    {{-- Featured Update Modal --}}
+    <div class="modal modal-blur fade" id="featured-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <form id="featured-modal-form">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Change Featured Status</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="featured-modal-id">
+                        <div class="mb-3">
+                            <label class="form-label">Is Featured?</label>
+                            <select id="featured-modal-select" class="form-select">
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link link-secondary me-auto" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @push('datatables_css')
@@ -148,7 +176,7 @@
                     { data: 'name', name: 'name' },
                     { data: 'parent', name: 'parent', orderable: false, searchable: false },
                     { data: 'sort_order', name: 'sort_order' },
-                    { data: 'product_count', name: 'product_count' },
+                    { data: 'is_featured', name: 'is_featured' },
                     { data: 'status', name: 'status' },
                     { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-end' },
                 ],
@@ -253,6 +281,45 @@
                     data: { status: status, _token: '{{ csrf_token() }}' },
                     success: function (res) {
                         $('#status-modal').modal('hide');
+                        table.ajax.reload(null, false);
+                        Swal.fire({ toast: true, position: 'top', showConfirmButton: false, timer: 1500, icon: 'success', title: res.message });
+                    },
+                    error: function () {
+                        Swal.fire({ toast: true, position: 'top', showConfirmButton: false, timer: 1500, icon: 'error', title: 'Failed to update' });
+                    },
+                    complete: function () {
+                        submitBtn.html(originalText).prop('disabled', false);
+                    }
+                });
+            });
+
+            // Open Featured Modal
+            $(document).on('click', '.featured-modal-btn', function (e) {
+                e.preventDefault();
+                let id = $(this).data('id');
+                let isFeatured = $(this).data('featured');
+                
+                $('#featured-modal-id').val(id);
+                $('#featured-modal-select').val(isFeatured);
+                $('#featured-modal').modal('show');
+            });
+
+            // Submit Featured Modal
+            $('#featured-modal-form').on('submit', function (e) {
+                e.preventDefault();
+                let id = $('#featured-modal-id').val();
+                let featured = $('#featured-modal-select').val();
+                let submitBtn = $(this).find('button[type="submit"]');
+                let originalText = submitBtn.html();
+                
+                submitBtn.html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Saving...').prop('disabled', true);
+
+                $.ajax({
+                    url: '/admin/categories/' + id + '/featured',
+                    type: 'POST',
+                    data: { is_featured: featured, _token: '{{ csrf_token() }}' },
+                    success: function (res) {
+                        $('#featured-modal').modal('hide');
                         table.ajax.reload(null, false);
                         Swal.fire({ toast: true, position: 'top', showConfirmButton: false, timer: 1500, icon: 'success', title: res.message });
                     },

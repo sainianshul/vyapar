@@ -3,17 +3,21 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
 class Category extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'parent_id', 'name', 'slug', 'icon', 'image',
-        'description', 'sort_order', 'is_active', 'level',
+        'description', 'sort_order', 'is_active', 'is_featured', 'level',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'is_featured' => 'boolean',
         'sort_order' => 'integer',
         'level' => 'integer',
         'product_count' => 'integer',
@@ -133,11 +137,26 @@ class Category extends Model
             return '<span class="avatar" style="background-image: url(' . e($url) . ')"></span>';
         }
 
-        $initial = mb_strtoupper(mb_substr($this->name ?? 'C', 0, 1));
-        $colors = ['blue', 'green', 'cyan', 'yellow', 'red', 'purple', 'orange'];
-        $index = abs(crc32($this->name ?? 'C')) % count($colors);
-        $colorClass = $colors[$index];
+        // Default image (Tabler icon for missing photo)
+        return '<span class="avatar bg-light text-muted"><i class="ti ti-photo"></i></span>';
+    }
 
-        return '<span class="avatar bg-' . $colorClass . '-lt fw-bold">' . e($initial) . '</span>';
+    public function toApiResponse(): array
+    {
+        return [
+            'id'          => $this->id,
+            'name'        => $this->name,
+            'slug'        => $this->slug,
+            'image'       => $this->image ? asset('storage/' . $this->image) : null,
+            'icon'        => $this->icon,
+            'description' => $this->description,
+            'parent_id'   => $this->parent_id,
+            'level'       => $this->level,
+            'sort_order'  => $this->sort_order,
+            'is_featured' => $this->is_featured,
+            'children'    => $this->relationLoaded('children') 
+                                ? $this->children->map(fn($child) => $child->toApiResponse()) 
+                                : [],
+        ];
     }
 }

@@ -72,6 +72,17 @@
                     </div>
 
                     <div class="col-md-6">
+                        <label class="form-label required">Featured</label>
+                        <select name="is_featured" class="form-select @error('is_featured') is-invalid @enderror" required>
+                            <option value="0" {{ old('is_featured', $category->is_featured) == '0' ? 'selected' : '' }}>No</option>
+                            <option value="1" {{ old('is_featured', $category->is_featured) == '1' ? 'selected' : '' }}>Yes</option>
+                        </select>
+                        @error('is_featured')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6">
                         <label class="form-label">Sort Order</label>
                         <input type="number" name="sort_order" class="form-control @error('sort_order') is-invalid @enderror" value="{{ old('sort_order', $category->sort_order) }}" min="0">
                         @error('sort_order')
