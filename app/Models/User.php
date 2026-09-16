@@ -21,9 +21,6 @@ class User extends Authenticatable
     const STATUS_BLOCKED = 2;
     const STATUS_SUSPENDED = 3;
 
-    const CREATED_BY_SELF = 0;
-    const CREATED_BY_ADMIN = 1;
-    const CREATED_BY_MANAGER = 2;
 
     protected $fillable = [
         'profile_completed_at',
@@ -119,8 +116,8 @@ class User extends Authenticatable
     public function getAvatarHtmlAttribute(): string
     {
         if (!empty($this->profile_photo)) {
-            $url = filter_var($this->profile_photo, FILTER_VALIDATE_URL) 
-                ? $this->profile_photo 
+            $url = filter_var($this->profile_photo, FILTER_VALIDATE_URL)
+                ? $this->profile_photo
                 : asset('storage/' . $this->profile_photo);
             return '<span class="avatar" style="background-image: url(' . e($url) . ')"></span>';
         }
