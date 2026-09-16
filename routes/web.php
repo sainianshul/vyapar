@@ -40,7 +40,8 @@ Route::prefix('admin')->group(function () {
         Route::post('comments', [\App\Http\Controllers\Admin\CommentController::class, 'store'])->name('comments.store');
         Route::delete('comments/{comment}', [\App\Http\Controllers\Admin\CommentController::class, 'destroy'])->name('comments.destroy');
         // Categories CRUD
-        Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
+        Route::post('categories/{category}/toggle-status', [\App\Http\Controllers\Admin\CategoryController::class, 'toggleStatus'])->name('categories.toggle-status');
+        Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class)->except(['show']);
 
         // Add future routes here for Nurses, Patients, Error Logs, etc.
     });

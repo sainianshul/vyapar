@@ -3,108 +3,171 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Category\StoreCategoryRequest;
+use App\Http\Requests\Admin\Category\UpdateCategoryRequest;
 use App\Models\Category;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
 {
     public function index()
     {
-        // Get all categories with their parent
-        $categories = Category::with('parent')->orderBy('sort_order')->latest()->paginate(20);
+        $categories = Category::with('parent', 'children')
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->paginate(25);
+
         return view('admin.categories.index', compact('categories'));
     }
 
     public function create()
     {
-        $categories = Category::whereNull('parent_id')->orWhere('level', '<', 2)->get();
-        return view('admin.categories.create', compact('categories'));
+        $parentCategories = $this->getParentOptions();
+        return view('admin.categories.create', compact('parentCategories'));
     }
 
-    public function store(Request $request)
+    public function store(StoreCategoryRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:150',
-            'parent_id' => 'nullable|exists:categories,id',
-            'description' => 'nullable|string',
-            'sort_order' => 'nullable|integer',
-            'is_active' => 'nullable|boolean',
-        ]);
+        $data = $request->safe()->except(['icon', 'image']);
+        $data['is_active'] = $request->boolean('is_active');
+        $data['sort_order'] = $data['sort_order'] ?? 0;
 
-        $data = $request->all();
-        $data['is_active'] = $request->has('is_active');
-        $data['slug'] = Str::slug($request->name);
+        // Handle icon upload
+        if ($request->hasFile('icon')) {
+            $data['icon'] = $request->file('icon')->store('categories/icons', 'public');
+        }
 
-        // determine level
-        if ($request->parent_id) {
-            $parent = Category::find($request->parent_id);
-            $data['level'] = $parent->level + 1;
-        } else {
-            $data['level'] = 0;
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('categories/images', 'public');
         }
 
         Category::create($data);
 
-        return redirect()->route('admin.categories.index')->with('success', 'Category created successfully.');
-    }
-
-    public function show(Category $category)
-    {
-        return view('admin.categories.show', compact('category'));
+        return redirect()->route('admin.categories.index')
+            ->with('success', 'Category created successfully.');
     }
 
     public function edit(Category $category)
     {
-        $categories = Category::where('id', '!=', $category->id)
-            ->where(function ($q) {
-                $q->whereNull('parent_id')->orWhere('level', '<', 2);
-            })->get();
-
-        return view('admin.categories.edit', compact('category', 'categories'));
+        $parentCategories = $this->getParentOptions($category->id);
+        return view('admin.categories.edit', compact('category', 'parentCategories'));
     }
 
-    public function update(Request $request, Category $category)
+    public function update(UpdateCategoryRequest $request, Category $category)
     {
-        $request->validate([
-            'name' => 'required|string|max:150',
-            'parent_id' => 'nullable|exists:categories,id|not_in:' . $category->id,
-            'description' => 'nullable|string',
-            'sort_order' => 'nullable|integer',
-            'is_active' => 'nullable|boolean',
-        ]);
+        $data = $request->safe()->except(['icon', 'image', 'remove_icon', 'remove_image']);
+        $data['is_active'] = $request->boolean('is_active');
 
-        $data = $request->all();
-        $data['is_active'] = $request->has('is_active');
-        if ($request->name !== $category->name) {
-            $data['slug'] = Str::slug($request->name);
+        // Handle icon removal
+        if ($request->boolean('remove_icon') && $category->icon) {
+            Storage::disk('public')->delete($category->icon);
+            $data['icon'] = null;
         }
 
-        // determine level
-        if ($request->parent_id) {
-            $parent = Category::find($request->parent_id);
-            $data['level'] = $parent->level + 1;
-        } else {
-            $data['level'] = 0;
+        // Handle icon upload (new file replaces old)
+        if ($request->hasFile('icon')) {
+            if ($category->icon) {
+                Storage::disk('public')->delete($category->icon);
+            }
+            $data['icon'] = $request->file('icon')->store('categories/icons', 'public');
+        }
+
+        // Handle image removal
+        if ($request->boolean('remove_image') && $category->image) {
+            Storage::disk('public')->delete($category->image);
+            $data['image'] = null;
+        }
+
+        // Handle image upload (new file replaces old)
+        if ($request->hasFile('image')) {
+            if ($category->image) {
+                Storage::disk('public')->delete($category->image);
+            }
+            $data['image'] = $request->file('image')->store('categories/images', 'public');
         }
 
         $category->update($data);
 
-        return redirect()->route('admin.categories.index')->with('success', 'Category updated successfully.');
+        return redirect()->route('admin.categories.index')
+            ->with('success', 'Category updated successfully.');
     }
 
     public function destroy(Category $category)
     {
         if ($category->children()->count() > 0) {
-            return back()->with('error', 'Cannot delete category because it has subcategories.');
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot delete: this category has subcategories. Delete them first.'
+            ], 422);
         }
 
         if ($category->product_count > 0) {
-            return back()->with('error', 'Cannot delete category because it has products.');
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot delete: this category has products linked to it.'
+            ], 422);
+        }
+
+        // Delete uploaded files
+        if ($category->icon) {
+            Storage::disk('public')->delete($category->icon);
+        }
+        if ($category->image) {
+            Storage::disk('public')->delete($category->image);
         }
 
         $category->delete();
 
-        return redirect()->route('admin.categories.index')->with('success', 'Category deleted successfully.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Category deleted successfully.'
+        ]);
+    }
+
+    public function toggleStatus(Category $category)
+    {
+        $category->update(['is_active' => !$category->is_active]);
+
+        return response()->json([
+            'success' => true,
+            'message' => ($category->is_active ? 'Activated' : 'Deactivated') . ' successfully.',
+            'is_active' => $category->is_active,
+        ]);
+    }
+
+    /**
+     * Get categories for parent dropdown with indentation.
+     * Excludes the given category (and its children) to prevent circular refs.
+     */
+    private function getParentOptions(?int $excludeId = null): array
+    {
+        $categories = Category::root()
+            ->with('children.children')
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get();
+
+        $options = [];
+        foreach ($categories as $cat) {
+            if ($cat->id === $excludeId) continue;
+            $options[] = ['id' => $cat->id, 'name' => $cat->name, 'level' => 0];
+            $this->addChildOptions($options, $cat, 1, $excludeId);
+        }
+
+        return $options;
+    }
+
+    private function addChildOptions(array &$options, Category $parent, int $depth, ?int $excludeId): void
+    {
+        foreach ($parent->children as $child) {
+            if ($child->id === $excludeId) continue;
+            $prefix = str_repeat('— ', $depth);
+            $options[] = ['id' => $child->id, 'name' => $prefix . $child->name, 'level' => $depth];
+            if ($child->children->count() > 0 && $depth < 3) {
+                $this->addChildOptions($options, $child, $depth + 1, $excludeId);
+            }
+        }
     }
 }
