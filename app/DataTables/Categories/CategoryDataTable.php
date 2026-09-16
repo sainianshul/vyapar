@@ -91,6 +91,19 @@ class CategoryDataTable extends DataTable
             $query->where('is_active', request('status'));
         }
 
+        if (request()->filled('is_featured')) {
+            $query->where('is_featured', request('is_featured'));
+        }
+
+        if (request()->filled('parent_id')) {
+            $parentId = request('parent_id');
+            if ($parentId === 'root') {
+                $query->whereNull('parent_id');
+            } else {
+                $query->where('parent_id', $parentId);
+            }
+        }
+
         // Default order by sort_order
         $query->orderBy('sort_order');
 

@@ -13,7 +13,8 @@ class CategoryController extends Controller
 {
     public function index(\App\DataTables\Categories\CategoryDataTable $dataTable)
     {
-        return $dataTable->render('admin.categories.index');
+        $rootCategories = Category::root()->orderBy('name')->get();
+        return $dataTable->render('admin.categories.index', compact('rootCategories'));
     }
 
     public function data(\App\DataTables\Categories\CategoryDataTable $dataTable)

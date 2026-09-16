@@ -42,8 +42,24 @@
                         <i class="ti ti-refresh"></i>
                     </button>
 
+                    {{-- Parent Category Filter --}}
+                    <select id="filter-parent" class="form-select" style="width: 150px;">
+                        <option value="">All Categories</option>
+                        <option value="root">Main Categories Only</option>
+                        @foreach ($rootCategories as $cat)
+                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                        @endforeach
+                    </select>
+
+                    {{-- Featured Filter --}}
+                    <select id="filter-featured" class="form-select" style="width: 140px;">
+                        <option value="">All Featured</option>
+                        <option value="1">Featured Yes</option>
+                        <option value="0">Featured No</option>
+                    </select>
+
                     {{-- Status Filter --}}
-                    <select id="filter-status" class="form-select" style="width: 150px;">
+                    <select id="filter-status" class="form-select" style="width: 140px;">
                         <option value="">All Status</option>
                         @foreach (\App\Models\Category::getStatusList() as $value => $label)
                             <option value="{{ $value }}">{{ $label }}</option>
@@ -168,6 +184,8 @@
                     url: '{{ route('admin.categories.data') }}',
                     data: function (d) {
                         d.status = $('#filter-status').val();
+                        d.parent_id = $('#filter-parent').val();
+                        d.is_featured = $('#filter-featured').val();
                     }
                 },
 
@@ -242,8 +260,8 @@
                 }, 400);
             });
 
-            // Status Filter
-            $('#filter-status').on('change', function () {
+            // Filters
+            $('#filter-status, #filter-parent, #filter-featured').on('change', function () {
                 table.ajax.reload();
             });
 
