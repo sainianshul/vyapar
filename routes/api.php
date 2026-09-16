@@ -30,5 +30,7 @@ Route::prefix('v1')->group(function () {
             Route::post('logout-all', [\App\Http\Controllers\Api\V1\Auth\AuthController::class, 'logoutAll']);
             Route::get('me', [\App\Http\Controllers\Api\V1\Auth\AuthController::class, 'me']);
         });
+
+        Route::put('profile', [\App\Http\Controllers\Api\V1\ProfileController::class, 'update']);
     });
 });

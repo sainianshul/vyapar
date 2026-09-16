@@ -16,8 +16,6 @@ class VerifyOtpRequest extends FormRequest
 
     public function rules(): array
     {
-        $userExists = User::where('phone', $this->phone)->exists();
-
         return [
             'phone' => [
                 'required',
@@ -26,12 +24,6 @@ class VerifyOtpRequest extends FormRequest
             'otp' => [
                 'required',
                 'digits:6',
-            ],
-            'name' => [
-                Rule::requiredIf(!$userExists),
-                'nullable',
-                'string',
-                'max:100',
             ],
             'device_id' => [
                 'required',
@@ -69,7 +61,6 @@ class VerifyOtpRequest extends FormRequest
             'phone.required' => 'Phone number is required.',
             'otp.required' => 'OTP is required.',
             'otp.digits' => 'OTP must be 6 digits.',
-            'name.required' => 'Name is required for new users.',
             'device_id.required' => 'Device ID is required.',
             'device_type.in' => 'Device type must be 1 (Android), 2 (iOS), or 3 (Web).',
         ];
@@ -85,10 +76,6 @@ class VerifyOtpRequest extends FormRequest
             'otp' => [
                 'description' => '6 digit OTP.',
                 'example' => '123456',
-            ],
-            'name' => [
-                'description' => 'Required only for new users.',
-                'example' => 'John Doe',
             ],
             'device_id' => [
                 'description' => 'Unique device identifier.',

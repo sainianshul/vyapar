@@ -26,6 +26,7 @@ class User extends Authenticatable
     const CREATED_BY_MANAGER = 2;
 
     protected $fillable = [
+        'is_registered',
         'name',
         'phone',
         'email',
@@ -38,7 +39,9 @@ class User extends Authenticatable
         'phone_verified_at',
         'last_login_at',
         'pincode',
+        'address',
         'city',
+        'state',
         'latitude',
         'longitude',
         'location_updated_at',
@@ -52,6 +55,7 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
+            'is_registered' => 'boolean',
             'role' => 'integer',
             'status' => 'integer',
             'created_by' => 'integer',
@@ -187,6 +191,7 @@ class User extends Authenticatable
     {
         return [
             'id' => $this->id,
+            'is_registered' => $this->is_registered,
             'name' => $this->name,
             'phone' => $this->phone,
             'email' => $this->email,
@@ -195,8 +200,10 @@ class User extends Authenticatable
             'status' => $this->status,
             'status_name' => $this->status_name,
             'profile_photo' => $this->profile_photo ? asset('storage/' . $this->profile_photo) : null,
-            'pincode' => $this->pincode,
+            'address' => $this->address,
+            'state' => $this->state,
             'city' => $this->city,
+            'pincode' => $this->pincode,
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
             'created_at' => $this->created_at,

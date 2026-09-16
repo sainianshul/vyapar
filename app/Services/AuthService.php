@@ -49,7 +49,6 @@ class AuthService
         
         return [
             'otp' => $otp,
-            'is_registered' => $isRegistered,
         ];
     }
 
@@ -76,14 +75,9 @@ class AuthService
         $otpRecord->markAsUsed();
 
         $user = User::where('phone', $data['phone'])->first();
-        $isNewUser = false;
-
         if (!$user) {
-            $isNewUser = true;
-
             $user = DB::transaction(function () use ($data) {
                 return User::create([
-                    'name' => $data['name'],
                     'phone' => $data['phone'],
                     'role' => User::ROLE_USER, // default role for new registrations
                     'status' => User::STATUS_ACTIVE,
@@ -91,6 +85,7 @@ class AuthService
                     'created_by' => User::CREATED_BY_SELF,
                     'latitude' => $data['latitude'] ?? null,
                     'longitude' => $data['longitude'] ?? null,
+                    'is_registered' => false,
                 ]);
             });
         }
@@ -114,7 +109,7 @@ class AuthService
         return [
             'token' => $token,
             'user' => $user,
-            'is_new_user' => $isNewUser,
+            'is_registered' => $user->is_registered,
         ];
     }
 

@@ -70,7 +70,6 @@ class AuthController extends Controller
                 properties: [
                     new OA\Property(property: 'phone', type: 'string', example: '9876543210'),
                     new OA\Property(property: 'otp', type: 'string', example: '123456'),
-                    new OA\Property(property: 'name', type: 'string', nullable: true, example: 'John Doe', description: 'Required for new users'),
                     new OA\Property(property: 'device_id', type: 'string', example: 'abc-123-def'),
                     new OA\Property(property: 'device_name', type: 'string', nullable: true, example: 'Samsung Galaxy S24'),
                     new OA\Property(property: 'device_type', type: 'integer', nullable: true, example: 1, description: '1=ANDROID, 2=IOS, 3=WEB'),
@@ -98,7 +97,7 @@ class AuthController extends Controller
             'Authentication successful',
             [
                 'token' => $result['token'],
-                'is_new_user' => $result['is_new_user'],
+                'is_registered' => $result['is_registered'],
                 'user' => $result['user']->toApiResponse(),
             ]
         );
