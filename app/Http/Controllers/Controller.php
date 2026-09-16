@@ -7,7 +7,7 @@ use OpenApi\Attributes as OA;
 #[OA\Info(
     version: '1.0.0',
     description: 'API endpoints for VVyaparMitra B2B Platform',
-    title: 'VVyaparMitra (IndiaMART Clone) API Documentation',
+    title: 'VVyaparMitra API Documentation',
     contact: new OA\Contact(email: 'admin@vvyaparmitra.com')
 )]
 #[OA\Server(
