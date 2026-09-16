@@ -55,8 +55,10 @@ class ProfileController extends Controller
             $data['profile_photo'] = $request->file('profile_photo')->store('users/photos', 'public');
         }
 
-        // Set is_registered to true when they successfully update profile
-        $data['is_registered'] = true;
+        // Set profile_completed_at when they successfully update profile
+        if (is_null($user->profile_completed_at)) {
+            $data['profile_completed_at'] = now();
+        }
 
         $user->update($data);
 

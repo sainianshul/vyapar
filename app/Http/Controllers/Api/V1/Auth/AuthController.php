@@ -97,7 +97,7 @@ class AuthController extends Controller
             'Authentication successful',
             [
                 'token' => $result['token'],
-                'is_registered' => $result['is_registered'],
+                'is_profile_complete' => $result['is_profile_complete'],
                 'user' => $result['user']->toApiResponse(),
             ]
         );

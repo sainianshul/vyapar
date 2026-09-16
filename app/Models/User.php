@@ -26,7 +26,7 @@ class User extends Authenticatable
     const CREATED_BY_MANAGER = 2;
 
     protected $fillable = [
-        'is_registered',
+        'profile_completed_at',
         'name',
         'phone',
         'email',
@@ -55,7 +55,7 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'is_registered' => 'boolean',
+            'profile_completed_at' => 'datetime',
             'role' => 'integer',
             'status' => 'integer',
             'created_by' => 'integer',
@@ -191,7 +191,8 @@ class User extends Authenticatable
     {
         return [
             'id' => $this->id,
-            'is_registered' => $this->is_registered,
+            'is_profile_complete' => !is_null($this->profile_completed_at),
+            'profile_completed_at' => $this->profile_completed_at,
             'name' => $this->name,
             'phone' => $this->phone,
             'email' => $this->email,

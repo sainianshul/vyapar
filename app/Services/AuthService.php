@@ -85,7 +85,7 @@ class AuthService
                     'created_by' => User::CREATED_BY_SELF,
                     'latitude' => $data['latitude'] ?? null,
                     'longitude' => $data['longitude'] ?? null,
-                    'is_registered' => false,
+                    'profile_completed_at' => null,
                 ]);
             });
         }
@@ -109,7 +109,7 @@ class AuthService
         return [
             'token' => $token,
             'user' => $user,
-            'is_registered' => $user->is_registered,
+            'is_profile_complete' => !is_null($user->profile_completed_at),
         ];
     }
 
