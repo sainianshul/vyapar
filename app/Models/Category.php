@@ -98,4 +98,46 @@ class Category extends Model
         $parent = self::find($parentId);
         return $parent ? $parent->level + 1 : 0;
     }
+
+    // ─── DataTables Helpers ───────────────────────
+
+    public static function getStatusList(): array
+    {
+        return [
+            1 => 'Active',
+            0 => 'Inactive',
+        ];
+    }
+
+    public function getStatusNameAttribute(): string
+    {
+        return self::getStatusList()[$this->is_active] ?? 'Unknown';
+    }
+
+    public function getStatusColorAttribute(): string
+    {
+        return $this->is_active ? 'success' : 'secondary';
+    }
+
+    public function getStatusIconAttribute(): string
+    {
+        return $this->is_active ? 'ti ti-check' : 'ti ti-x';
+    }
+
+    public function getIconHtmlAttribute(): string
+    {
+        if (!empty($this->image)) {
+            $url = filter_var($this->image, FILTER_VALIDATE_URL) 
+                ? $this->image 
+                : asset('storage/' . $this->image);
+            return '<span class="avatar" style="background-image: url(' . e($url) . ')"></span>';
+        }
+
+        $initial = mb_strtoupper(mb_substr($this->name ?? 'C', 0, 1));
+        $colors = ['blue', 'green', 'cyan', 'yellow', 'red', 'purple', 'orange'];
+        $index = abs(crc32($this->name ?? 'C')) % count($colors);
+        $colorClass = $colors[$index];
+
+        return '<span class="avatar bg-' . $colorClass . '-lt fw-bold">' . e($initial) . '</span>';
+    }
 }

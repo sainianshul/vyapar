@@ -11,14 +11,14 @@ use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
 {
-    public function index()
+    public function index(\App\DataTables\Categories\CategoryDataTable $dataTable)
     {
-        $categories = Category::with('parent', 'children')
-            ->orderBy('sort_order')
-            ->orderBy('name')
-            ->paginate(25);
+        return $dataTable->render('admin.categories.index');
+    }
 
-        return view('admin.categories.index', compact('categories'));
+    public function data(\App\DataTables\Categories\CategoryDataTable $dataTable)
+    {
+        return $dataTable->ajax();
     }
 
     public function create()
@@ -107,14 +107,17 @@ class CategoryController extends Controller
         ]);
     }
 
-    public function toggleStatus(Category $category)
+    public function updateStatus(Request $request, Category $category)
     {
-        $category->update(['is_active' => !$category->is_active]);
+        $request->validate([
+            'status' => 'required|boolean',
+        ]);
+
+        $category->update(['is_active' => $request->status]);
 
         return response()->json([
             'success' => true,
-            'message' => ($category->is_active ? 'Activated' : 'Deactivated') . ' successfully.',
-            'is_active' => $category->is_active,
+            'message' => 'Status updated successfully.'
         ]);
     }
 

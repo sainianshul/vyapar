@@ -1,4 +1,5 @@
 @extends('admin.layouts.app')
+
 @section('title', 'Categories')
 
 @section('content')
@@ -20,152 +21,278 @@
     </div>
 
     <div class="card">
-        <div class="table-responsive">
-            <table class="table table-vcenter card-table">
-                <thead>
-                    <tr>
-                        <th class="w-1">#</th>
-                        <th>Category</th>
-                        <th>Parent</th>
-                        <th>Sort</th>
-                        <th>Products</th>
-                        <th>Status</th>
-                        <th class="text-end">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($categories as $category)
-                    <tr>
-                        <td class="text-secondary">{{ $category->id }}</td>
-                        <td>
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="avatar avatar-sm rounded bg-primary-lt">
-                                    <i class="ti ti-category"></i>
-                                </span>
-                                <div>
-                                    <div class="fw-semibold">
-                                        @if($category->level > 0)
-                                            <span class="text-muted">{{ str_repeat('— ', $category->level) }}</span>
-                                        @endif
-                                        {{ $category->name }}
-                                    </div>
-                                    <div class="text-secondary small">{{ $category->slug }}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            @if($category->parent)
-                                <span class="badge bg-blue-lt">{{ $category->parent->name }}</span>
-                            @else
-                                <span class="text-muted">—</span>
-                            @endif
-                        </td>
-                        <td class="text-secondary">{{ $category->sort_order }}</td>
-                        <td class="text-secondary">{{ $category->product_count }}</td>
-                        <td>
-                            <label class="form-check form-switch mb-0">
-                                <input class="form-check-input toggle-status" type="checkbox"
-                                    data-id="{{ $category->id }}"
-                                    {{ $category->is_active ? 'checked' : '' }}>
-                            </label>
-                        </td>
-                        <td>
-                            <div class="d-flex gap-1 justify-content-end">
-                                <a href="{{ route('admin.categories.edit', $category) }}" class="btn btn-icon btn-ghost-primary btn-sm" data-bs-toggle="tooltip" title="Edit">
-                                    <i class="ti ti-pencil"></i>
-                                </a>
-                                <button type="button" class="btn btn-icon btn-ghost-danger btn-sm btn-delete"
-                                    data-id="{{ $category->id }}" data-name="{{ $category->name }}"
-                                    data-bs-toggle="tooltip" title="Delete">
-                                    <i class="ti ti-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="7" class="text-center py-4">
-                            <div class="empty">
-                                <div class="empty-icon"><i class="ti ti-category" style="font-size: 2rem;"></i></div>
-                                <p class="empty-title">No categories yet</p>
-                                <p class="empty-subtitle text-secondary">Create your first category to get started.</p>
-                                <div class="empty-action">
-                                    <a href="{{ route('admin.categories.create') }}" class="btn btn-primary">
-                                        <i class="ti ti-plus me-1"></i>Add Category
-                                    </a>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
+
+        {{-- Toolbar --}}
+        <div class="card-header">
+            <div class="d-flex align-items-center justify-content-between w-100 flex-wrap gap-3">
+
+                {{-- Search --}}
+                <div class="input-icon">
+                    <span class="input-icon-addon"><i class="ti ti-search"></i></span>
+                    <input type="text" id="dt-search" class="form-control" style="width: 260px;"
+                        placeholder="Search categories..." />
+                </div>
+
+                {{-- Right Controls --}}
+                <div class="d-flex align-items-center gap-2">
+
+                    {{-- Refresh Button --}}
+                    <button type="button" class="btn btn-icon btn-ghost-secondary" id="refresh-table-btn"
+                        data-bs-toggle="tooltip" title="Refresh">
+                        <i class="ti ti-refresh"></i>
+                    </button>
+
+                    {{-- Status Filter --}}
+                    <select id="filter-status" class="form-select" style="width: 150px;">
+                        <option value="">All Status</option>
+                        @foreach (\App\Models\Category::getStatusList() as $value => $label)
+                            <option value="{{ $value }}">{{ $label }}</option>
+                        @endforeach
+                    </select>
+
+                </div>
+            </div>
         </div>
-        @if($categories->hasPages())
-        <div class="card-footer d-flex align-items-center">
-            {{ $categories->links() }}
+
+        {{-- Body --}}
+        <div class="card-body">
+
+            {{-- Loading Spinner --}}
+            <div id="categories-loader" class="d-flex justify-content-center align-items-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading…</span>
+                </div>
+            </div>
+
+            {{-- Table --}}
+            <div id="categories-table-wrapper" class="table-responsive d-none">
+                <table id="categories-table" class="table table-vcenter w-100">
+                    <thead>
+                        <tr>
+                            <th class="w-1">S.No</th>
+                            <th>Category Info</th>
+                            <th>Parent Category</th>
+                            <th>Sort Order</th>
+                            <th>Products</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            @include('admin.layouts.partials._table-empty', [
+                'id' => 'categories-empty',
+                'title' => 'No categories found',
+                'subtitle' => 'Try adjusting your search or filters to find what you are looking for.'
+            ])
+
         </div>
-        @endif
+    </div>
+
+    {{-- Status Update Modal --}}
+    <div class="modal modal-blur fade" id="status-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <form id="status-modal-form">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Change Status</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="status-modal-id">
+                        <div class="mb-3">
+                            <label class="form-label">Select Status</label>
+                            <select id="status-modal-select" class="form-select">
+                                @foreach (\App\Models\Category::getStatusList() as $value => $label)
+                                    <option value="{{ $value }}">{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link link-secondary me-auto" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
 @endsection
 
-@push('scripts')
-<script>
-$(function () {
+@push('datatables_css')
+    @include('admin.layouts.partials._datatable-cdn-css')
+@endpush
 
-    // Toggle Status (AJAX)
-    $(document).on('change', '.toggle-status', function () {
-        let checkbox = $(this);
-        let id = checkbox.data('id');
+@push('datatables_js')
+    @include('admin.layouts.partials._datatable-cdn-js')
 
-        $.ajax({
-            url: '/admin/categories/' + id + '/toggle-status',
-            type: 'POST',
-            data: { _token: '{{ csrf_token() }}' },
-            success: function (res) {
-                showToast(res.message, 'success');
-            },
-            error: function () {
-                // Revert checkbox on failure
-                checkbox.prop('checked', !checkbox.prop('checked'));
-                showToast('Failed to update status', 'error');
-            }
-        });
-    });
+    <script>
+        $(function () {
 
-    // Delete with SweetAlert
-    $(document).on('click', '.btn-delete', function () {
-        let id = $(this).data('id');
-        let name = $(this).data('name');
-        $(this).tooltip('hide');
+            let table = $('#categories-table').DataTable({
+                serverSide: true,
+                processing: false,
 
-        Swal.fire({
-            title: 'Delete "' + name + '"?',
-            text: 'This cannot be undone.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, Delete',
-            customClass: { confirmButton: 'btn btn-danger', cancelButton: 'btn btn-light ms-2' },
-            buttonsStyling: false,
-        }).then(function (result) {
-            if (!result.isConfirmed) return;
-            $.ajax({
-                url: '/admin/categories/' + id,
-                type: 'POST',
-                data: { _method: 'DELETE', _token: '{{ csrf_token() }}' },
-                success: function (res) {
-                    showToast(res.message, 'success');
-                    setTimeout(() => location.reload(), 800);
+                ajax: {
+                    url: '{{ route('admin.categories.data') }}',
+                    data: function (d) {
+                        d.status = $('#filter-status').val();
+                    }
                 },
-                error: function (xhr) {
-                    let msg = xhr.responseJSON?.message || 'Something went wrong';
-                    showToast(msg, 'error');
+
+                columns: [
+                    { data: null, name: 'id', render: function (data, type, row, meta) { return meta.row + meta.settings._iDisplayStart + 1; }, orderable: false, searchable: false },
+                    { data: 'name', name: 'name' },
+                    { data: 'parent', name: 'parent', orderable: false, searchable: false },
+                    { data: 'sort_order', name: 'sort_order' },
+                    { data: 'product_count', name: 'product_count' },
+                    { data: 'status', name: 'status' },
+                    { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-end' },
+                ],
+
+                order: [[3, 'asc']], // Order by sort_order asc
+                pageLength: 25,
+                lengthMenu: [[15, 25, 50, 100], [15, 25, 50, 100]],
+
+                dom:
+                    "<'row'<'col-12'tr>>" +
+                    "<'row align-items-center mt-3 pt-3 flex-nowrap'" +
+                    "<'col-sm-12 col-md-5'i>" +
+                    "<'col-sm-12 col-md-7 d-flex justify-content-md-end align-items-center gap-3'lp>>",
+
+                language: {
+                    emptyTable: ' ',
+                    zeroRecords: ' ',
+                    loadingRecords: ' ',
+                    info: 'Showing _START_–_END_ of _TOTAL_ categories',
+                    infoEmpty: 'No categories to show',
+                    infoFiltered: '(filtered from _MAX_)',
+                    lengthMenu: 'Show _MENU_',
+                    paginate: {
+                        previous: '<i class="ti ti-chevron-left"></i>',
+                        next: '<i class="ti ti-chevron-right"></i>',
+                    },
+                },
+
+                initComplete: function () {
+                    $('#categories-loader').remove();
+                    let total = this.api().page.info().recordsDisplay;
+                    if (total === 0) {
+                        $('#categories-table-wrapper').addClass('d-none');
+                        $('#categories-empty').removeClass('d-none');
+                    } else {
+                        $('#categories-empty').addClass('d-none');
+                        $('#categories-table-wrapper').removeClass('d-none');
+                    }
+                },
+
+                drawCallback: function () {
+                    if ($('#categories-loader').length === 0) {
+                        let total = this.api().page.info().recordsDisplay;
+                        if (total === 0) {
+                            $('#categories-table-wrapper').addClass('d-none');
+                            $('#categories-empty').removeClass('d-none');
+                        } else {
+                            $('#categories-empty').addClass('d-none');
+                            $('#categories-table-wrapper').removeClass('d-none');
+                        }
+                    }
+                    $('[data-bs-toggle="tooltip"]').tooltip({ trigger: 'hover' });
                 }
             });
-        });
-    });
 
-});
-</script>
+            // Search
+            let searchTimer;
+            $('#dt-search').on('input', function () {
+                clearTimeout(searchTimer);
+                let query = $(this).val();
+                searchTimer = setTimeout(function () {
+                    table.search(query).draw();
+                }, 400);
+            });
+
+            // Status Filter
+            $('#filter-status').on('change', function () {
+                table.ajax.reload();
+            });
+
+            // Refresh Button
+            $('#refresh-table-btn').on('click', function () {
+                $(this).tooltip('hide');
+                table.ajax.reload(null, false);
+                Swal.fire({ toast: true, position: 'top', showConfirmButton: false, timer: 1500, icon: 'success', title: 'Refreshed' });
+            });
+
+            // Open Status Modal
+            $(document).on('click', '.status-modal-btn', function (e) {
+                e.preventDefault();
+                let id = $(this).data('id');
+                let currentStatus = $(this).data('status');
+                
+                $('#status-modal-id').val(id);
+                $('#status-modal-select').val(currentStatus);
+                $('#status-modal').modal('show');
+            });
+
+            // Submit Status Modal
+            $('#status-modal-form').on('submit', function (e) {
+                e.preventDefault();
+                let id = $('#status-modal-id').val();
+                let status = $('#status-modal-select').val();
+                let submitBtn = $(this).find('button[type="submit"]');
+                let originalText = submitBtn.html();
+                
+                submitBtn.html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Saving...').prop('disabled', true);
+
+                $.ajax({
+                    url: '/admin/categories/' + id + '/status',
+                    type: 'POST',
+                    data: { status: status, _token: '{{ csrf_token() }}' },
+                    success: function (res) {
+                        $('#status-modal').modal('hide');
+                        table.ajax.reload(null, false);
+                        Swal.fire({ toast: true, position: 'top', showConfirmButton: false, timer: 1500, icon: 'success', title: res.message });
+                    },
+                    error: function () {
+                        Swal.fire({ toast: true, position: 'top', showConfirmButton: false, timer: 1500, icon: 'error', title: 'Failed to update' });
+                    },
+                    complete: function () {
+                        submitBtn.html(originalText).prop('disabled', false);
+                    }
+                });
+            });
+
+            // Delete
+            $(document).on('click', '.btn-delete', function () {
+                let id = $(this).data('id');
+                let name = $(this).data('name');
+                $(this).tooltip('hide');
+                
+                Swal.fire({
+                    title: 'Delete "' + name + '"?',
+                    text: 'This action cannot be undone.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, Delete',
+                    customClass: { confirmButton: 'btn btn-danger', cancelButton: 'btn btn-light ms-2' },
+                    buttonsStyling: false,
+                }).then(function (result) {
+                    if (!result.isConfirmed) return;
+                    $.post('/admin/categories/' + id, { _method: 'DELETE', _token: '{{ csrf_token() }}' })
+                        .done(function (res) {
+                            table.ajax.reload(null, false);
+                            Swal.fire({ toast: true, position: 'top', showConfirmButton: false, timer: 1500, icon: 'success', title: res.message });
+                        })
+                        .fail(function (xhr) {
+                            let msg = xhr.responseJSON?.message || 'Something went wrong';
+                            Swal.fire({ toast: true, position: 'top', showConfirmButton: false, timer: 2500, icon: 'error', title: msg });
+                        });
+                });
+            });
+
+        });
+    </script>
 @endpush
