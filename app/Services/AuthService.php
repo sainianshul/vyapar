@@ -42,14 +42,11 @@ class AuthService
             'status' => OtpVerification::STATUS_ACTIVE,
         ]);
 
-        $isRegistered = User::where('phone', $phone)->exists();
-
         // TODO: Dispatch actual SMS via gateway here in production
         // $message = "Welcome to VVyaparMitra! Your OTP for verification is {$otp}. Do not share this with anyone.";
         
         return [
             'otp' => $otp,
-            'is_registered' => $isRegistered,
         ];
     }
 
@@ -83,7 +80,7 @@ class AuthService
                     'role' => User::ROLE_USER, // default role for new registrations
                     'status' => User::STATUS_ACTIVE,
                     'phone_verified_at' => now(),
-                    'created_by' => User::CREATED_BY_SELF,
+                    'created_by' => 0, // 0 for self registered
                     'latitude' => $data['latitude'] ?? null,
                     'longitude' => $data['longitude'] ?? null,
                     'profile_completed_at' => null,

@@ -51,10 +51,7 @@ class AuthController extends Controller
         }
 
         return ApiResponse::success(
-            $message,
-            [
-                'is_registered' => $result['is_registered'],
-            ]
+            $message
         );
     }
 
