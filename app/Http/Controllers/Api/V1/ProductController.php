@@ -57,7 +57,7 @@ class ProductController extends Controller
         }
 
         if ($request->filled('search')) {
-            $query->where('title', 'LIKE', '%' . $request->search . '%');
+            $query->where('search_tags', 'LIKE', '%' . $request->search . '%');
         }
 
         if ($request->filled('condition')) {
@@ -267,7 +267,7 @@ class ProductController extends Controller
         }
 
         if ($request->filled('search')) {
-            $query->where('title', 'LIKE', '%' . $request->search . '%');
+            $query->where('search_tags', 'LIKE', '%' . $request->search . '%');
         }
 
         $sort = $request->input('sort', 'latest');

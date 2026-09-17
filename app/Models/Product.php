@@ -108,13 +108,32 @@ class Product extends Model
 
         static::creating(function ($product) {
             $product->slug = self::generateUniqueSlug($product->title);
+            $product->search_tags = self::generateSearchTags($product);
         });
 
         static::updating(function ($product) {
             if ($product->isDirty('title')) {
                 $product->slug = self::generateUniqueSlug($product->title, $product->id);
             }
+            if ($product->isDirty(['title', 'category_id'])) {
+                $product->search_tags = self::generateSearchTags($product);
+            }
         });
+    }
+
+    public static function generateSearchTags(Product $product): string
+    {
+        $tags = [$product->title];
+        
+        $category = Category::with('parent')->find($product->category_id);
+        if ($category) {
+            $tags[] = $category->name;
+            if ($category->parent) {
+                $tags[] = $category->parent->name;
+            }
+        }
+        
+        return implode(' ', array_filter($tags));
     }
 
     private static function generateUniqueSlug(string $title, ?int $ignoreId = null): string
