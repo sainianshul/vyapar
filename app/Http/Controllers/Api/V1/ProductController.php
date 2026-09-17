@@ -139,13 +139,13 @@ class ProductController extends Controller
     }
 
     #[OA\Get(
-        path: '/api/v1/products/{slug}',
+        path: '/api/v1/products/{id}',
         operationId: 'getProductDetail',
-        summary: 'Get product detail by slug',
+        summary: 'Get product detail by id',
         security: [['bearerAuth' => []]],
         tags: ['Products'],
         parameters: [
-            new OA\Parameter(name: 'slug', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
         ],
         responses: [
             new OA\Response(response: 200, description: 'Product detail fetched successfully'),
@@ -153,9 +153,9 @@ class ProductController extends Controller
             new OA\Response(response: 401, description: 'Unauthenticated'),
         ]
     )]
-    public function show(Request $request, string $slug): JsonResponse
+    public function show(Request $request, int $id): JsonResponse
     {
-        $product = Product::where('slug', $slug)
+        $product = Product::where('id', $id)
             ->active()
             ->with(['seller', 'category', 'images' => fn($q) => $q->orderBy('sort_order')])
             ->firstOrFail();
@@ -201,7 +201,7 @@ class ProductController extends Controller
                         new OA\Property(property: 'price_unit', type: 'string', nullable: true, example: 'per piece', description: 'Allowed values: per piece, per dozen, per kg, per gram, per liter, per box, per pack'),
                         new OA\Property(property: 'is_negotiable', type: 'boolean', nullable: true, example: true),
                         new OA\Property(property: 'condition', type: 'integer', example: 1, description: 'Allowed values: 1 (New), 2 (Used)'),
-                        new OA\Property(property: 'quantity', type: 'integer', nullable: true, example: 1),
+                        new OA\Property(property: 'minimum_quantity', type: 'integer', nullable: true, example: 1),
                         new OA\Property(property: 'location', type: 'string', nullable: true, example: 'Connaught Place'),
                         new OA\Property(property: 'city', type: 'string', nullable: true, example: 'New Delhi'),
                         new OA\Property(property: 'pincode', type: 'string', nullable: true, example: '110001'),
@@ -341,7 +341,7 @@ class ProductController extends Controller
                         new OA\Property(property: 'price_unit', type: 'string', nullable: true),
                         new OA\Property(property: 'is_negotiable', type: 'boolean', nullable: true),
                         new OA\Property(property: 'condition', type: 'integer', nullable: true),
-                        new OA\Property(property: 'quantity', type: 'integer', nullable: true),
+                        new OA\Property(property: 'minimum_quantity', type: 'integer', nullable: true),
                         new OA\Property(property: 'location', type: 'string', nullable: true),
                         new OA\Property(property: 'city', type: 'string', nullable: true),
                         new OA\Property(property: 'pincode', type: 'string', nullable: true),

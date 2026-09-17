@@ -215,7 +215,7 @@
                     { data: 'category', name: 'category', orderable: false, searchable: false },
                     { data: 'condition', name: 'condition', searchable: false },
                     { data: 'price', name: 'price' },
-                    { data: 'quantity', name: 'quantity', searchable: false },
+                    { data: 'minimum_quantity', name: 'minimum_quantity', searchable: false },
                     { data: 'city', name: 'city' },
                     { data: 'is_featured', name: 'is_featured' },
                     { data: 'status', name: 'status' },

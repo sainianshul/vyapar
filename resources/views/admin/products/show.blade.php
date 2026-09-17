@@ -234,7 +234,7 @@
                                 </div>
                                 <div class="datagrid-item">
                                     <div class="datagrid-title">Minimum Quantity</div>
-                                    <div class="datagrid-content">{{ $product->quantity }}</div>
+                                    <div class="datagrid-content">{{ $product->minimum_quantity }}</div>
                                 </div>
                                 <div class="datagrid-item">
                                     <div class="datagrid-title">Status</div>

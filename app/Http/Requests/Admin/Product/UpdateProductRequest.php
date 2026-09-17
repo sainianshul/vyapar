@@ -31,7 +31,7 @@ class UpdateProductRequest extends FormRequest
             'price_unit' => 'nullable|string|max:50',
             'is_negotiable' => 'nullable|boolean',
             'condition' => 'required|integer|in:1,2',
-            'quantity' => 'required|integer|min:1',
+            'minimum_quantity' => 'required|integer|min:1',
             'location' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:100',
             'pincode' => 'nullable|string|max:10',

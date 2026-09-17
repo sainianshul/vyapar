@@ -30,7 +30,7 @@ class StoreProductRequest extends FormRequest
             'price_unit' => ['nullable', 'string', 'in:' . implode(',', array_keys(Product::getPriceUnitsList()))],
             'is_negotiable' => ['nullable', 'boolean'],
             'condition' => ['required', 'integer', 'in:' . implode(',', array_keys(Product::getConditionList()))],
-            'quantity' => ['nullable', 'integer', 'min:1'],
+            'minimum_quantity' => ['nullable', 'integer', 'min:1'],
             'location' => ['nullable', 'string', 'max:255'],
             'city' => ['nullable', 'string', 'max:255'],
             'pincode' => ['nullable', 'string', 'max:20'],

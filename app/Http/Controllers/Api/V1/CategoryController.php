@@ -88,18 +88,18 @@ class CategoryController extends Controller
     }
 
     #[OA\Get(
-        path: '/api/v1/categories/{slug}',
+        path: '/api/v1/categories/{id}',
         operationId: 'showCategory',
-        summary: 'Get a single category by slug',
+        summary: 'Get a single category by id',
         description: 'Returns category details along with its active subcategories.',
         tags: ['Categories'],
         parameters: [
             new OA\Parameter(
-                name: 'slug',
+                name: 'id',
                 in: 'path',
                 required: true,
-                description: 'Category slug',
-                schema: new OA\Schema(type: 'string')
+                description: 'Category id',
+                schema: new OA\Schema(type: 'integer')
             ),
         ],
         responses: [
@@ -107,10 +107,10 @@ class CategoryController extends Controller
             new OA\Response(response: 404, description: 'Category not found'),
         ]
     )]
-    public function show(string $slug)
+    public function show(int $id)
     {
         $category = Category::active()
-            ->where('slug', $slug)
+            ->where('id', $id)
             ->with([
                 'children' => function ($q) {
                     $q->active()->orderBy('sort_order')->orderBy('name')

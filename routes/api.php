@@ -20,7 +20,7 @@ Route::prefix('v1')->group(function () {
     Route::prefix('categories')->group(function () {
         Route::get('/', [\App\Http\Controllers\Api\V1\CategoryController::class, 'index']);
         Route::get('featured', [\App\Http\Controllers\Api\V1\CategoryController::class, 'featured']);
-        Route::get('{slug}', [\App\Http\Controllers\Api\V1\CategoryController::class, 'show']);
+        Route::get('{id}', [\App\Http\Controllers\Api\V1\CategoryController::class, 'show']);
     });
 
 
@@ -39,7 +39,7 @@ Route::prefix('v1')->group(function () {
         Route::prefix('products')->group(function () {
             Route::get('/', [\App\Http\Controllers\Api\V1\ProductController::class, 'index']);
             Route::get('featured', [\App\Http\Controllers\Api\V1\ProductController::class, 'featured']);
-            Route::get('{slug}', [\App\Http\Controllers\Api\V1\ProductController::class, 'show']);
+            Route::get('{id}', [\App\Http\Controllers\Api\V1\ProductController::class, 'show']);
             Route::post('/', [\App\Http\Controllers\Api\V1\ProductController::class, 'store']);
             Route::post('{id}', [\App\Http\Controllers\Api\V1\ProductController::class, 'update']);
         });

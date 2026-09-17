@@ -27,6 +27,15 @@ class Product extends Model
     const UNIT_BOX = 'per box';
     const UNIT_PACK = 'per pack';
 
+    const IS_FEATURED_YES = 1;
+    const IS_FEATURED_NO = 0;
+
+    const IS_VERIFIED_YES = 1;
+    const IS_VERIFIED_NO = 0;
+
+    const IS_NEGOTIABLE_YES = 1;
+    const IS_NEGOTIABLE_NO = 0;
+
     protected $fillable = [
         'user_id',
         'category_id',
@@ -37,7 +46,7 @@ class Product extends Model
         'price_unit',
         'is_negotiable',
         'condition',
-        'quantity',
+        'minimum_quantity',
         'location',
         'city',
         'pincode',
@@ -55,9 +64,9 @@ class Product extends Model
     {
         return [
             'price' => 'decimal:2',
-            'is_negotiable' => 'boolean',
+            'is_negotiable' => 'integer',
             'condition' => 'integer',
-            'quantity' => 'integer',
+            'minimum_quantity' => 'integer',
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
             'status' => 'integer',
@@ -249,7 +258,7 @@ class Product extends Model
             'is_negotiable' => $this->is_negotiable,
             'condition' => $this->condition,
             'condition_name' => $this->condition_name,
-            'quantity' => $this->quantity,
+            'minimum_quantity' => $this->minimum_quantity,
             'location' => $this->location,
             'city' => $this->city,
             'pincode' => $this->pincode,
@@ -287,7 +296,7 @@ class Product extends Model
             'is_negotiable' => $this->is_negotiable,
             'condition' => $this->condition,
             'condition_name' => $this->condition_name,
-            'quantity' => $this->quantity,
+            'minimum_quantity' => $this->minimum_quantity,
             'location' => $this->location,
             'city' => $this->city,
             'pincode' => $this->pincode,

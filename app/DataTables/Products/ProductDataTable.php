@@ -43,8 +43,8 @@ class ProductDataTable extends DataTable
             ->editColumn('price', function (Product $product) {
                 return '₹' . number_format($product->price, 2) . ($product->price_unit ? ' / ' . e($product->price_unit) : '');
             })
-            ->addColumn('quantity', function (Product $product) {
-                return $product->quantity;
+            ->addColumn('minimum_quantity', function (Product $product) {
+                return $product->minimum_quantity;
             })
             ->addColumn('city', function (Product $product) {
                 return $product->city ? e($product->city) : '<span class="text-muted">—</span>';

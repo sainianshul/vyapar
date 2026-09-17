@@ -173,9 +173,9 @@
 
                         <div class="mb-3">
                             <label class="form-label required">Minimum Quantity</label>
-                            <input type="number" name="quantity" class="form-control @error('quantity') is-invalid @enderror" 
-                                value="{{ old('quantity', 1) }}" min="1" required>
-                            @error('quantity') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            <input type="number" name="minimum_quantity" class="form-control @error('minimum_quantity') is-invalid @enderror" 
+                                value="{{ old('minimum_quantity', 1) }}" min="1" required>
+                            @error('minimum_quantity') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
                         <div class="mb-3">
