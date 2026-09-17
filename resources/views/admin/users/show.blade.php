@@ -99,7 +99,7 @@
                             </span>
                         </div>
                         <div class="col">
-                            <div class="fw-bold fs-3">0</div>
+                            <div class="fw-bold fs-3">{{ $user->products()->count() }}</div>
                             <div class="text-secondary">Products Listed</div>
                         </div>
                     </div>
@@ -290,15 +290,83 @@
 
                 {{-- Tab: Products --}}
                 <div class="tab-pane fade" id="tab-products" role="tabpanel">
-                    <div class="empty py-5">
-                        <div class="empty-icon">
-                            <i class="ti ti-package text-muted" style="font-size: 3rem;"></i>
+                    @php
+                        $products = $user->products()->latest()->get();
+                    @endphp
+                    @if($products->count() > 0)
+                        <div class="table-responsive">
+                            <table class="table table-vcenter card-table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Price</th>
+                                        <th>Condition</th>
+                                        <th>Status</th>
+                                        <th>Stats</th>
+                                        <th>Listed On</th>
+                                        <th class="w-1"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($products as $product)
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex py-1 align-items-center">
+                                                @if($product->primaryImage)
+                                                    <span class="avatar me-2" style="background-image: url({{ asset('storage/' . $product->primaryImage->image_path) }})"></span>
+                                                @else
+                                                    <span class="avatar me-2 bg-secondary-lt"><i class="ti ti-photo"></i></span>
+                                                @endif
+                                                <div class="flex-fill">
+                                                    <div class="font-weight-medium">{{ $product->title }}</div>
+                                                    <div class="text-secondary"><a href="#" class="text-reset">{{ $product->category->name ?? 'N/A' }}</a></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>₹{{ number_format($product->price, 2) }}</div>
+                                            <div class="text-secondary">{{ $product->price_unit ?? '' }}</div>
+                                        </td>
+                                        <td class="text-secondary">
+                                            {{ $product->condition_name }}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{{ $product->status == 1 ? 'green' : ($product->status == 2 ? 'blue' : 'secondary') }}-lt">
+                                                {{ $product->status_name }}
+                                            </span>
+                                            @if($product->is_featured)
+                                                <span class="badge bg-yellow-lt ms-1" title="Featured"><i class="ti ti-star"></i></span>
+                                            @endif
+                                            @if($product->is_verified)
+                                                <span class="badge bg-blue-lt ms-1" title="Verified"><i class="ti ti-shield-check"></i></span>
+                                            @endif
+                                        </td>
+                                        <td class="text-secondary">
+                                            <div><i class="ti ti-eye me-1"></i>{{ $product->views_count }}</div>
+                                            <div><i class="ti ti-message me-1"></i>{{ $product->leads_count }}</div>
+                                        </td>
+                                        <td class="text-secondary">
+                                            {{ $product->created_at->format('d M Y') }}
+                                        </td>
+                                        <td>
+                                            <a href="#" class="btn btn-sm btn-outline-secondary">View</a>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
-                        <p class="empty-title">No Products Listed</p>
-                        <p class="empty-subtitle text-secondary">
-                            Products and services listed by this user will appear here once the catalog module is active.
-                        </p>
-                    </div>
+                    @else
+                        <div class="empty py-5">
+                            <div class="empty-icon">
+                                <i class="ti ti-package text-muted" style="font-size: 3rem;"></i>
+                            </div>
+                            <p class="empty-title">No Products Listed</p>
+                            <p class="empty-subtitle text-secondary">
+                                This user has not listed any products yet.
+                            </p>
+                        </div>
+                    @endif
                 </div>
 
                 {{-- Tab: Leads / Enquiries --}}

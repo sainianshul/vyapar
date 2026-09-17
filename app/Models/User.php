@@ -182,6 +182,11 @@ class User extends Authenticatable
         return $this->hasMany(LoginHistory::class);
     }
 
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+
     // ─── API Response ────────────────────────
 
     public function toApiResponse(): array

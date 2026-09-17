@@ -193,7 +193,89 @@ class Product extends Model
 
     // ─── API Response ──────────────────────────────
 
-    public function toApiResponse(): array
+    public function toBuyerListArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'slug' => $this->slug,
+            'price' => $this->price,
+            'price_unit' => $this->price_unit,
+            'is_negotiable' => $this->is_negotiable,
+            'condition_name' => $this->condition_name,
+            'city' => $this->city,
+            'is_featured' => $this->is_featured,
+            'is_verified' => $this->is_verified,
+            'primary_image' => $this->relationLoaded('primaryImage') && $this->primaryImage 
+                                ? asset('storage/' . $this->primaryImage->image_path) 
+                                : null,
+            'created_at' => $this->created_at,
+        ];
+    }
+
+    public function toSellerListArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'slug' => $this->slug,
+            'price' => $this->price,
+            'price_unit' => $this->price_unit,
+            'condition_name' => $this->condition_name,
+            'city' => $this->city,
+            'status' => $this->status,
+            'status_name' => $this->status_name,
+            'views_count' => $this->views_count,
+            'leads_count' => $this->leads_count,
+            'is_featured' => $this->is_featured,
+            'is_verified' => $this->is_verified,
+            'primary_image' => $this->relationLoaded('primaryImage') && $this->primaryImage 
+                                ? asset('storage/' . $this->primaryImage->image_path) 
+                                : null,
+            'expires_at' => $this->expires_at,
+            'created_at' => $this->created_at,
+        ];
+    }
+
+    public function toBuyerDetailArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'slug' => $this->slug,
+            'description' => $this->description,
+            'price' => $this->price,
+            'price_unit' => $this->price_unit,
+            'is_negotiable' => $this->is_negotiable,
+            'condition' => $this->condition,
+            'condition_name' => $this->condition_name,
+            'quantity' => $this->quantity,
+            'location' => $this->location,
+            'city' => $this->city,
+            'pincode' => $this->pincode,
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
+            'is_featured' => $this->is_featured,
+            'is_verified' => $this->is_verified,
+            'seller' => $this->relationLoaded('seller') && $this->seller ? [
+                'id' => $this->seller->id,
+                'name' => $this->seller->name,
+                'profile_photo' => $this->seller->profile_photo ? asset('storage/' . $this->seller->profile_photo) : null,
+                'city' => $this->seller->city,
+            ] : null,
+            'category' => $this->relationLoaded('category') && $this->category ? [
+                'id' => $this->category->id,
+                'name' => $this->category->name,
+                'slug' => $this->category->slug,
+            ] : null,
+            'images' => $this->relationLoaded('images') 
+                        ? $this->images->map(fn($img) => $img->toApiResponse()) 
+                        : [],
+            'created_at' => $this->created_at,
+        ];
+    }
+
+    public function toSellerDetailArray(): array
     {
         return [
             'id' => $this->id,
@@ -216,19 +298,20 @@ class Product extends Model
             'views_count' => $this->views_count,
             'leads_count' => $this->leads_count,
             'is_featured' => $this->is_featured,
-            'seller' => $this->relationLoaded('seller') && $this->seller ? [
-                'id' => $this->seller->id,
-                'name' => $this->seller->name,
-                'profile_photo' => $this->seller->profile_photo ? asset('storage/' . $this->seller->profile_photo) : null,
-            ] : null,
+            'featured_at' => $this->featured_at,
+            'is_verified' => $this->is_verified,
+            'verified_at' => $this->verified_at,
             'category' => $this->relationLoaded('category') && $this->category ? [
                 'id' => $this->category->id,
                 'name' => $this->category->name,
+                'slug' => $this->category->slug,
             ] : null,
             'images' => $this->relationLoaded('images') 
                         ? $this->images->map(fn($img) => $img->toApiResponse()) 
                         : [],
+            'expires_at' => $this->expires_at,
             'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }

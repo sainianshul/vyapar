@@ -32,34 +32,17 @@ class ProductController extends Controller
         return view('admin.products.create', compact('categories', 'users'));
     }
 
-    public function store(StoreProductRequest $request)
+    public function store(StoreProductRequest $request, \App\Services\ProductService $productService)
     {
-        $data = $request->safe()->except(['primary_image', 'additional_images']);
-        $data['is_negotiable'] = $request->boolean('is_negotiable');
-        $data['is_featured'] = $request->boolean('is_featured');
-        $data['slug'] = Str::slug($data['title']);
-
-        $product = Product::create($data);
-
-        if ($request->hasFile('primary_image')) {
-            $path = $request->file('primary_image')->store('products/images', 'public');
-            $product->images()->create([
-                'image_path' => $path,
-                'sort_order' => 0,
-                'is_primary' => true,
-            ]);
-        }
-
-        if ($request->hasFile('additional_images')) {
-            foreach ($request->file('additional_images') as $index => $image) {
-                $path = $image->store('products/images', 'public');
-                $product->images()->create([
-                    'image_path' => $path,
-                    'sort_order' => $index + 1,
-                    'is_primary' => false,
-                ]);
-            }
-        }
+        $data = $request->validated();
+        $seller = User::findOrFail($data['user_id']);
+        
+        $productService->createProduct(
+            $data, 
+            $seller, 
+            $request->file('primary_image'), 
+            $request->file('additional_images')
+        );
 
         return redirect()->route('admin.products.index')
             ->with('success', 'Product created successfully.');

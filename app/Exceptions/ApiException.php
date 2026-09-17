@@ -14,11 +14,17 @@ class ApiException extends Exception
         parent::__construct($message, $code ?: $this->defaultStatus);
     }
 
-    public function render()
+    public function render($request)
     {
-        return ApiResponse::error(
-            $this->getMessage(),
-            $this->getCode() ?: $this->defaultStatus
-        );
+        // API request → JSON response
+        if ($request->expectsJson() || $request->is('api/*')) {
+            return ApiResponse::error(
+                $this->getMessage(),
+                $this->getCode() ?: $this->defaultStatus
+            );
+        }
+
+        // Web request (Admin Panel) → redirect back with error
+        return redirect()->back()->withInput()->with('error', $this->getMessage());
     }
 }
