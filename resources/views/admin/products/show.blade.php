@@ -9,9 +9,9 @@
             <div class="col">
                 <x-breadcrumb :items="[
                     ['label' => 'Products', 'url' => route('admin.products.index')],
-                    ['label' => $product->title],
+                    ['label' => 'Product Details'],
                 ]" />
-                <h2 class="page-title">{{ $product->title }}</h2>
+                <h2 class="page-title">Product Details</h2>
             </div>
             <div class="col-auto d-flex gap-2">
                 <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary">
@@ -59,9 +59,9 @@
             <div class="row align-items-center">
                 <div class="col-auto">
                     @if($product->primaryImage)
-                        <span class="avatar avatar-xl rounded" style="background-image: url({{ $product->primaryImage->url }})"></span>
+                        <span class="avatar avatar-xl rounded" style="background-image: url({{ $product->primaryImage->url }}); width: 120px; height: 120px; background-size: contain; background-color: #f8f9fa;"></span>
                     @else
-                        <span class="avatar avatar-xl rounded bg-primary-lt fs-2 fw-bold">
+                        <span class="avatar rounded bg-primary-lt fs-2 fw-bold" style="width: 120px; height: 120px;">
                             <i class="ti ti-package"></i>
                         </span>
                     @endif
@@ -303,15 +303,16 @@
 
                 {{-- Tab: Images --}}
                 <div class="tab-pane fade" id="tab-images" role="tabpanel">
-                    @if($product->images->count() > 0)
-                        <div class="row g-3">
-                            @foreach($product->images as $image)
-                                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-                                    <div class="card card-sm shadow-sm">
-                                        <a href="{{ $image->url }}" target="_blank" class="d-block">
-                                            <img src="{{ $image->url }}" class="card-img-top" alt="Product Image"
-                                                style="height: 160px; object-fit: cover;">
-                                        </a>
+                    <div class="p-3">
+                        @if($product->images->count() > 0)
+                            <div class="row g-3">
+                                @foreach($product->images as $image)
+                                    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                                        <div class="card card-sm shadow-sm">
+                                            <a href="{{ $image->url }}" target="_blank" class="d-block bg-light">
+                                                <img src="{{ $image->url }}" class="card-img-top" alt="Product Image"
+                                                    style="height: 160px; object-fit: contain; background-color: #f8f9fa;">
+                                            </a>
                                         <div class="card-body p-2 text-center">
                                             @if($image->is_primary)
                                                 <span class="badge bg-primary-lt"><i class="ti ti-star me-1"></i>Primary</span>
@@ -334,6 +335,7 @@
                             </p>
                         </div>
                     @endif
+                    </div>
                 </div>
 
                 {{-- Tab: Seller Info --}}

@@ -245,7 +245,7 @@
                                 <div class="datagrid-item">
                                     <div class="datagrid-title">Created By</div>
                                     <div class="datagrid-content">
-                                        @if($user->created_by == \App\Models\User::CREATED_BY_SELF)
+                                        @if(empty($user->created_by))
                                             Self Registered (OTP)
                                         @else
                                             Created by Admin
