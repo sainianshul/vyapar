@@ -219,11 +219,19 @@
                             </label>
                         </div>
 
-                        <div class="mb-4">
+                        <div class="mb-3">
                             <label class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" name="is_featured" value="1" 
                                     {{ old('is_featured', $product->is_featured) ? 'checked' : '' }}>
                                 <span class="form-check-label">Mark as Featured</span>
+                            </label>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="is_verified" value="1" 
+                                    {{ old('is_verified', $product->is_verified) ? 'checked' : '' }}>
+                                <span class="form-check-label">Verified Product</span>
                             </label>
                         </div>
 

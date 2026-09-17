@@ -16,18 +16,20 @@ class CategoryDataTable extends DataTable
                       ->orWhere('slug', 'like', "%{$keyword}%");
             })
             ->editColumn('name', function (Category $category) {
+                $showUrl = route('admin.categories.show', $category->id);
                 return '
                     <div class="d-flex align-items-center">
                         <span class="avatar avatar-sm me-2">' . $category->icon_html . '</span>
                         <div class="fw-semibold">
-                            ' . e($category->name) . '
+                            <a href="' . $showUrl . '" class="text-reset text-decoration-none">' . e($category->name) . '</a>
                         </div>
                     </div>
                 ';
             })
             ->addColumn('parent', function (Category $category) {
                 if ($category->parent) {
-                    return e($category->parent->name);
+                    $parentUrl = route('admin.categories.show', $category->parent->id);
+                    return '<a href="' . $parentUrl . '" class="text-reset text-decoration-none">' . e($category->parent->name) . '</a>';
                 }
                 return '<span class="text-muted">—</span>';
             })
@@ -54,10 +56,17 @@ class CategoryDataTable extends DataTable
                 ';
             })
             ->addColumn('actions', function (Category $category) {
+                $showUrl = route('admin.categories.show', $category->id);
                 $editUrl = route('admin.categories.edit', $category->id);
 
                 return '
                     <div class="d-flex gap-1 justify-content-end">
+                        <a href="' . $showUrl . '"
+                            class="btn btn-icon btn-sm btn-outline-primary"
+                            data-bs-toggle="tooltip" title="View">
+                            <i class="ti ti-eye"></i>
+                        </a>
+
                         <a href="' . $editUrl . '"
                             class="btn btn-icon btn-sm btn-outline-warning"
                             data-bs-toggle="tooltip" title="Edit">

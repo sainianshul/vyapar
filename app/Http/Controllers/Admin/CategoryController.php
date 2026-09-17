@@ -28,6 +28,12 @@ class CategoryController extends Controller
         return view('admin.categories.create', compact('parentCategories'));
     }
 
+    public function show(Category $category)
+    {
+        $category->load('parent');
+        return view('admin.categories.show', compact('category'));
+    }
+
     public function store(StoreCategoryRequest $request)
     {
         $data = $request->safe()->except(['image']);

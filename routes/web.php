@@ -44,7 +44,7 @@ Route::prefix('admin')->group(function () {
         Route::get('categories/{category}/children', [\App\Http\Controllers\Admin\CategoryController::class, 'children'])->name('categories.children');
         Route::post('categories/{category}/status', [\App\Http\Controllers\Admin\CategoryController::class, 'updateStatus'])->name('categories.update-status');
         Route::post('categories/{category}/featured', [\App\Http\Controllers\Admin\CategoryController::class, 'updateFeatured'])->name('categories.update-featured');
-        Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class)->except(['show']);
+        Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
 
         // Products CRUD
         Route::get('products/data', [\App\Http\Controllers\Admin\ProductController::class, 'data'])->name('products.data');

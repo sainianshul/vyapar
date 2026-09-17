@@ -408,62 +408,9 @@
                         <h3 class="mb-1">Recent Views</h3>
                         <p class="text-secondary">Users who viewed this product listing.</p>
                     </div>
-                    @if($product->views_count > 0)
-                        <div class="table-responsive">
-                            <table class="table table-vcenter">
-                                <thead>
-                                    <tr>
-                                        <th>User</th>
-                                        <th>Viewed At</th>
-                                        <th>Source</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {{-- Dummy rows for now --}}
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <span class="avatar avatar-sm bg-secondary-lt rounded-circle me-2">
-                                                    <i class="ti ti-user"></i>
-                                                </span>
-                                                <div>
-                                                    <div class="fw-semibold">Anonymous Viewer</div>
-                                                    <div class="text-secondary small">Guest</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td><span class="text-secondary">{{ now()->subHours(2)->format('d M Y, H:i') }}</span></td>
-                                        <td><span class="badge bg-blue-lt">App</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <span class="avatar avatar-sm bg-secondary-lt rounded-circle me-2">
-                                                    <i class="ti ti-user"></i>
-                                                </span>
-                                                <div>
-                                                    <div class="fw-semibold">Anonymous Viewer</div>
-                                                    <div class="text-secondary small">Guest</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td><span class="text-secondary">{{ now()->subHours(5)->format('d M Y, H:i') }}</span></td>
-                                        <td><span class="badge bg-green-lt">Search</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    @else
-                        <div class="empty py-5">
-                            <div class="empty-icon">
-                                <i class="ti ti-eye-off text-muted" style="font-size: 3rem;"></i>
-                            </div>
-                            <p class="empty-title">No Views Yet</p>
-                            <p class="empty-subtitle text-secondary">
-                                This product has not been viewed by anyone yet. Views will be tracked once the app is live.
-                            </p>
-                        </div>
-                    @endif
+                    <div class="table-responsive">
+                        {{ $dataTable->table(['class' => 'table table-vcenter card-table w-100']) }}
+                    </div>
                 </div>
 
                 {{-- Tab: Leads / Enquiries (Dummy for now) --}}
@@ -493,6 +440,7 @@
 @endsection
 
 @push('scripts')
+{{ $dataTable->scripts() }}
 <script>
     $(function() {
         // Status change from dropdown

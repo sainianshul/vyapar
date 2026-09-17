@@ -37,6 +37,7 @@ class UpdateProductRequest extends FormRequest
             'pincode' => 'nullable|string|max:10',
             'status' => 'required|integer|in:1,2,3,4',
             'is_featured' => 'nullable|boolean',
+            'is_verified' => 'nullable|boolean',
             'primary_image' => 'nullable|image|max:5120', // 5MB max
             'additional_images.*' => 'nullable|image|max:5120', // 5MB max
             'remove_images' => 'nullable|array',

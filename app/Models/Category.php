@@ -46,6 +46,16 @@ class Category extends Model
         return $ancestors->reverse();
     }
 
+    public function getAllChildrenIds()
+    {
+        $ids = [];
+        foreach ($this->children as $child) {
+            $ids[] = $child->id;
+            $ids = array_merge($ids, $child->getAllChildrenIds());
+        }
+        return $ids;
+    }
+
     // ─── Scopes ────────────────────────────────────
 
     public function scopeActive($query)

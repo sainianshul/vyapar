@@ -56,6 +56,7 @@ class Product extends Model
         'views_count',
         'leads_count',
         'is_featured',
+        'is_verified',
         'featured_at',
         'expires_at'
     ];

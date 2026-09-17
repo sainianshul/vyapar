@@ -35,6 +35,9 @@ class ProductController extends Controller
     public function store(StoreProductRequest $request, \App\Services\ProductService $productService)
     {
         $data = $request->validated();
+        $data['is_negotiable'] = $request->boolean('is_negotiable');
+        $data['is_featured'] = $request->boolean('is_featured');
+        $data['is_verified'] = $request->boolean('is_verified');
         $seller = User::findOrFail($data['user_id']);
         
         $productService->createProduct(
@@ -48,13 +51,13 @@ class ProductController extends Controller
             ->with('success', 'Product created successfully.');
     }
 
-    public function show(Product $product)
+    public function show(Product $product, \App\DataTables\Products\ProductViewDataTable $dataTable)
     {
         $product->load(['seller', 'category', 'images' => function ($q) {
             $q->orderBy('is_primary', 'desc')->orderBy('sort_order');
         }]);
 
-        return view('admin.products.show', compact('product'));
+        return $dataTable->with('product_id', $product->id)->render('admin.products.show', compact('product'));
     }
 
     public function edit(Product $product)
@@ -77,6 +80,7 @@ class ProductController extends Controller
         $data = $request->safe()->except(['primary_image', 'additional_images', 'remove_images']);
         $data['is_negotiable'] = $request->boolean('is_negotiable');
         $data['is_featured'] = $request->boolean('is_featured');
+        $data['is_verified'] = $request->boolean('is_verified');
 
         if ($product->title !== $data['title']) {
             $data['slug'] = Str::slug($data['title']);
