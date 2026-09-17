@@ -33,7 +33,7 @@ Route::prefix('v1')->group(function () {
             Route::get('me', [\App\Http\Controllers\Api\V1\AuthController::class, 'me']);
         });
 
-        Route::put('profile', [\App\Http\Controllers\Api\V1\ProfileController::class, 'update']);
+        Route::post('profile', [\App\Http\Controllers\Api\V1\ProfileController::class, 'update']);
 
         // Products
         Route::prefix('products')->group(function () {

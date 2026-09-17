@@ -11,7 +11,7 @@ use OpenApi\Attributes as OA;
 
 class ProfileController extends Controller
 {
-    #[OA\Put(
+    #[OA\Post(
         path: '/api/v1/profile',
         operationId: 'updateProfile',
         summary: 'Update user profile (Name, Address, etc.)',
