@@ -171,21 +171,70 @@
                             <i class="ti ti-plus me-1"></i>Add Subcategory
                         </a>
                     </div>
-                    <div class="table-responsive">
-                        <table id="subcategories-table" class="table table-vcenter card-table w-100">
-                            <thead>
-                                <tr>
-                                    <th class="w-1">S.No</th>
-                                    <th>Category Info</th>
-                                    <th>Sort Order</th>
-                                    <th>Featured</th>
-                                    <th>Status</th>
-                                    <th class="text-end">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
+                    
+                    @if($category->children->count() > 0)
+                        <div class="table-responsive">
+                            <table class="table table-vcenter card-table w-100">
+                                <thead>
+                                    <tr>
+                                        <th class="w-1">S.No</th>
+                                        <th>Category Info</th>
+                                        <th>Sort Order</th>
+                                        <th>Featured</th>
+                                        <th>Status</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($category->children as $index => $child)
+                                        <tr>
+                                            <td>{{ $index + 1 }}</td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <span class="avatar avatar-sm me-2">{!! $child->icon_html !!}</span>
+                                                    <div class="fw-semibold">
+                                                        <a href="{{ route('admin.categories.show', $child->id) }}" class="text-reset text-decoration-none">{{ $child->name }}</a>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-secondary">{{ $child->sort_order }}</td>
+                                            <td>
+                                                @if($child->is_featured)
+                                                    <span class="badge bg-yellow-lt"><i class="ti ti-star-filled me-1"></i>Yes</span>
+                                                @else
+                                                    <span class="badge bg-secondary-lt">No</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-{{ $child->status_color }}-lt">
+                                                    <i class="{{ $child->status_icon }} me-1"></i>{{ $child->status_name }}
+                                                </span>
+                                            </td>
+                                            <td class="text-end">
+                                                <div class="d-flex gap-1 justify-content-end">
+                                                    <a href="{{ route('admin.categories.show', $child->id) }}" class="btn btn-icon btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="View">
+                                                        <i class="ti ti-eye"></i>
+                                                    </a>
+                                                    <a href="{{ route('admin.categories.edit', $child->id) }}" class="btn btn-icon btn-sm btn-outline-warning" data-bs-toggle="tooltip" title="Edit">
+                                                        <i class="ti ti-pencil"></i>
+                                                    </a>
+                                                    <button type="button" class="btn btn-icon btn-sm btn-outline-danger btn-delete" data-id="{{ $child->id }}" data-name="{{ $child->name }}" data-bs-toggle="tooltip" title="Delete">
+                                                        <i class="ti ti-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        @include('admin.layouts.partials._table-empty', [
+                            'id' => 'subcategories-empty',
+                            'title' => 'No subcategories found',
+                            'subtitle' => 'This category does not have any direct subcategories.'
+                        ])
+                    @endif
                 </div>
 
                 {{-- Tab: Products --}}
@@ -194,7 +243,15 @@
                         <h3 class="mb-1">Products</h3>
                         <p class="text-secondary mb-0">Products linked to this category and all its subcategories.</p>
                     </div>
-                    <div class="table-responsive">
+
+                    {{-- Loading Spinner --}}
+                    <div id="products-loader" class="d-flex justify-content-center align-items-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading…</span>
+                        </div>
+                    </div>
+
+                    <div id="products-table-wrapper" class="table-responsive d-none">
                         <table id="products-table" class="table table-vcenter card-table w-100">
                             <thead>
                                 <tr>
@@ -212,6 +269,12 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                    
+                    @include('admin.layouts.partials._table-empty', [
+                        'id' => 'products-empty',
+                        'title' => 'No products found',
+                        'subtitle' => 'This category and its subcategories currently do not have any products.'
+                    ])
                 </div>
 
             </div>
@@ -250,37 +313,6 @@
                           "<'col-sm-12 col-md-5'i>" +
                           "<'col-sm-12 col-md-7 d-flex justify-content-md-end align-items-center'p>>";
 
-            // Initialize Subcategories Table
-            let subcategoriesTable = $('#subcategories-table').DataTable({
-                serverSide: true,
-                processing: true,
-                ajax: {
-                    url: '{{ route('admin.categories.data') }}',
-                    data: function (d) {
-                        d.parent_id = '{{ $category->id }}';
-                    }
-                },
-                columns: [
-                    { data: null, name: 'id', render: function (data, type, row, meta) { return meta.row + meta.settings._iDisplayStart + 1; }, orderable: false, searchable: false },
-                    { data: 'name', name: 'name', render: function(data, type, row) {
-                        // Link name to the category show page instead of just returning raw HTML
-                        return '<a href="/admin/categories/' + row.id + '" class="text-reset text-decoration-none">' + data + '</a>';
-                    }},
-                    { data: 'sort_order', name: 'sort_order' },
-                    { data: 'is_featured', name: 'is_featured' },
-                    { data: 'status', name: 'status' },
-                    { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-end' },
-                ],
-                order: [[2, 'asc']], // Order by sort_order
-                pageLength: 10,
-                lengthMenu: [[10, 25, 50], [10, 25, 50]],
-                dom: dtDom,
-                language: dtLanguage,
-                drawCallback: function () {
-                    $('[data-bs-toggle="tooltip"]').tooltip({ trigger: 'hover' });
-                }
-            });
-
             // Initialize Products Table
             let productsTable = $('#products-table').DataTable({
                 serverSide: true,
@@ -307,7 +339,28 @@
                 lengthMenu: [[10, 25, 50], [10, 25, 50]],
                 dom: dtDom,
                 language: dtLanguage,
+                initComplete: function () {
+                    $('#products-loader').remove();
+                    let total = this.api().page.info().recordsDisplay;
+                    if (total === 0) {
+                        $('#products-table-wrapper').addClass('d-none');
+                        $('#products-empty').removeClass('d-none');
+                    } else {
+                        $('#products-empty').addClass('d-none');
+                        $('#products-table-wrapper').removeClass('d-none');
+                    }
+                },
                 drawCallback: function () {
+                    if ($('#products-loader').length === 0) {
+                        let total = this.api().page.info().recordsDisplay;
+                        if (total === 0) {
+                            $('#products-table-wrapper').addClass('d-none');
+                            $('#products-empty').removeClass('d-none');
+                        } else {
+                            $('#products-empty').addClass('d-none');
+                            $('#products-table-wrapper').removeClass('d-none');
+                        }
+                    }
                     $('[data-bs-toggle="tooltip"]').tooltip({ trigger: 'hover' });
                 }
             });
@@ -316,9 +369,8 @@
             $(document).on('click', '.btn-delete', function () {
                 let id = $(this).data('id');
                 let name = $(this).data('name');
-                let isCategory = $(this).closest('table').attr('id') === 'subcategories-table';
-                let url = isCategory ? '/admin/categories/' + id : '/admin/products/' + id;
-                let tableToReload = isCategory ? subcategoriesTable : productsTable;
+                let isCategory = !$(this).closest('table').attr('id'); // Since subcategories is a simple table, the closest table won't have an id if it's the simple one, or wait, we just check if it's in the products table wrapper.
+                let url = $(this).closest('#products-table-wrapper').length ? '/admin/products/' + id : '/admin/categories/' + id;
                 
                 $(this).tooltip('hide');
                 
@@ -334,7 +386,11 @@
                     if (!result.isConfirmed) return;
                     $.post(url, { _method: 'DELETE', _token: '{{ csrf_token() }}' })
                         .done(function (res) {
-                            tableToReload.ajax.reload(null, false);
+                            if (url.includes('products')) {
+                                productsTable.ajax.reload(null, false);
+                            } else {
+                                location.reload(); // Reload page for simple subcategory table
+                            }
                             Swal.fire({ toast: true, position: 'top', showConfirmButton: false, timer: 1500, icon: 'success', title: res.message });
                         })
                         .fail(function (xhr) {
