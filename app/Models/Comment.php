@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Comment extends Model
 {
     public const TYPE_USER = 'user';
+    public const TYPE_PRODUCT = 'product';
 
     protected $fillable = [
         'commentable_type',

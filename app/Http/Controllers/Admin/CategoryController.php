@@ -132,6 +132,13 @@ class CategoryController extends Controller
         ]);
     }
 
+    public function children(Category $category)
+    {
+        return response()->json(
+            $category->children()->active()->orderBy('sort_order')->orderBy('name')->select('id', 'name')->get()
+        );
+    }
+
     /**
      * Get categories for parent dropdown with indentation.
      * Excludes the given category (and its children) to prevent circular refs.

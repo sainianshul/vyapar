@@ -35,6 +35,17 @@ class Category extends Model
         return $this->hasMany(Category::class, 'parent_id');
     }
 
+    public function getAncestorsAttribute()
+    {
+        $ancestors = collect();
+        $parent = $this->parent;
+        while ($parent) {
+            $ancestors->push($parent);
+            $parent = $parent->parent;
+        }
+        return $ancestors->reverse();
+    }
+
     // ─── Scopes ────────────────────────────────────
 
     public function scopeActive($query)

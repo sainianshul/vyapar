@@ -23,6 +23,13 @@ class ProductImage extends Model
         return $this->belongsTo(Product::class);
     }
 
+    public function getUrlAttribute(): string
+    {
+        return filter_var($this->image_path, FILTER_VALIDATE_URL) 
+            ? $this->image_path 
+            : asset('storage/' . $this->image_path);
+    }
+
     public function toApiResponse(): array
     {
         return [

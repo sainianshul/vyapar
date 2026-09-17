@@ -13,6 +13,7 @@ class CommentController extends Controller
         $validated = $request->validate([
             'commentable_type' => 'required|string|in:' . implode(',', [
                 Comment::TYPE_USER,
+                Comment::TYPE_PRODUCT,
             ]),
             'commentable_id' => 'required|integer',
             'body' => 'required|string|max:2000',

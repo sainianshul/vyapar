@@ -41,11 +41,18 @@ Route::prefix('admin')->group(function () {
         Route::delete('comments/{comment}', [\App\Http\Controllers\Admin\CommentController::class, 'destroy'])->name('comments.destroy');
         // Categories CRUD
         Route::get('categories/data', [\App\Http\Controllers\Admin\CategoryController::class, 'data'])->name('categories.data');
+        Route::get('categories/{category}/children', [\App\Http\Controllers\Admin\CategoryController::class, 'children'])->name('categories.children');
         Route::post('categories/{category}/status', [\App\Http\Controllers\Admin\CategoryController::class, 'updateStatus'])->name('categories.update-status');
         Route::post('categories/{category}/featured', [\App\Http\Controllers\Admin\CategoryController::class, 'updateFeatured'])->name('categories.update-featured');
         Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class)->except(['show']);
 
-        // Add future routes here for Nurses, Patients, Error Logs, etc.
+        // Products CRUD
+        Route::get('products/data', [\App\Http\Controllers\Admin\ProductController::class, 'data'])->name('products.data');
+        Route::post('products/{product}/status', [\App\Http\Controllers\Admin\ProductController::class, 'updateStatus'])->name('products.update-status');
+        Route::post('products/{product}/featured', [\App\Http\Controllers\Admin\ProductController::class, 'updateFeatured'])->name('products.update-featured');
+        Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
+
+        // Add future routes here for Leads, Requirements, etc.
     });
     });
 });
