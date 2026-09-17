@@ -49,6 +49,7 @@ class AuthService
         
         return [
             'otp' => $otp,
+            'is_registered' => $isRegistered,
         ];
     }
 
