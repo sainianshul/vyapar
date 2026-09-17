@@ -173,6 +173,7 @@ class ProductController extends Controller
                 'user_id' => $userId,
             ]);
             $product->increment('views_count');
+            $product->views_count++; // Update in-memory for the API response
         }
 
         return ApiResponse::success('Product detail', [

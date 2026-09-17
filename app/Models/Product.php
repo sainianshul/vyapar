@@ -284,6 +284,7 @@ class Product extends Model
             'pincode' => $this->pincode,
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
+            'views_count' => $this->views_count,
             'is_featured' => $this->is_featured,
             'is_verified' => $this->is_verified,
             'seller' => $this->relationLoaded('seller') && $this->seller ? [
