@@ -31,6 +31,8 @@ class ProfileController extends Controller
                             new OA\Property(property: 'state', type: 'string', example: 'Delhi'),
                             new OA\Property(property: 'city', type: 'string', example: 'New Delhi'),
                             new OA\Property(property: 'pincode', type: 'string', example: '110001'),
+                            new OA\Property(property: 'latitude', type: 'number', format: 'float', nullable: true, example: 28.7041),
+                            new OA\Property(property: 'longitude', type: 'number', format: 'float', nullable: true, example: 77.1025),
                             new OA\Property(property: 'profile_photo', type: 'string', format: 'binary', nullable: true),
                         ]
                     )
@@ -58,6 +60,10 @@ class ProfileController extends Controller
         // Set profile_completed_at when they successfully update profile
         if (is_null($user->profile_completed_at)) {
             $data['profile_completed_at'] = now();
+        }
+
+        if (isset($data['latitude']) && isset($data['longitude'])) {
+            $data['location_updated_at'] = now();
         }
 
         $user->update($data);

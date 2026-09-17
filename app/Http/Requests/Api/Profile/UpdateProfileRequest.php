@@ -28,6 +28,8 @@ class UpdateProfileRequest extends FormRequest
             'state' => 'required|string|max:100',
             'city' => 'required|string|max:100',
             'pincode' => 'required|string|max:10',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             'profile_photo' => 'nullable|image|max:2048',
         ];
     }

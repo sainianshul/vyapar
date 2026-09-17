@@ -409,7 +409,7 @@
                                                         <i class="ti ti-device-mobile"></i>
                                                     </span>
                                                     <div>
-                                                        <div class="fw-semibold">{{ $token->name ?? 'Unknown Device' }}</div>
+                                                        <div class="fw-semibold">{{ $token->device_name ?? $token->name ?? 'Unknown Device' }}</div>
                                                     </div>
                                                 </div>
                                             </td>
