@@ -15,6 +15,7 @@ class CategoryController extends Controller
         operationId: 'listCategories',
         summary: 'Get all active categories (tree structure)',
         description: 'Returns all active root categories with their active children nested. Optionally pass parent_id to get subcategories of a specific category.',
+        security: [['bearerAuth' => []]],
         tags: ['Categories'],
         parameters: [
             new OA\Parameter(
@@ -66,6 +67,7 @@ class CategoryController extends Controller
         operationId: 'featuredCategories',
         summary: 'Get featured categories for home page',
         description: 'Returns only active & featured categories, sorted by sort_order. Used on the app home screen.',
+        security: [['bearerAuth' => []]],
         tags: ['Categories'],
         responses: [
             new OA\Response(response: 200, description: 'Success'),
@@ -92,6 +94,7 @@ class CategoryController extends Controller
         operationId: 'showCategory',
         summary: 'Get a single category by id',
         description: 'Returns category details along with its active subcategories.',
+        security: [['bearerAuth' => []]],
         tags: ['Categories'],
         parameters: [
             new OA\Parameter(
