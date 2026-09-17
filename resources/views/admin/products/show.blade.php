@@ -439,6 +439,14 @@
 
 @endsection
 
+@push('datatables_css')
+    @include('admin.layouts.partials._datatable-cdn-css')
+@endpush
+
+@push('datatables_js')
+    @include('admin.layouts.partials._datatable-cdn-js')
+@endpush
+
 @push('scripts')
 {{ $dataTable->scripts() }}
 <script>
@@ -472,6 +480,13 @@
                     }
                 });
             });
+        });
+
+        // Fix DataTable column width in Bootstrap tabs
+        $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+            if($.fn.dataTable) {
+                $($.fn.dataTable.tables(true)).DataTable().columns.adjust();
+            }
         });
     });
 </script>
