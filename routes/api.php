@@ -50,6 +50,8 @@ Route::prefix('v1')->group(function () {
         Route::prefix('my/products')->group(function () {
             Route::get('/', [\App\Http\Controllers\Api\V1\ProductController::class, 'myProducts']);
             Route::get('{id}', [\App\Http\Controllers\Api\V1\ProductController::class, 'myProductDetail']);
+            Route::post('{id}/status', [\App\Http\Controllers\Api\V1\ProductController::class, 'updateStatus']);
+            Route::delete('{id}', [\App\Http\Controllers\Api\V1\ProductController::class, 'destroy']);
         });
     });
 });

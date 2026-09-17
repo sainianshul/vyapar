@@ -392,4 +392,81 @@ class ProductController extends Controller
             'product' => $updatedProduct->toSellerDetailArray()
         ]);
     }
+
+    #[OA\Post(
+        path: '/api/v1/my/products/{id}/status',
+        operationId: 'updateProductStatus',
+        summary: 'Update product status (e.g. mark sold or inactive)',
+        security: [['bearerAuth' => []]],
+        tags: ['Products'],
+        parameters: [
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\MediaType(
+                mediaType: 'application/json',
+                schema: new OA\Schema(
+                    required: ['status'],
+                    properties: [
+                        new OA\Property(property: 'status', type: 'integer', description: 'Allowed values: 1 (Active), 2 (Inactive), 3 (Sold), 4 (Draft)'),
+                    ]
+                )
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'Product status updated successfully'),
+            new OA\Response(response: 422, description: 'Validation Error'),
+            new OA\Response(response: 403, description: 'Forbidden (Not the owner)'),
+            new OA\Response(response: 404, description: 'Product not found'),
+        ]
+    )]
+    public function updateStatus(Request $request, int $id): JsonResponse
+    {
+        $request->validate([
+            'status' => 'required|integer|in:1,2,3,4',
+        ]);
+
+        $product = Product::where('id', $id)
+            ->where('user_id', $request->user()->id)
+            ->firstOrFail();
+
+        $product->update(['status' => $request->status]);
+
+        return ApiResponse::success('Product status updated successfully', [
+            'product' => $product->fresh()->toSellerDetailArray()
+        ]);
+    }
+
+    #[OA\Delete(
+        path: '/api/v1/my/products/{id}',
+        operationId: 'deleteProduct',
+        summary: 'Delete a product',
+        security: [['bearerAuth' => []]],
+        tags: ['Products'],
+        parameters: [
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Product deleted successfully'),
+            new OA\Response(response: 403, description: 'Forbidden (Not the owner)'),
+            new OA\Response(response: 404, description: 'Product not found'),
+        ]
+    )]
+    public function destroy(Request $request, int $id): JsonResponse
+    {
+        $product = Product::where('id', $id)
+            ->where('user_id', $request->user()->id)
+            ->firstOrFail();
+
+        // Optional: delete images from storage if required
+        foreach ($product->images as $image) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($image->image_path);
+            $image->delete();
+        }
+
+        $product->delete();
+
+        return ApiResponse::success('Product deleted successfully');
+    }
 }
