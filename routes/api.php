@@ -41,6 +41,9 @@ Route::prefix('v1')->group(function () {
         Route::get('/requirements/{id}', [\App\Http\Controllers\Api\V1\RequirementController::class, 'show']);
         Route::post('/requirements', [\App\Http\Controllers\Api\V1\RequirementController::class, 'store']);
         
+        // Home (Buyer Dashboard - single fast endpoint)
+        Route::get('/home', [\App\Http\Controllers\Api\V1\HomeController::class, 'index']);
+
         // Dashboard
         Route::prefix('dashboard')->group(function () {
             Route::get('/seller', [\App\Http\Controllers\Api\V1\DashboardController::class, 'sellerDashboard']);
