@@ -17,7 +17,7 @@ class FeedbackController extends Controller
         operationId: 'getFeedbacks',
         summary: 'Get all feedbacks',
         description: 'Retrieve all feedbacks with user details',
-        security: [['sanctum' => []]],
+        security: [['bearerAuth' => []]],
         tags: ['Feedbacks']
     )]
     #[OA\Response(

@@ -1,0 +1,790 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC Call & Flutter API Reference</title>
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: white; margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; display: flex; gap: 20px; }
+        .main-panel { flex: 2; }
+        .side-panel { flex: 1; background: #1e1e1e; padding: 20px; border-radius: 8px; border: 1px solid #333; height: fit-content;}
+        
+        .header { text-align: center; margin-bottom: 20px; color: #4CAF50; }
+        .controls-card { background: #1e1e1e; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #333;}
+        .input-group { margin-bottom: 15px; display: flex; gap: 10px; align-items: center; }
+        input, select { padding: 8px; border-radius: 4px; border: 1px solid #333; background: #2c2c2c; color: white; flex: 1; }
+        button { padding: 8px 15px; border-radius: 4px; border: none; font-weight: bold; cursor: pointer; color: white; }
+        .btn-primary { background: #2196F3; }
+        .btn-success { background: #4CAF50; }
+        .btn-danger { background: #f44336; }
+        .btn-warning { background: #ff9800; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .video-container { display: flex; gap: 15px; justify-content: center; margin-top: 20px; }
+        .video-box { flex: 1; background: #000; border-radius: 8px; overflow: hidden; position: relative; min-height: 250px; border: 2px solid #333; }
+        video { width: 100%; height: 100%; object-fit: cover; }
+        .video-label { position: absolute; bottom: 10px; left: 10px; background: rgba(0,0,0,0.7); padding: 5px 10px; border-radius: 4px; font-size: 14px; }
+        
+        #logs { background: #000; color: #0f0; padding: 10px; border-radius: 4px; height: 150px; overflow-y: auto; font-family: monospace; font-size: 12px; margin-top: 20px; }
+        .incoming-alert { display: none; background: #ff9800; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 20px; color: black; font-weight: bold; animation: shake 0.5s infinite alternate;}
+        
+        @keyframes shake { 0% { transform: translateX(-2px); } 100% { transform: translateX(2px); } }
+
+        .status-bar { background: #333; padding: 8px 15px; border-radius: 4px; margin-bottom: 15px; font-size: 13px; display: flex; justify-content: space-between; }
+        
+        .history-item { padding: 10px; border-bottom: 1px solid #333; font-size: 13px; display: flex; justify-content: space-between;}
+        .history-item:last-child { border-bottom: none; }
+        .status-badge { padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold;}
+        .status-ended { background: #f44336; color: white; }
+        .status-missed { background: #ff9800; color: black; }
+        .status-answered { background: #4CAF50; color: white; }
+        .status-rejected { background: #9e9e9e; color: white; }
+    </style>
+</head>
+<body>
+
+<h2 class="header">WebRTC Blueprint for Flutter Devs (APIs + Logic)</h2>
+
+<div class="container">
+    <!-- MAIN PANEL: CALL CONTROLS & VIDEO -->
+    <div class="main-panel">
+        
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span>Role: <b id="roleDisplay">-</b></span>
+            <span>Call ID: <b id="callIdDisplay">-</b></span>
+            <span>State: <b id="stateDisplay">Idle</b></span>
+        </div>
+
+        <div class="controls-card">
+            <h3>1. Identity (Auth)</h3>
+            <div class="input-group">
+                <input type="text" id="apiToken" placeholder="Enter Bearer Token">
+            </div>
+            <div class="input-group">
+                <input type="number" id="myUserId" placeholder="My User ID (e.g. 264)">
+                <button class="btn-primary" id="btnConnect" onclick="connectPusher()">Connect Pusher</button>
+            </div>
+
+            <hr style="border-color: #333; margin: 20px 0;">
+
+            <h3>2. Actions</h3>
+            <div class="input-group">
+                <input type="number" id="targetUserId" placeholder="Target User ID (e.g. 164)">
+                <select id="callTypeSelector">
+                    <option value="audio">Audio Call (Mic Only)</option>
+                    <option value="video">Video Call (Camera & Mic)</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <button class="btn-success" id="btnCall" onclick="initiateCall()" disabled>ðŸ“ž Call</button>
+                <button class="btn-danger" id="btnEnd" onclick="endCall()" disabled>ðŸ›‘ End Call</button>
+            </div>
+        </div>
+
+        <!-- Incoming Call Alert UI -->
+        <div id="incomingAlert" class="incoming-alert">
+            ðŸ”” <span id="callerNameText">Someone</span> is calling you (<span id="incomingCallType">audio</span>)...
+            <button class="btn-success" style="margin-left: 15px;" onclick="answerCall('accept')">âœ… Accept</button>
+            <button class="btn-danger" style="margin-left: 5px;" onclick="answerCall('reject')">âŒ Reject</button>
+        </div>
+
+        <div class="video-container">
+            <div class="video-box">
+                <video id="localVideo" autoplay muted playsinline></video>
+                <div class="video-label">My Device (Local)</div>
+            </div>
+            <div class="video-box">
+                <video id="remoteVideo" autoplay playsinline></video>
+                <div class="video-label">Remote Peer</div>
+            </div>
+        </div>
+
+        <div id="logs">System Ready. Waiting for actions...</div>
+    </div>
+
+    <!-- SIDE PANEL: CALL HISTORY -->
+    <div class="side-panel">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3>Call History</h3>
+            <button class="btn-primary" style="padding: 4px 8px; font-size: 12px;" onclick="fetchCallHistory()">Load</button>
+        </div>
+        <div id="historyList" style="max-height: 500px; overflow-y: auto;">
+            <div style="color: #888; font-size: 13px; text-align: center;">Click Load to fetch call logs.</div>
+        </div>
+
+        <hr style="border-color: #333; margin: 20px 0;">
+
+        <!-- API Reference for Flutter Dev -->
+        <h3>API Quick Reference</h3>
+        <div style="font-size: 12px; color: #aaa; line-height: 1.8;">
+            <b>POST</b> /api/call/initiate<br>
+            <b>POST</b> /api/call/answer<br>
+            <b>POST</b> /api/call/signal<br>
+            <b>POST</b> /api/call/end<br>
+            <b>POST</b> /api/call/missed<br>
+            <b>GET</b> /api/call/history<br>
+            <b>GET</b> /api/call/active<br>
+        </div>
+    </div>
+</div>
+
+<!-- Ringtone Audio -->
+<audio id="ringtoneAudio" loop preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/2870/2870-preview.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+    // =========================================================================
+    // ðŸš€ FLUTTER DEVELOPER MASTER CHEAT SHEET (APIs & WEBSOCKETS)
+    // =========================================================================
+    // Base URL: https://onesuite.winntus.in/public/api
+    // Headers Required: Authorization: Bearer {token}, Accept: application/json
+    //
+    // --- 1. REST APIs (HTTP POST/GET) ---
+    //
+    // 1. Initiate Call (Hit when Caller dials)
+    //    POST /call/initiate
+    //    Body: { "receiver_id": 164, "call_type": "audio", "chat_id": 93 }
+    //    Resp: { "status": true, "call_id": 12, "data": { "call_id": 12, "status": "ringing"... } }
+    //
+    // 2. Answer Call (Hit when Receiver taps Accept/Reject)
+    //    POST /call/answer
+    //    Body: { "call_id": 12, "action": "accept" } // or "reject"
+    //    Resp: { "status": true, "data": { "call_id": 12, "status": "answered" } }
+    //
+    // 3. Send WebRTC Signal (Hit automatically when SDP/ICE is generated)
+    //    POST /call/signal
+    //    Body: { "call_id": 12, "signal_type": "offer", "signal_data": "{\"type\":\"offer\",\"sdp\":\"...\"}" }
+    //    (signal_type can be: "offer", "answer", "ice-candidate")
+    //
+    // 4. End Call (Hit when User taps Red Hangup button)
+    //    POST /call/end
+    //    Body: { "call_id": 12, "reason": "caller_ended" } // reason is optional
+    //    Resp: { "status": true, "data": { "duration_seconds": 45, "end_reason": "caller_ended" } }
+    //
+    // 5. Missed Call (Hit by Caller app if receiver doesn't answer after 45 secs)
+    //    POST /call/missed
+    //    Body: { "call_id": 12 }
+    //
+    //
+    // --- 2. PUSHER WEBSOCKET EVENTS ---
+    // Key: 39e47d55853774809727 | Cluster: ap2
+    // Channel to Subscribe: 'wintus-call.{myUserId}' (e.g. wintus-call.164)
+    //
+    // EVENT 1: 'incoming-call' (Receiver gets this when Caller hits /initiate)
+    // Payload: { 
+    //    "callId": 12, "callerId": 264, "callerName": "Rajkumar", 
+    //    "callerAvatar": "url...", "callType": "audio", "receiverId": 164 
+    // }
+    // Action: Play ringtone, show incoming call screen.
+    //
+    // EVENT 2: 'call-answered' (Caller gets this when Receiver hits /answer)
+    // Payload: { 
+    //    "callId": 12, "receiverId": 164, "receiverName": "Lalit", 
+    //    "action": "accept", "callerId": 264 
+    // }
+    // Action: If 'accept', Caller creates SDP Offer & hits /signal. Stop ringtone.
+    //
+    // EVENT 3: 'call-signal' (Both get this when the OTHER hits /signal)
+    // Payload: { 
+    //    "callId": 12, "senderId": 264, "targetUserId": 164, 
+    //    "signalType": "offer", "signalData": "{\"type\":\"offer\",\"sdp\":\"...\"}" 
+    // }
+    // Action: If 'offer' -> create Answer. If 'answer' or 'ice-candidate' -> add to PeerConnection.
+    //
+    // EVENT 4: 'call-ended' (Both get this when OTHER hits /end or /missed)
+    // Payload: { "callId": 12, "endedBy": 264, "reason": "caller_ended", "duration": 45 }
+    // Action: Close RTCPeerConnection, dismiss call screen.
+    // =========================================================================
+
+    const API_BASE_URL = 'https://onesuite.winntus.in/public/api/call';
+    const PUSHER_KEY = '39e47d55853774809727';
+    const PUSHER_CLUSTER = 'ap2';
+
+    // WEBRTC: Free STUN Server (helps find public IP for P2P)
+    // Flutter: Use same config in RTCPeerConnection
+    const rtcConfig = {
+        iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' },
+            { urls: 'stun:stun2.l.google.com:19302' },
+            { urls: 'stun:stun3.l.google.com:19302' },
+            { urls: 'stun:stun4.l.google.com:19302' },
+            // FREE TURN servers (for mobile NAT traversal - Jio/Airtel etc.)
+            {
+                urls: 'turn:openrelay.metered.ca:80',
+                username: 'openrelayproject',
+                credential: 'openrelayproject'
+            },
+            {
+                urls: 'turn:openrelay.metered.ca:443',
+                username: 'openrelayproject',
+                credential: 'openrelayproject'
+            },
+            {
+                urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+                username: 'openrelayproject',
+                credential: 'openrelayproject'
+            }
+        ]
+    };
+
+    // ---- State Variables ----
+    let localStream = null;
+    let peerConnection = null;
+    let pusher = null;
+    let myChannel = null;
+    let currentCallId = null;
+    let myRole = null;           // 'caller' or 'receiver' â€” tracks who I am in this call
+    let currentCallType = null;  // 'audio' or 'video' â€” tracks the active call type
+    let myUserId = null;         // My own user ID (set on connect)
+
+    // DOM
+    const logBox = document.getElementById('logs');
+    const localVideo = document.getElementById('localVideo');
+    const remoteVideo = document.getElementById('remoteVideo');
+    const incomingAlert = document.getElementById('incomingAlert');
+    const ringtone = document.getElementById('ringtoneAudio');
+
+    function log(msg) {
+        logBox.innerHTML += `\n[${new Date().toLocaleTimeString()}] ${msg}`;
+        logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    function updateStatus(role, callId, state) {
+        document.getElementById('roleDisplay').innerText = role || '-';
+        document.getElementById('callIdDisplay').innerText = callId || '-';
+        document.getElementById('stateDisplay').innerText = state || 'Idle';
+    }
+
+    function getHeaders() {
+        return {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': 'Bearer ' + document.getElementById('apiToken').value
+        };
+    }
+
+    // ==========================================
+    // 1. START MEDIA (Camera / Mic)
+    // ==========================================
+    // Flutter: Use navigator.mediaDevices.getUserMedia equivalent
+    //   - flutter_webrtc: helper.openCamera(mediaConstraints)
+    //   - For audio only: { audio: true, video: false }
+    //   - For video call: { audio: true, video: true }
+    async function startMedia(callType) {
+        const isVideo = (callType === 'video');
+        log(`Starting media... (video: ${isVideo}, audio: true)`);
+
+        try {
+            // Stop any previous stream
+            if (localStream) {
+                localStream.getTracks().forEach(t => t.stop());
+            }
+
+            localStream = await navigator.mediaDevices.getUserMedia({
+                video: isVideo,
+                audio: true
+            });
+            localVideo.srcObject = localStream;
+            log("âœ… Media started successfully.");
+        } catch (error) {
+            log("âŒ Media Error: " + error.message);
+            alert("Camera/Mic permission denied! Please allow and try again.");
+            throw error; // Stop the call flow if media fails
+        }
+    }
+
+
+    // ==========================================
+    // 2. CONNECT TO PUSHER (Real-time Events)
+    // ==========================================
+    // Flutter: Use pusher_channels_flutter package
+    //   - PusherChannelsFlutter.init(apiKey, cluster)
+    //   - pusher.subscribe(channelName: 'wintus-call.{myUserId}')
+    //   - pusher.onEvent = (event) { ... }
+    function connectPusher() {
+        myUserId = document.getElementById('myUserId').value;
+        if (!myUserId) return alert("Enter My User ID");
+
+        pusher = new Pusher(PUSHER_KEY, { cluster: PUSHER_CLUSTER });
+        myChannel = pusher.subscribe('wintus-call.' + myUserId);
+
+        log("âœ… Connected! Listening on channel: wintus-call." + myUserId);
+        document.getElementById('btnCall').disabled = false;
+
+        // -----------------------------------------------
+        // PUSHER EVENT A: "incoming-call"
+        // Triggered when: Someone calls ME
+        // Who receives: Only the RECEIVER
+        // Data: { callId, callerId, callerName, callerAvatar, callType, receiverId }
+        // -----------------------------------------------
+        myChannel.bind('incoming-call', (data) => {
+            // SAFETY CHECK: Only process if I am the receiver (not the caller)
+            if (String(data.callerId) === String(myUserId)) {
+                log("âš ï¸ Ignoring own incoming-call event (I am the caller).");
+                return;
+            }
+
+            log("ðŸ”” INCOMING CALL from: " + data.callerName + " (" + data.callType + ")");
+            currentCallId = data.callId;
+            currentCallType = data.callType; // Remember what type of call it is
+            myRole = 'receiver';
+
+            document.getElementById('callerNameText').innerText = data.callerName;
+            document.getElementById('incomingCallType').innerText = data.callType;
+            incomingAlert.style.display = 'block';
+            updateStatus('Receiver', data.callId, 'Ringing');
+
+            // Play ringtone
+            ringtone.play().catch(() => log("âš ï¸ Ringtone blocked by browser. Click page first."));
+        });
+
+        // -----------------------------------------------
+        // PUSHER EVENT B: "call-answered"
+        // Triggered when: Receiver accepts/rejects my call
+        // Who receives: Only the CALLER
+        // Data: { callId, receiverId, receiverName, action, callerId }
+        // -----------------------------------------------
+        myChannel.bind('call-answered', async (data) => {
+            // SAFETY CHECK: Only the caller should process this
+            if (myRole !== 'caller') {
+                log("âš ï¸ Ignoring call-answered (I am not the caller).");
+                return;
+            }
+
+            log("ðŸ“ž CALL ANSWERED! Action: " + data.action);
+            stopRingtone();
+
+            if (data.action === 'accept') {
+                updateStatus('Caller', currentCallId, 'Connecting...');
+                document.getElementById('btnEnd').disabled = false;
+
+                // CALLER starts media and creates WebRTC Offer
+                try {
+                    await startMedia(currentCallType);
+                    await createPeerConnection();
+                    await createOffer();
+                } catch(e) {
+                    log("âŒ Failed to start media after answer: " + e.message);
+                }
+            } else {
+                log("âŒ Call was REJECTED by receiver.");
+                updateStatus('-', '-', 'Rejected');
+                currentCallId = null;
+                myRole = null;
+                document.getElementById('btnCall').disabled = false;
+            }
+        });
+
+        // -----------------------------------------------
+        // PUSHER EVENT C: "call-signal"
+        // Triggered when: Other party sends WebRTC data (SDP/ICE)
+        // Who receives: The OTHER participant
+        // Data: { callId, senderId, targetUserId, signalType, signalData }
+        //   signalType: 'offer' | 'answer' | 'ice-candidate'
+        //   signalData: JSON string of SDP or ICE candidate
+        // -----------------------------------------------
+        myChannel.bind('call-signal', async (data) => {
+            // SAFETY CHECK: Ignore if signal is from myself
+            if (String(data.senderId) === String(myUserId)) {
+                log("âš ï¸ Ignoring own signal.");
+                return;
+            }
+
+            log("ðŸ“¡ SIGNAL: " + data.signalType + " from user " + data.senderId);
+            const signalData = JSON.parse(data.signalData);
+
+            if (!peerConnection) await createPeerConnection();
+
+            if (data.signalType === 'offer') {
+                // WEBRTC: Receiver gets Offer -> sets it -> creates Answer
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(signalData));
+                await createAnswer();
+                updateStatus('Receiver', currentCallId, 'Connected');
+            }
+            else if (data.signalType === 'answer') {
+                // WEBRTC: Caller gets Answer -> sets it -> connection completes
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(signalData));
+                updateStatus('Caller', currentCallId, 'Connected');
+            }
+            else if (data.signalType === 'ice-candidate') {
+                // WEBRTC: Network path candidate from the other side
+                await peerConnection.addIceCandidate(new RTCIceCandidate(signalData));
+            }
+        });
+
+        // -----------------------------------------------
+        // PUSHER EVENT D: "call-ended"
+        // Triggered when: Other party hangs up
+        // Who receives: The OTHER participant
+        // Data: { callId, endedBy, reason, targetUserId, duration }
+        // -----------------------------------------------
+        myChannel.bind('call-ended', (data) => {
+            // SAFETY CHECK: Ignore if I ended it (I already cleaned up)
+            if (String(data.endedBy) === String(myUserId)) {
+                log("âš ï¸ Ignoring own call-ended event.");
+                return;
+            }
+
+            log("ðŸ›‘ CALL ENDED by remote user. Reason: " + data.reason);
+            if (data.duration) log("â±ï¸ Duration: " + data.duration + " seconds");
+            endCallCleanup();
+        });
+    }
+
+
+    // ==========================================
+    // 3. API ENDPOINTS (Hitting Laravel Backend)
+    // ==========================================
+
+    /**
+     * -------------------------------------------------
+     * API ENDPOINT: Initiate Call
+     * -------------------------------------------------
+     * Method:  POST
+     * Path:    /api/call/initiate
+     * Headers: Authorization: Bearer {token}
+     * Body:    { "receiver_id": 164, "call_type": "audio", "chat_id": 93 }
+     * Response: { "status": true, "call_id": 5, "data": { ... } }
+     *
+     * Flutter: Called when user taps the Call button in chat screen.
+     * -------------------------------------------------
+     */
+    async function initiateCall() {
+        const targetId = document.getElementById('targetUserId').value;
+        currentCallType = document.getElementById('callTypeSelector').value;
+        if (!targetId) return alert("Enter target user ID");
+
+        // Set role as CALLER
+        myRole = 'caller';
+        document.getElementById('btnCall').disabled = true;
+
+        log("ðŸ“ž Initiating " + currentCallType + " call to user " + targetId + "...");
+        updateStatus('Caller', '...', 'Dialing');
+
+        try {
+            const res = await fetch(API_BASE_URL + '/initiate', {
+                method: 'POST',
+                headers: getHeaders(),
+                body: JSON.stringify({
+                    receiver_id: parseInt(targetId),
+                    call_type: currentCallType
+                    // chat_id: 93  // Optional: pass if calling from a chat
+                })
+            });
+            const data = await res.json();
+
+            if (data.status) {
+                currentCallId = data.call_id;
+                log("âœ… Call initiated. Waiting for answer... (Call ID: " + currentCallId + ")");
+                document.getElementById('btnEnd').disabled = false;
+                updateStatus('Caller', currentCallId, 'Ringing');
+            } else {
+                log("âŒ Error: " + data.message);
+                myRole = null;
+                document.getElementById('btnCall').disabled = false;
+                updateStatus('-', '-', 'Failed');
+            }
+        } catch (e) {
+            log("âŒ Network Error: " + e.message);
+            myRole = null;
+            document.getElementById('btnCall').disabled = false;
+        }
+    }
+
+    /**
+     * -------------------------------------------------
+     * API ENDPOINT: Answer Call
+     * -------------------------------------------------
+     * Method:  POST
+     * Path:    /api/call/answer
+     * Headers: Authorization: Bearer {token}
+     * Body:    { "call_id": 5, "action": "accept" }    // or "reject"
+     * Response: { "status": true, "data": { "call_id": 5, "status": "answered" } }
+     *
+     * Flutter: Called when receiver taps Accept or Reject on incoming call screen.
+     * -------------------------------------------------
+     */
+    async function answerCall(action) {
+        incomingAlert.style.display = 'none';
+        stopRingtone();
+
+        log("ðŸ“ž Answering call with action: " + action);
+
+        try {
+            const res = await fetch(API_BASE_URL + '/answer', {
+                method: 'POST',
+                headers: getHeaders(),
+                body: JSON.stringify({ call_id: currentCallId, action: action })
+            });
+            const data = await res.json();
+            log("API Response: " + JSON.stringify(data));
+
+            if (action === 'accept') {
+                document.getElementById('btnEnd').disabled = false;
+                updateStatus('Receiver', currentCallId, 'Accepted, Waiting for Offer...');
+
+                // RECEIVER starts media AFTER accepting
+                // The media type comes from the incoming-call event (currentCallType)
+                try {
+                    await startMedia(currentCallType);
+                } catch(e) {
+                    log("âŒ Media failed: " + e.message);
+                }
+                // Now wait for caller's "offer" signal via Pusher (handled in call-signal event)
+            } else {
+                currentCallId = null;
+                myRole = null;
+                updateStatus('-', '-', 'Rejected');
+            }
+        } catch (e) { log("âŒ Error: " + e.message); }
+    }
+
+    /**
+     * -------------------------------------------------
+     * API ENDPOINT: Send WebRTC Signal
+     * -------------------------------------------------
+     * Method:  POST
+     * Path:    /api/call/signal
+     * Headers: Authorization: Bearer {token}
+     * Body:    { "call_id": 5, "signal_type": "offer", "signal_data": "{...}" }
+     *          signal_type: "offer" | "answer" | "ice-candidate"
+     *          signal_data: JSON.stringify(RTCSessionDescription or RTCIceCandidate)
+     * Response: { "status": true, "message": "Signal relayed." }
+     *
+     * Flutter: Called automatically by WebRTC when SDP/ICE data is ready.
+     *   - Offer: created by CALLER after receiver accepts
+     *   - Answer: created by RECEIVER after receiving offer
+     *   - ICE: created by BOTH sides as network paths are discovered
+     * -------------------------------------------------
+     */
+    async function sendSignalAPI(type, signalData) {
+        try {
+            await fetch(API_BASE_URL + '/signal', {
+                method: 'POST',
+                headers: getHeaders(),
+                body: JSON.stringify({
+                    call_id: currentCallId,
+                    signal_type: type,
+                    signal_data: JSON.stringify(signalData)
+                })
+            });
+        } catch (e) { log("âŒ Signal Error: " + e.message); }
+    }
+
+    /**
+     * -------------------------------------------------
+     * API ENDPOINT: End Call
+     * -------------------------------------------------
+     * Method:  POST
+     * Path:    /api/call/end
+     * Headers: Authorization: Bearer {token}
+     * Body:    { "call_id": 5 }
+     * Response: { "status": true, "data": { "duration_seconds": 45, "end_reason": "caller_ended" } }
+     *
+     * Flutter: Called when user taps the red Hang Up button.
+     * -------------------------------------------------
+     */
+    async function endCall() {
+        if (!currentCallId) return;
+        log("ðŸ›‘ Ending call...");
+
+        try {
+            await fetch(API_BASE_URL + '/end', {
+                method: 'POST',
+                headers: getHeaders(),
+                body: JSON.stringify({ call_id: currentCallId })
+            });
+        } catch (e) {}
+
+        endCallCleanup();
+    }
+
+    /**
+     * -------------------------------------------------
+     * API ENDPOINT: Call History
+     * -------------------------------------------------
+     * Method:  GET
+     * Path:    /api/call/history?per_page=20
+     * Headers: Authorization: Bearer {token}
+     * Response: { "status": true, "data": [...], "pagination": { ... } }
+     *
+     * Flutter: Called on Call Logs screen to show all past calls.
+     * -------------------------------------------------
+     */
+    async function fetchCallHistory() {
+        const historyList = document.getElementById('historyList');
+        historyList.innerHTML = '<div style="color: #888; text-align: center;">Loading...</div>';
+
+        try {
+            const res = await fetch(API_BASE_URL + '/history', {
+                method: 'GET',
+                headers: getHeaders()
+            });
+            const response = await res.json();
+
+            if (response.status && response.data && response.data.length > 0) {
+                historyList.innerHTML = '';
+                response.data.forEach(call => {
+                    const statusClass = {
+                        'ended': 'status-ended',
+                        'missed': 'status-missed',
+                        'answered': 'status-answered',
+                        'rejected': 'status-rejected'
+                    }[call.status] || '';
+
+                    const icon = call.call_type === 'video' ? 'ðŸ“¹' : 'ðŸ“ž';
+                    const dir = call.direction === 'outgoing' ? 'â†—ï¸' : 'â†™ï¸';
+
+                    historyList.innerHTML += `
+                        <div class="history-item">
+                            <div>
+                                <b>${icon} ${dir} ${call.other_user.name}</b><br>
+                                <span style="color: #888; font-size: 11px;">${call.date} at ${call.time}</span>
+                            </div>
+                            <div style="text-align: right;">
+                                <span class="status-badge ${statusClass}">${call.status.toUpperCase()}</span>
+                                <div style="font-size: 10px; color:#888; margin-top:5px;">
+                                    ${call.duration_seconds ? call.duration_seconds + 's' : '-'}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                historyList.innerHTML = '<div style="color: #888; text-align: center;">No call history found.</div>';
+            }
+        } catch (e) {
+            historyList.innerHTML = `<div style="color: red;">Error: ${e.message}</div>`;
+        }
+    }
+
+    /**
+     * -------------------------------------------------
+     * API ENDPOINT: Check Active Call (Not used in UI, but documented)
+     * -------------------------------------------------
+     * Method:  GET
+     * Path:    /api/call/active
+     * Headers: Authorization: Bearer {token}
+     * Response: { "status": true, "has_active": true/false, "data": { ... } }
+     *
+     * Flutter: Call this when app opens/resumes to check if there's an ongoing call.
+     * -------------------------------------------------
+     */
+
+    /**
+     * -------------------------------------------------
+     * API ENDPOINT: Mark Missed Call (Not used in UI, but documented)
+     * -------------------------------------------------
+     * Method:  POST
+     * Path:    /api/call/missed
+     * Headers: Authorization: Bearer {token}
+     * Body:    { "call_id": 5 }
+     *
+     * Flutter: Called by CALLER's app when ringing times out (30-60 sec).
+     * -------------------------------------------------
+     */
+
+
+    // ==========================================
+    // 4. WEBRTC INTERNAL LOGIC
+    // ==========================================
+    // Flutter: Use flutter_webrtc package for all of this
+    //   - RTCPeerConnection (same API as browser)
+    //   - RTCSessionDescription, RTCIceCandidate (same API)
+
+    async function createPeerConnection() {
+        log("ðŸ”§ Creating RTCPeerConnection...");
+        peerConnection = new RTCPeerConnection(rtcConfig);
+
+        // Add my local audio/video tracks to the connection pipe
+        if (localStream) {
+            localStream.getTracks().forEach(track => {
+                peerConnection.addTrack(track, localStream);
+                log("   Added track: " + track.kind); // 'audio' or 'video'
+            });
+        } else {
+            log("âš ï¸ WARNING: No local stream! Media not started yet.");
+        }
+
+        // WEBRTC: When remote audio/video arrives, display it
+        peerConnection.ontrack = (event) => {
+            log("ðŸŽ¥ Remote stream received! Tracks: " + event.streams[0].getTracks().map(t => t.kind).join(', '));
+            remoteVideo.srcObject = event.streams[0];
+        };
+
+        // WEBRTC: When ICE candidate is found, send it to the other person via API
+        peerConnection.onicecandidate = (event) => {
+            if (event.candidate) {
+                sendSignalAPI('ice-candidate', event.candidate);
+            }
+        };
+
+        // WEBRTC: Monitor connection state
+        peerConnection.onconnectionstatechange = () => {
+            log("ðŸ”— Connection State: " + peerConnection.connectionState);
+            if (peerConnection.connectionState === 'connected') {
+                updateStatus(myRole === 'caller' ? 'Caller' : 'Receiver', currentCallId, 'ðŸŸ¢ LIVE');
+            }
+        };
+    }
+
+    // WEBRTC: Caller creates Offer (my mic/camera capabilities)
+    async function createOffer() {
+        log("ðŸ“¤ Creating SDP Offer...");
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        sendSignalAPI('offer', offer); // Send to receiver via Laravel API
+    }
+
+    // WEBRTC: Receiver creates Answer (my response to caller's offer)
+    async function createAnswer() {
+        log("ðŸ“¤ Creating SDP Answer...");
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+        sendSignalAPI('answer', answer); // Send to caller via Laravel API
+    }
+
+
+    // ==========================================
+    // 5. CLEANUP & UTILITIES
+    // ==========================================
+    function stopRingtone() {
+        ringtone.pause();
+        ringtone.currentTime = 0;
+    }
+
+    function endCallCleanup() {
+        currentCallId = null;
+        myRole = null;
+        currentCallType = null;
+
+        if (peerConnection) {
+            peerConnection.close();
+            peerConnection = null;
+        }
+
+        // Stop local media tracks
+        if (localStream) {
+            localStream.getTracks().forEach(t => t.stop());
+            localStream = null;
+            localVideo.srcObject = null;
+        }
+
+        remoteVideo.srcObject = null;
+        document.getElementById('btnCall').disabled = false;
+        document.getElementById('btnEnd').disabled = true;
+        incomingAlert.style.display = 'none';
+        stopRingtone();
+        updateStatus('-', '-', 'Idle');
+        log("âœ… Call Cleanup complete. Ready for next call.");
+    }
+</script>
+
+</body>
+</html>
+

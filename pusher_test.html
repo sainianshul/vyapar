@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pusher WebRTC Event Monitor</title>
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --panel-bg: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --primary: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .header-card {
+            background: var(--panel-bg);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-end;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .input-group label {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        input {
+            background: #0f172a;
+            border: 1px solid var(--border);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 11px 24px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            height: 40px;
+        }
+
+        button:hover { background: #2563eb; }
+        .btn-danger { background: var(--danger); }
+
+        .split-view {
+            display: flex;
+            gap: 20px;
+            height: calc(100vh - 250px);
+        }
+
+        .panel {
+            flex: 1;
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #162032;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--danger);
+            margin-right: 8px;
+        }
+        .status-dot.active { background: var(--success); box-shadow: 0 0 8px var(--success); }
+
+        .logs {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .log-entry {
+            background: #0f172a;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--primary);
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .log-time { color: var(--text-muted); font-size: 11px; font-weight: normal;}
+        
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: #a7f3d0;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="header-card">
+        <div class="input-group" style="flex: 100%;">
+            <label>API Base URL</label>
+            <input type="text" id="apiUrl" value="https://vyapar.rezel.online" placeholder="e.g. http://localhost:8000">
+        </div>
+        <div class="input-group">
+            <label>Caller (User 1) ID</label>
+            <input type="number" id="user1" placeholder="e.g. 264">
+        </div>
+        <div class="input-group">
+            <label>Caller (User 1) Bearer Token</label>
+            <input type="text" id="token1" placeholder="Bearer token for User 1">
+        </div>
+        <div class="input-group">
+            <label>Receiver (User 2) ID</label>
+            <input type="number" id="user2" placeholder="e.g. 164">
+        </div>
+        <div class="input-group">
+            <label>Receiver (User 2) Bearer Token</label>
+            <input type="text" id="token2" placeholder="Bearer token for User 2">
+        </div>
+        <div class="input-group" style="flex: unset;">
+            <button id="btnConnect" onclick="toggleConnection()">Start Monitoring</button>
+        </div>
+    </div>
+
+    <div class="split-view">
+        <!-- User 1 Panel -->
+        <div class="panel">
+            <div class="panel-header">
+                <div><span class="status-dot" id="dot1"></span> Events for User 1 (<span id="lbl1">Offline</span>)</div>
+                <button onclick="clearLogs(1)" style="padding: 4px 10px; font-size: 12px; height: 26px;">Clear</button>
+            </div>
+            <div class="logs" id="logs1">
+                <div style="color: var(--text-muted); text-align: center; margin-top: 50px;">Waiting for connection...</div>
+            </div>
+        </div>
+
+        <!-- User 2 Panel -->
+        <div class="panel">
+            <div class="panel-header">
+                <div><span class="status-dot" id="dot2"></span> Events for User 2 (<span id="lbl2">Offline</span>)</div>
+                <button onclick="clearLogs(2)" style="padding: 4px 10px; font-size: 12px; height: 26px;">Clear</button>
+            </div>
+            <div class="logs" id="logs2">
+                <div style="color: var(--text-muted); text-align: center; margin-top: 50px;">Waiting for connection...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const PUSHER_KEY = '39e47d55853774809727';
+        const PUSHER_CLUSTER = 'ap2';
+
+        let pusher1 = null;
+        let pusher2 = null;
+        let channel1 = null;
+        let channel2 = null;
+        let isConnected = false;
+
+        function toggleConnection() {
+            if (isConnected) {
+                disconnect();
+            } else {
+                connect();
+            }
+        }
+
+        function createPusherInstance(token, baseUrl) {
+            return new Pusher(PUSHER_KEY, { 
+                cluster: PUSHER_CLUSTER,
+                authEndpoint: `${baseUrl}/api/v1/broadcasting/auth`,
+                auth: {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            });
+        }
+
+        function bindEvents(channel, panelNum) {
+            ['incoming-call', 'call-answered', 'call-signal', 'call-ended', 'message.sent'].forEach(evt => {
+                channel.bind(evt, (data) => logEvent(panelNum, evt, data));
+            });
+            channel.bind('pusher:subscription_succeeded', () => {
+                logSystemMessage(panelNum, `Successfully subscribed to private channel.`);
+                document.getElementById('dot' + panelNum).classList.add('active');
+            });
+            channel.bind('pusher:subscription_error', (status) => {
+                logSystemMessage(panelNum, `Subscription error: ${status}`);
+                document.getElementById('dot' + panelNum).classList.remove('active');
+            });
+        }
+
+        function connect() {
+            const u1 = document.getElementById('user1').value;
+            const t1 = document.getElementById('token1').value.trim();
+            const u2 = document.getElementById('user2').value;
+            const t2 = document.getElementById('token2').value.trim();
+            const baseUrl = document.getElementById('apiUrl').value.replace(/\/$/, "");
+
+            if (!u1 || !t1 || !u2 || !t2) {
+                alert("Please enter both User IDs and their Bearer Tokens!");
+                return;
+            }
+
+            // Create separate Pusher instances with their respective tokens
+            pusher1 = createPusherInstance(t1, baseUrl);
+            pusher2 = createPusherInstance(t2, baseUrl);
+
+            // Subscribe User 1 to their private channel
+            channel1 = pusher1.subscribe(`private-vyaparmitra_user.${u1}`);
+            bindEvents(channel1, 1);
+
+            // Subscribe User 2 to their private channel
+            channel2 = pusher2.subscribe(`private-vyaparmitra_user.${u2}`);
+            bindEvents(channel2, 2);
+
+            // UI Updates
+            isConnected = true;
+            document.getElementById('btnConnect').innerText = "Stop Monitoring";
+            document.getElementById('btnConnect').classList.add('btn-danger');
+            
+            document.getElementById('lbl1').innerText = `private-vyaparmitra_user.${u1}`;
+            document.getElementById('lbl2').innerText = `private-vyaparmitra_user.${u2}`;
+            
+            document.getElementById('logs1').innerHTML = '';
+            document.getElementById('logs2').innerHTML = '';
+            
+            logSystemMessage(1, `Connecting to channel...`);
+            logSystemMessage(2, `Connecting to channel...`);
+        }
+
+        function disconnect() {
+            if (pusher1) {
+                pusher1.disconnect();
+                pusher1 = null;
+            }
+            if (pusher2) {
+                pusher2.disconnect();
+                pusher2 = null;
+            }
+            isConnected = false;
+            document.getElementById('btnConnect').innerText = "Start Monitoring";
+            document.getElementById('btnConnect').classList.remove('btn-danger');
+            
+            document.getElementById('dot1').classList.remove('active');
+            document.getElementById('dot2').classList.remove('active');
+            document.getElementById('lbl1').innerText = "Offline";
+            document.getElementById('lbl2').innerText = "Offline";
+
+            logSystemMessage(1, `Disconnected.`);
+            logSystemMessage(2, `Disconnected.`);
+        }
+
+        function logEvent(panelNum, eventName, data) {
+            const logsDiv = document.getElementById('logs' + panelNum);
+            
+            // Determine Color based on event
+            let color = 'var(--primary)';
+            if(eventName === 'incoming-call') color = 'var(--warning)';
+            if(eventName === 'call-answered') color = 'var(--success)';
+            if(eventName === 'call-ended') color = 'var(--danger)';
+            if(eventName === 'call-signal') color = '#a855f7'; // purple
+            if(eventName === 'message.sent') color = '#06b6d4'; // cyan
+
+            const time = new Date().toLocaleTimeString([], { hour12: true, hour: '2-digit', minute:'2-digit', second:'2-digit' });
+
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.style.borderLeftColor = color;
+            
+            entry.innerHTML = `
+                <div class="log-header">
+                    <span style="color: ${color};">${eventName}</span>
+                    <span class="log-time">${time}</span>
+                </div>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            `;
+            
+            logsDiv.appendChild(entry);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        }
+
+        function logSystemMessage(panelNum, msg) {
+            const logsDiv = document.getElementById('logs' + panelNum);
+            const entry = document.createElement('div');
+            entry.style.color = 'var(--text-muted)';
+            entry.style.textAlign = 'center';
+            entry.style.marginBottom = '15px';
+            entry.style.fontSize = '12px';
+            entry.innerText = msg;
+            logsDiv.appendChild(entry);
+        }
+
+        function clearLogs(panelNum) {
+            document.getElementById('logs' + panelNum).innerHTML = '';
+        }
+    </script>
+</body>
+</html>

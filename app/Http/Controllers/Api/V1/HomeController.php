@@ -29,7 +29,7 @@ class HomeController extends Controller
         operationId: 'getHome',
         summary: 'Buyer Home / Dashboard',
         description: 'Returns categories (10, featured first), nearby products (10, location-based), active banners, and recent feedbacks (5) in a single fast API call. Results are cached for performance.',
-        security: [['sanctum' => []]],
+        security: [['bearerAuth' => []]],
         tags: ['Home']
     )]
     #[OA\Parameter(

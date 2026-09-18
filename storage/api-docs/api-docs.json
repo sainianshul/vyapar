@@ -198,6 +198,70 @@
                 ]
             }
         },
+        "/api/v1/banners": {
+            "get": {
+                "tags": [
+                    "Banners"
+                ],
+                "summary": "Get active banners",
+                "description": "Retrieve all active banners",
+                "operationId": "getBanners",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Banners fetched successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Summer Sale"
+                                                    },
+                                                    "type": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "type_name": {
+                                                        "type": "string",
+                                                        "example": "Category"
+                                                    },
+                                                    "reference_id": {
+                                                        "type": "integer",
+                                                        "example": 5
+                                                    },
+                                                    "banner_image": {
+                                                        "type": "string",
+                                                        "format": "url"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/categories": {
             "get": {
                 "tags": [
@@ -499,6 +563,240 @@
                     },
                     "401": {
                         "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/feedbacks": {
+            "get": {
+                "tags": [
+                    "Feedbacks"
+                ],
+                "summary": "Get all feedbacks",
+                "description": "Retrieve all feedbacks with user details",
+                "operationId": "getFeedbacks",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Feedback fetched successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "user_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "feedback": {
+                                                        "type": "string",
+                                                        "example": "Great service!"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "active"
+                                                    },
+                                                    "user_name": {
+                                                        "type": "string",
+                                                        "example": "John Doe"
+                                                    },
+                                                    "user_city": {
+                                                        "type": "string",
+                                                        "example": "New Delhi"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/home": {
+            "get": {
+                "tags": [
+                    "Home"
+                ],
+                "summary": "Buyer Home / Dashboard",
+                "description": "Returns categories (10, featured first), nearby products (10, location-based), active banners, and recent feedbacks (5) in a single fast API call. Results are cached for performance.",
+                "operationId": "getHome",
+                "parameters": [
+                    {
+                        "name": "latitude",
+                        "in": "query",
+                        "description": "User latitude for nearby products",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "longitude",
+                        "in": "query",
+                        "description": "User longitude for nearby products",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Home data fetched successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Home data fetched successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "banners": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "type": {
+                                                                "type": "integer"
+                                                            },
+                                                            "type_name": {
+                                                                "type": "string"
+                                                            },
+                                                            "reference_id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "banner_image": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "categories": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "slug": {
+                                                                "type": "string"
+                                                            },
+                                                            "image": {
+                                                                "type": "string"
+                                                            },
+                                                            "is_featured": {
+                                                                "type": "integer"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "products": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "title": {
+                                                                "type": "string"
+                                                            },
+                                                            "price": {
+                                                                "type": "number"
+                                                            },
+                                                            "city": {
+                                                                "type": "string"
+                                                            },
+                                                            "distance_km": {
+                                                                "type": "number",
+                                                                "nullable": true
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "products_source": {
+                                                    "type": "string",
+                                                    "example": "nearby_10km"
+                                                },
+                                                "feedbacks": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "feedback": {
+                                                                "type": "string"
+                                                            },
+                                                            "user_name": {
+                                                                "type": "string"
+                                                            },
+                                                            "user_city": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -2242,6 +2540,10 @@
             "description": "Authentication"
         },
         {
+            "name": "Banners",
+            "description": "Banners"
+        },
+        {
             "name": "Categories",
             "description": "Categories"
         },
@@ -2252,6 +2554,14 @@
         {
             "name": "Dashboard",
             "description": "Dashboard"
+        },
+        {
+            "name": "Feedbacks",
+            "description": "Feedbacks"
+        },
+        {
+            "name": "Home",
+            "description": "Home"
         },
         {
             "name": "Leads",
