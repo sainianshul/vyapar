@@ -105,8 +105,13 @@ Route::prefix('v1')->group(function () {
         Route::prefix('my/products')->group(function () {
             Route::get('/', [\App\Http\Controllers\Api\V1\ProductController::class, 'myProducts']);
             Route::get('{id}', [\App\Http\Controllers\Api\V1\ProductController::class, 'myProductDetail']);
+            Route::get('{id}/leads', [\App\Http\Controllers\Api\V1\LeadController::class, 'myProductLeads']);
             Route::post('{id}/status', [\App\Http\Controllers\Api\V1\ProductController::class, 'updateStatus']);
             Route::delete('{id}', [\App\Http\Controllers\Api\V1\ProductController::class, 'destroy']);
+        });
+
+        Route::prefix('my/enquiries')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Api\V1\LeadController::class, 'myReceivedEnquiries']);
         });
     });
 });

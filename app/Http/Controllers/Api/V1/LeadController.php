@@ -209,4 +209,69 @@ class LeadController extends Controller
             'lead' => $lead->toApiResponse()
         ]);
     }
+    #[OA\Get(
+        path: '/api/v1/my/products/{id}/leads',
+        operationId: 'myProductLeads',
+        summary: 'Get leads for a specific product',
+        security: [['bearerAuth' => []]],
+        tags: ['Leads'],
+        parameters: [
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
+            new OA\Parameter(name: 'page', in: 'query', required: false, schema: new OA\Schema(type: 'integer')),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Leads fetched successfully'),
+        ]
+    )]
+    public function myProductLeads(Request $request, int $id): JsonResponse
+    {
+        $product = \App\Models\Product::where('id', $id)
+            ->where('user_id', $request->user()->id)
+            ->firstOrFail();
+
+        $leads = Lead::where('product_id', $product->id)
+            ->with(['buyer:id,name,profile_photo,city,phone'])
+            ->orderByDesc('updated_at')
+            ->paginate(20);
+
+        return ApiResponse::success('Leads fetched successfully', [
+            'leads' => $leads->getCollection()->map(fn($l) => $l->toApiResponse()),
+            'pagination' => [
+                'current_page' => $leads->currentPage(),
+                'last_page' => $leads->lastPage(),
+                'total' => $leads->total(),
+            ]
+        ]);
+    }
+
+    #[OA\Get(
+        path: '/api/v1/my/enquiries',
+        operationId: 'myReceivedEnquiries',
+        summary: 'Get all received enquiries (source = 1)',
+        security: [['bearerAuth' => []]],
+        tags: ['Leads'],
+        parameters: [
+            new OA\Parameter(name: 'page', in: 'query', required: false, schema: new OA\Schema(type: 'integer')),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Enquiries fetched successfully'),
+        ]
+    )]
+    public function myReceivedEnquiries(Request $request): JsonResponse
+    {
+        $leads = Lead::where('seller_id', $request->user()->id)
+            ->where('source', Lead::SOURCE_INQUIRY_FORM)
+            ->with(['buyer:id,name,profile_photo,city,phone', 'product:id,title', 'requirement:id,title'])
+            ->orderByDesc('updated_at')
+            ->paginate(20);
+
+        return ApiResponse::success('Enquiries fetched successfully', [
+            'enquiries' => $leads->getCollection()->map(fn($l) => $l->toApiResponse()),
+            'pagination' => [
+                'current_page' => $leads->currentPage(),
+                'last_page' => $leads->lastPage(),
+                'total' => $leads->total(),
+            ]
+        ]);
+    }
 }

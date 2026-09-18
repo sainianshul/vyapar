@@ -40,6 +40,9 @@ class DashboardController extends Controller
             // 2. Total Leads Received
             $totalLeads = Lead::where('seller_id', $userId)->count();
 
+            // 2b. Total Enquiries Received
+            $totalEnquiries = Lead::where('seller_id', $userId)->where('source', Lead::SOURCE_INQUIRY_FORM)->count();
+
             // 3. Total Product Views (Sum)
             $totalViews = Product::where('user_id', $userId)->sum('views_count');
 
@@ -65,6 +68,7 @@ class DashboardController extends Controller
             return [
                 'total_products' => $totalProducts,
                 'total_leads_received' => $totalLeads,
+                'total_enquiries_received' => $totalEnquiries,
                 'total_product_views' => (int) $totalViews,
                 'total_unread_chats' => $unreadChats,
                 'most_viewed_product' => $mostViewedProduct ? $mostViewedProduct->toSellerListArray() : null,
