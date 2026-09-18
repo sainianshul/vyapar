@@ -46,7 +46,7 @@ class RequirementController extends Controller
     {
         $query = Requirement::query()
             ->active()
-            ->with('images');
+            ->with(['images', 'user:id,name,profile_photo,city,created_at']);
 
         if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);

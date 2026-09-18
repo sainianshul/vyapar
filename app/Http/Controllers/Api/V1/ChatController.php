@@ -95,7 +95,7 @@ class ChatController extends Controller
     public function startConversation(Request $request): JsonResponse
     {
         $request->validate([
-            'seller_id' => 'required|integer|exists:users,id|different:seller_id', // cannot chat with self, wait, different from self logic needs custom
+            'seller_id' => 'required|integer|exists:users,id', 
             'product_id' => 'nullable|integer|exists:products,id',
             'requirement_id' => 'nullable|integer|exists:requirements,id',
         ]);

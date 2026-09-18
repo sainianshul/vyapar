@@ -239,6 +239,13 @@ class Product extends Model
             'primary_image' => $this->relationLoaded('primaryImage') && $this->primaryImage 
                                 ? asset('storage/' . $this->primaryImage->image_path) 
                                 : null,
+            'seller' => $this->relationLoaded('seller') && $this->seller ? [
+                'id' => $this->seller->id,
+                'name' => $this->seller->name,
+                'profile_photo' => $this->seller->profile_photo ? asset('storage/' . $this->seller->profile_photo) : null,
+                'city' => $this->seller->city,
+                'joined_at' => $this->seller->created_at,
+            ] : null,
             'created_at' => $this->created_at,
         ];
     }

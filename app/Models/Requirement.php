@@ -122,6 +122,13 @@ class Requirement extends Model
             'image' => $this->relationLoaded('images') && $this->images->first()
                 ? asset('storage/' . $this->images->first()->image_path)
                 : null,
+            'user' => $this->relationLoaded('user') && $this->user ? [
+                'id' => $this->user->id,
+                'name' => $this->user->name,
+                'profile_photo' => $this->user->profile_photo ? asset('storage/' . $this->user->profile_photo) : null,
+                'city' => $this->user->city,
+                'joined_at' => $this->user->created_at,
+            ] : null,
             'created_at' => $this->created_at,
         ];
     }

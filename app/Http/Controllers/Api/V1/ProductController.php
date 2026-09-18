@@ -50,7 +50,7 @@ class ProductController extends Controller
     {
         $query = Product::query()
             ->active()
-            ->with('primaryImage');
+            ->with(['primaryImage', 'seller:id,name,profile_photo,city,created_at']);
 
         if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
