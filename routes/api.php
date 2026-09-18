@@ -16,13 +16,10 @@ Route::prefix('v1')->group(function () {
         Route::post('verify-otp', [\App\Http\Controllers\Api\V1\AuthController::class, 'verifyOtp']);
     });
 
-    // Protected Routes
-    // Public Requirements
-    Route::get('/requirements', [\App\Http\Controllers\Api\V1\RequirementController::class, 'index']);
-    Route::get('/requirements/{id}', [\App\Http\Controllers\Api\V1\RequirementController::class, 'show']);
-
     Route::middleware('auth:sanctum')->group(function () {
-        // Protected Requirements
+        // Requirements
+        Route::get('/requirements', [\App\Http\Controllers\Api\V1\RequirementController::class, 'index']);
+        Route::get('/requirements/{id}', [\App\Http\Controllers\Api\V1\RequirementController::class, 'show']);
         Route::post('/requirements', [\App\Http\Controllers\Api\V1\RequirementController::class, 'store']);
         
         // Dashboard
