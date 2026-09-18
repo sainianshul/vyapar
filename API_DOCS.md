@@ -861,12 +861,62 @@ Fired when the other person hangs up. Payload contains `reason`. App should clos
 
 ---
 
-## 8. Dashboard (For Sellers)
+## 8. Buyer Home (Single Fast Endpoint)
+
+**Overview:**
+To provide a fast loading experience on the buyer's home screen, a single API is used to fetch banners, featured categories, nearby products, and feedbacks all at once. The result is heavily cached (for 5 minutes) based on a rounded ~1km grid of the user's location.
+
+### 8.1 Buyer Home API
+
+- **Endpoint:** `/api/v1/home`
+- **Method:** `GET`
+- **Headers:**
+    - `Accept: application/json`
+    - `Authorization: Bearer <your_token>`
+- **Query Parameters (Optional):**
+    - `latitude` _(float)_: GPS Latitude.
+    - `longitude` _(float)_: GPS Longitude.
+- **Behavior:**
+    - Attempts to find 10 products within expanding radiuses (10km, 50km, 100km).
+    - If it finds fewer than 10 nearby, it pulls fallback products (featured/latest) to always return exactly 10 products, sorted strictly by distance (closest first).
+- **Response Structure (`data` object):**
+    - `banners`: Array of active banners.
+    - `categories`: Array of 10 featured categories.
+    - `products`: Array of 10 products sorted by distance.
+    - `products_source`: String indicating how products were fetched (e.g. `nearby_10km`, `fallback`, `nearby_and_fallback`).
+    - `feedbacks`: Array of 5 active user feedbacks.
+
+---
+
+## 9. Banners & Feedbacks (Standalone APIs)
+
+### 9.1 Get Active Banners
+
+Used if banners need to be fetched separately (outside of the Home API).
+
+- **Endpoint:** `/api/v1/banners`
+- **Method:** `GET`
+- **Headers:**
+    - `Accept: application/json`
+
+### 9.2 Get Active Feedbacks
+
+Used if feedbacks need to be fetched separately (outside of the Home API).
+
+- **Endpoint:** `/api/v1/feedbacks`
+- **Method:** `GET`
+- **Headers:**
+    - `Accept: application/json`
+    - `Authorization: Bearer <your_token>`
+
+---
+
+## 10. Dashboard (For Sellers)
 
 **Overview:**
 Provides aggregate statistics for the seller to show on their Home Screen. The data is cached for 5 minutes on the backend to improve performance.
 
-### 8.1 Get Seller Dashboard Stats
+### 10.1 Get Seller Dashboard Stats
 
 - **Endpoint:** `/api/v1/dashboard/seller`
 - **Method:** `GET`
@@ -884,9 +934,9 @@ Provides aggregate statistics for the seller to show on their Home Screen. The d
 
 ---
 
-## 9. System / Utility Endpoints
+## 11. System / Utility Endpoints
 
-### 9.1 Server Health Check
+### 11.1 Server Health Check
 
 Check if the API is up and running. No authentication required.
 
@@ -896,3 +946,4 @@ Check if the API is up and running. No authentication required.
 ---
 
 _End of Documentation_
+
