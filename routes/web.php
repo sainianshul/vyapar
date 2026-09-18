@@ -52,6 +52,16 @@ Route::prefix('admin')->group(function () {
         Route::post('products/{product}/featured', [\App\Http\Controllers\Admin\ProductController::class, 'updateFeatured'])->name('products.update-featured');
         Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
 
+        // Banners CRUD
+        Route::get('banners/data', [\App\Http\Controllers\Admin\BannerController::class, 'data'])->name('banners.data');
+        Route::post('banners/{banner}/status', [\App\Http\Controllers\Admin\BannerController::class, 'updateStatus'])->name('banners.update-status');
+        Route::resource('banners', \App\Http\Controllers\Admin\BannerController::class)->except(['create', 'edit', 'show']);
+
+        // Feedbacks CRUD
+        Route::get('feedbacks/data', [\App\Http\Controllers\Admin\FeedbackController::class, 'data'])->name('feedbacks.data');
+        Route::post('feedbacks/{feedback}/status', [\App\Http\Controllers\Admin\FeedbackController::class, 'updateStatus'])->name('feedbacks.update-status');
+        Route::resource('feedbacks', \App\Http\Controllers\Admin\FeedbackController::class)->except(['create', 'edit', 'show']);
+
         // Add future routes here for Leads, Requirements, etc.
     });
     });

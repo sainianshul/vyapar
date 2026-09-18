@@ -49,6 +49,8 @@ class AuthService
         $smartpingPass = config('services.smartping.pass');
         $smartpingFrom = config('services.smartping.from');
 
+        /* 
+        // Uncomment in production to enable actual SMS sending
         if ($smartpingUser && $smartpingPass) {
             $url = "https://api.smartping.ai/fe/api/v1/send?"
                 . "username={$smartpingUser}"
@@ -69,6 +71,7 @@ class AuthService
                 \Illuminate\Support\Facades\Log::error('SmartPing API Exception', ['error' => $e->getMessage()]);
             }
         }
+        */
         
         return [
             'otp' => $otp,

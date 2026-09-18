@@ -28,6 +28,9 @@ Route::prefix('v1')->group(function () {
         });
     });
 
+    // Banners
+    Route::get('banners', [\App\Http\Controllers\Api\V1\BannerController::class, 'index']);
+
     Route::prefix('cron')->group(function () {
         Route::get('/calls/cleanup', [\App\Http\Controllers\Api\V1\WebRTCCallController::class, 'cronCleanupCalls']);
     });
@@ -117,5 +120,8 @@ Route::prefix('v1')->group(function () {
         Route::prefix('my/enquiries')->group(function () {
             Route::get('/', [\App\Http\Controllers\Api\V1\LeadController::class, 'myReceivedEnquiries']);
         });
+
+        // Feedbacks
+        Route::get('feedbacks', [\App\Http\Controllers\Api\V1\FeedbackController::class, 'index']);
     });
 });

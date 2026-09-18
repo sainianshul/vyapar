@@ -100,6 +100,24 @@
                     </a>
                 </li>
 
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.banners.index') }}">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="ti ti-photo"></i>
+                        </span>
+                        <span class="nav-link-title">Banners</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.feedbacks.index') }}">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="ti ti-message-report"></i>
+                        </span>
+                        <span class="nav-link-title">Feedbacks</span>
+                    </a>
+                </li>
+
                 {{-- ===================== --}}
                 {{-- LEADS & BUSINESS --}}
                 {{-- ===================== --}}
