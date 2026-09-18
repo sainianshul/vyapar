@@ -42,8 +42,33 @@ class AuthService
             'status' => OtpVerification::STATUS_ACTIVE,
         ]);
 
-        // TODO: Dispatch actual SMS via gateway here in production
-        // $message = "Welcome to VVyaparMitra! Your OTP for verification is {$otp}. Do not share this with anyone.";
+        $messageText = "Welcome to VVyaparMitra! Your OTP for verification is {$otp}. Do not share this with anyone.";
+        $messageEncoded = str_replace(' ', '%20', $messageText);
+
+        $smartpingUser = config('services.smartping.user');
+        $smartpingPass = config('services.smartping.pass');
+        $smartpingFrom = config('services.smartping.from');
+
+        if ($smartpingUser && $smartpingPass) {
+            $url = "https://api.smartping.ai/fe/api/v1/send?"
+                . "username={$smartpingUser}"
+                . "&password={$smartpingPass}"
+                . "&unicode=false"
+                . "&from={$smartpingFrom}"
+                . "&to={$phone}"
+                . "&text={$messageEncoded}";
+
+            try {
+                $response = \Illuminate\Support\Facades\Http::get($url);
+                if ($response->successful()) {
+                    \Illuminate\Support\Facades\Log::info('SmartPing OTP sent successfully', ['phone' => $phone, 'response' => $response->body()]);
+                } else {
+                    \Illuminate\Support\Facades\Log::error('SmartPing OTP failed', ['phone' => $phone, 'response' => $response->body()]);
+                }
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('SmartPing API Exception', ['error' => $e->getMessage()]);
+            }
+        }
         
         return [
             'otp' => $otp,

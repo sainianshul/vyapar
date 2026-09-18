@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'smartping' => [
+        'user' => env('SMARTPING_USER'),
+        'pass' => env('SMARTPING_PASS'),
+        'from' => env('SMARTPING_FROM'),
+    ],
+
 ];
