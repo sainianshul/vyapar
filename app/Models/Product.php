@@ -73,7 +73,8 @@ class Product extends Model
             'status' => 'integer',
             'views_count' => 'integer',
             'leads_count' => 'integer',
-            'is_featured' => 'boolean',
+            'is_featured' => 'integer',
+            'is_verified' => 'integer',
             'featured_at' => 'datetime',
             'expires_at' => 'datetime',
         ];

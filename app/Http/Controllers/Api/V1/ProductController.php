@@ -322,7 +322,7 @@ class ProductController extends Controller
     #[OA\Post(
         path: '/api/v1/products/{id}',
         operationId: 'updateProduct',
-        summary: 'Update a product (Using POST for multipart/form-data with _method=PUT)',
+        summary: 'Update a product (multipart/form-data)',
         security: [['bearerAuth' => []]],
         tags: ['Products'],
         parameters: [
@@ -334,7 +334,6 @@ class ProductController extends Controller
                 mediaType: 'multipart/form-data',
                 schema: new OA\Schema(
                     properties: [
-                        new OA\Property(property: '_method', type: 'string', example: 'PUT', description: 'Required for Laravel to treat POST as PUT'),
                         new OA\Property(property: 'category_id', type: 'integer', nullable: true),
                         new OA\Property(property: 'title', type: 'string', nullable: true),
                         new OA\Property(property: 'description', type: 'string', nullable: true),

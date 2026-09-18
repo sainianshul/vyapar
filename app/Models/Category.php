@@ -16,8 +16,8 @@ class Category extends Model
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
-        'is_featured' => 'boolean',
+        'is_active' => 'integer',
+        'is_featured' => 'integer',
         'sort_order' => 'integer',
         'level' => 'integer',
         'product_count' => 'integer',
