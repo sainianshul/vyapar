@@ -27,6 +27,10 @@ class RequirementService
             $data['latitude'] = $data['latitude'] ?? $buyer->latitude;
             $data['longitude'] = $data['longitude'] ?? $buyer->longitude;
 
+            if (empty($data['city']) || empty($data['latitude']) || empty($data['longitude'])) {
+                throw new \Exception('Location details are missing. Please provide address/location details for the requirement or update them in your profile.');
+            }
+
             $requirement = Requirement::create($data);
 
             if ($images && is_array($images)) {

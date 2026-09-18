@@ -34,6 +34,10 @@ class ProductService
             $data['latitude'] = $data['latitude'] ?? $seller->latitude;
             $data['longitude'] = $data['longitude'] ?? $seller->longitude;
 
+            if (empty($data['city']) || empty($data['latitude']) || empty($data['longitude'])) {
+                throw new \Exception('Location details are missing. Please provide address/location details for the product or update them in your profile.');
+            }
+
             // Set default data
             $data['user_id'] = $seller->id;
             $data['status'] = $data['status'] ?? Product::STATUS_ACTIVE;
