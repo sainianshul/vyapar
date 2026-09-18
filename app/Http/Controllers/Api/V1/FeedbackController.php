@@ -8,37 +8,37 @@ use Illuminate\Http\Request;
 use App\Models\Feedback;
 use Illuminate\Http\JsonResponse;
 
+use OpenApi\Attributes as OA;
+
 class FeedbackController extends Controller
 {
-    /**
-     * @OA\Get(
-     *     path="/api/v1/feedbacks",
-     *     operationId="getFeedbacks",
-     *     tags={"Feedbacks"},
-     *     summary="Get all feedbacks",
-     *     description="Retrieve all feedbacks with user details",
-     *     security={{"sanctum":{}}},
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Feedback fetched successfully"),
-     *             @OA\Property(property="data", type="array", @OA\Items(
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="user_id", type="integer", example=1),
-     *                 @OA\Property(property="feedback", type="string", example="Great service!"),
-     *                 @OA\Property(property="status", type="string", example="active"),
-     *                 @OA\Property(property="user_name", type="string", example="John Doe"),
-     *                 @OA\Property(property="user_city", type="string", example="New Delhi"),
-     *                 @OA\Property(property="created_at", type="string", format="date-time")
-     *             ))
-     *         )
-     *     )
-     * )
-     * 
-     * Get feedbacks
-     */
+    #[OA\Get(
+        path: '/api/v1/feedbacks',
+        operationId: 'getFeedbacks',
+        summary: 'Get all feedbacks',
+        description: 'Retrieve all feedbacks with user details',
+        security: [['sanctum' => []]],
+        tags: ['Feedbacks']
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Successful operation',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'success', type: 'boolean', example: true),
+                new OA\Property(property: 'message', type: 'string', example: 'Feedback fetched successfully'),
+                new OA\Property(property: 'data', type: 'array', items: new OA\Items(properties: [
+                    new OA\Property(property: 'id', type: 'integer', example: 1),
+                    new OA\Property(property: 'user_id', type: 'integer', example: 1),
+                    new OA\Property(property: 'feedback', type: 'string', example: 'Great service!'),
+                    new OA\Property(property: 'status', type: 'string', example: 'active'),
+                    new OA\Property(property: 'user_name', type: 'string', example: 'John Doe'),
+                    new OA\Property(property: 'user_city', type: 'string', example: 'New Delhi'),
+                    new OA\Property(property: 'created_at', type: 'string', format: 'date-time')
+                ]))
+            ]
+        )
+    )]
     public function index(Request $request): JsonResponse
     {
         $feedbacks = Feedback::with('user:id,name,city')->latest()->get();

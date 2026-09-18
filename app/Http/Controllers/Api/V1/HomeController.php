@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
+use OpenApi\Attributes as OA;
+
 class HomeController extends Controller
 {
     private const PRODUCT_LIMIT = 10;
@@ -22,57 +24,69 @@ class HomeController extends Controller
     // Radius tiers in KM
     private const RADIUS_TIERS = [10, 50, 100];
 
-    /**
-     * @OA\Get(
-     *     path="/api/v1/home",
-     *     operationId="getHome",
-     *     tags={"Home"},
-     *     summary="Buyer Home / Dashboard",
-     *     description="Returns categories (10, featured first), nearby products (10, location-based), active banners, and recent feedbacks (5) in a single fast API call. Results are cached for performance.",
-     *     security={{"sanctum":{}}},
-     *     @OA\Parameter(name="latitude", in="query", required=false, @OA\Schema(type="number", format="float"), description="User latitude for nearby products"),
-     *     @OA\Parameter(name="longitude", in="query", required=false, @OA\Schema(type="number", format="float"), description="User longitude for nearby products"),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Home data fetched successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Home data fetched successfully"),
-     *             @OA\Property(property="data", type="object",
-     *                 @OA\Property(property="banners", type="array", @OA\Items(
-     *                     @OA\Property(property="id", type="integer"),
-     *                     @OA\Property(property="name", type="string"),
-     *                     @OA\Property(property="type", type="integer"),
-     *                     @OA\Property(property="type_name", type="string"),
-     *                     @OA\Property(property="reference_id", type="integer"),
-     *                     @OA\Property(property="banner_image", type="string")
-     *                 )),
-     *                 @OA\Property(property="categories", type="array", @OA\Items(
-     *                     @OA\Property(property="id", type="integer"),
-     *                     @OA\Property(property="name", type="string"),
-     *                     @OA\Property(property="slug", type="string"),
-     *                     @OA\Property(property="image", type="string"),
-     *                     @OA\Property(property="is_featured", type="integer")
-     *                 )),
-     *                 @OA\Property(property="products", type="array", @OA\Items(
-     *                     @OA\Property(property="id", type="integer"),
-     *                     @OA\Property(property="title", type="string"),
-     *                     @OA\Property(property="price", type="number"),
-     *                     @OA\Property(property="city", type="string"),
-     *                     @OA\Property(property="distance_km", type="number", nullable=true)
-     *                 )),
-     *                 @OA\Property(property="products_source", type="string", example="nearby_10km"),
-     *                 @OA\Property(property="feedbacks", type="array", @OA\Items(
-     *                     @OA\Property(property="id", type="integer"),
-     *                     @OA\Property(property="feedback", type="string"),
-     *                     @OA\Property(property="user_name", type="string"),
-     *                     @OA\Property(property="user_city", type="string")
-     *                 ))
-     *             )
-     *         )
-     *     )
-     * )
-     */
+    #[OA\Get(
+        path: '/api/v1/home',
+        operationId: 'getHome',
+        summary: 'Buyer Home / Dashboard',
+        description: 'Returns categories (10, featured first), nearby products (10, location-based), active banners, and recent feedbacks (5) in a single fast API call. Results are cached for performance.',
+        security: [['sanctum' => []]],
+        tags: ['Home']
+    )]
+    #[OA\Parameter(
+        name: 'latitude',
+        description: 'User latitude for nearby products',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(type: 'number', format: 'float')
+    )]
+    #[OA\Parameter(
+        name: 'longitude',
+        description: 'User longitude for nearby products',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(type: 'number', format: 'float')
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Home data fetched successfully',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'success', type: 'boolean', example: true),
+                new OA\Property(property: 'message', type: 'string', example: 'Home data fetched successfully'),
+                new OA\Property(property: 'data', type: 'object', properties: [
+                    new OA\Property(property: 'banners', type: 'array', items: new OA\Items(properties: [
+                        new OA\Property(property: 'id', type: 'integer'),
+                        new OA\Property(property: 'name', type: 'string'),
+                        new OA\Property(property: 'type', type: 'integer'),
+                        new OA\Property(property: 'type_name', type: 'string'),
+                        new OA\Property(property: 'reference_id', type: 'integer'),
+                        new OA\Property(property: 'banner_image', type: 'string')
+                    ])),
+                    new OA\Property(property: 'categories', type: 'array', items: new OA\Items(properties: [
+                        new OA\Property(property: 'id', type: 'integer'),
+                        new OA\Property(property: 'name', type: 'string'),
+                        new OA\Property(property: 'slug', type: 'string'),
+                        new OA\Property(property: 'image', type: 'string'),
+                        new OA\Property(property: 'is_featured', type: 'integer')
+                    ])),
+                    new OA\Property(property: 'products', type: 'array', items: new OA\Items(properties: [
+                        new OA\Property(property: 'id', type: 'integer'),
+                        new OA\Property(property: 'title', type: 'string'),
+                        new OA\Property(property: 'price', type: 'number'),
+                        new OA\Property(property: 'city', type: 'string'),
+                        new OA\Property(property: 'distance_km', type: 'number', nullable: true)
+                    ])),
+                    new OA\Property(property: 'products_source', type: 'string', example: 'nearby_10km'),
+                    new OA\Property(property: 'feedbacks', type: 'array', items: new OA\Items(properties: [
+                        new OA\Property(property: 'id', type: 'integer'),
+                        new OA\Property(property: 'feedback', type: 'string'),
+                        new OA\Property(property: 'user_name', type: 'string'),
+                        new OA\Property(property: 'user_city', type: 'string')
+                    ]))
+                ])
+            ]
+        )
+    )]
     public function index(Request $request): JsonResponse
     {
         $lat = $request->input('latitude');
