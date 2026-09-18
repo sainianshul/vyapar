@@ -212,7 +212,7 @@ class ChatController extends Controller
         $request->validate([
             'type' => ['required', 'integer', Rule::in([Message::TYPE_TEXT, Message::TYPE_IMAGE, Message::TYPE_CALLLOG])],
             'body' => 'required_if:type,1|string|nullable',
-            'media' => 'required_if:type,2|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'media' => 'required_if:type,2|nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
 
         $userId = $request->user()->id;

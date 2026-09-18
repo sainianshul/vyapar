@@ -179,7 +179,7 @@ class RequirementController extends Controller
     #[OA\Get(
         path: '/api/v1/my/requirements',
         operationId: 'getMyRequirements',
-        summary: 'Get logged-in buyer requirements',
+        summary: 'Get own requirements',
         security: [['bearerAuth' => []]],
         tags: ['Requirements'],
         responses: [
