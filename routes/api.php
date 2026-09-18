@@ -28,6 +28,10 @@ Route::prefix('v1')->group(function () {
         });
     });
 
+    Route::prefix('cron')->group(function () {
+        Route::get('/calls/cleanup', [\App\Http\Controllers\Api\V1\WebRTCCallController::class, 'cronCleanupCalls']);
+    });
+
     Route::middleware('auth:sanctum')->group(function () {
         // Requirements
         Route::get('/requirements', [\App\Http\Controllers\Api\V1\RequirementController::class, 'index']);

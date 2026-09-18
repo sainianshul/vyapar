@@ -555,4 +555,60 @@ class WebRTCCallController extends Controller
             return ApiResponse::error('Server error: ' . $e->getMessage(), 500);
         }
     }
+
+    #[OA\Get(
+        path: '/api/v1/cron/calls/cleanup',
+        operationId: 'cronCleanupCalls',
+        summary: 'Webhook to automatically mark stale ringing calls as missed',
+        tags: ['Cron Jobs'],
+        responses: [
+            new OA\Response(response: 200, description: 'Cleanup executed'),
+        ]
+    )]
+    public function cronCleanupCalls(Request $request)
+    {
+        try {
+            $threshold = now()->subMinutes(2);
+
+            $staleCalls = WebRTCCallLog::whereIn('status', ['initiated', 'ringing'])
+                ->where('created_at', '<', $threshold)
+                ->get();
+
+            $count = 0;
+
+            foreach ($staleCalls as $callLog) {
+                $callLog->status     = 'missed';
+                $callLog->end_reason = 'missed';
+                $callLog->ended_at   = now();
+                $callLog->save();
+
+                event(new CallEnded(
+                    $callLog->id,
+                    $callLog->caller_id, // We just pass caller as the actor
+                    'missed',
+                    $callLog->receiver_id,
+                    null
+                ));
+
+                // Send to receiver as well just in case they need to clear their UI
+                event(new CallEnded(
+                    $callLog->id,
+                    $callLog->caller_id,
+                    'missed',
+                    $callLog->caller_id,
+                    null
+                ));
+
+                $count++;
+            }
+
+            return ApiResponse::success('Cron executed successfully.', [
+                'cleaned_up_count' => $count
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error("Error running calls cleanup cron: " . $e->getMessage());
+            return ApiResponse::error('Server error: ' . $e->getMessage(), 500);
+        }
+    }
 }
