@@ -10,6 +10,10 @@ Route::get('/health', function () {
 });
 
 Route::prefix('v1')->group(function () {
+    
+    // Broadcast Auth Route for Sanctum API
+    \Illuminate\Support\Facades\Broadcast::routes(['middleware' => ['auth:sanctum']]);
+
     // Public Routes
     Route::prefix('auth')->group(function () {
         Route::post('send-otp', [\App\Http\Controllers\Api\V1\AuthController::class, 'sendOtp']);
