@@ -68,6 +68,11 @@ class LeadService
                 'message' => $data['message'] ?? null,
                 'status' => Lead::STATUS_NEW,
             ]);
+
+            // Increment leads_count on the Product if applicable
+            if (!empty($data['product_id'])) {
+                \App\Models\Product::where('id', $data['product_id'])->increment('leads_count');
+            }
         }
 
         // AUTO CONVERT INQUIRY TO CHAT
