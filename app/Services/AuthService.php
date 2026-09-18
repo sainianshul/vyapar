@@ -42,7 +42,7 @@ class AuthService
             'status' => OtpVerification::STATUS_ACTIVE,
         ]);
 
-        $messageText = "Welcome to VVyaparMitra! Your OTP for verification is {$otp}. Do not share this with anyone.";
+        $messageText = "Your OTP for Login is {$otp}, Valid for 10 minutes. Do not share it with anyone. Thanks CAN WINN FOUNDATION";
         $messageEncoded = str_replace(' ', '%20', $messageText);
 
         $smartpingUser = config('services.smartping.user');
