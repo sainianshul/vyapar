@@ -24,38 +24,45 @@
                 </li>
                 
                 {{-- ===================== --}}
-                {{-- USERS & PROFILES --}}
+                {{-- USERS --}}
                 {{-- ===================== --}}
                 <li class="nav-item mt-3 mb-1">
-                    <div class="nav-link text-uppercase text-muted fs-8 fw-bold">Users & Profiles</div>
+                    <div class="nav-link text-uppercase text-muted fs-8 fw-bold">Users</div>
                 </li>
                 
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#navbar-users" data-bs-toggle="dropdown" data-bs-auto-close="false" role="button" aria-expanded="false" >
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.users.index') }}">
                         <span class="nav-link-icon d-md-none d-lg-inline-block">
                             <i class="ti ti-users"></i>
                         </span>
-                        <span class="nav-link-title">Users (Buyers/Sellers)</span>
+                        <span class="nav-link-title">All Users</span>
                     </a>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="{{ route('admin.users.index') }}">
-                            All Users
-                        </a>
-                        <a class="dropdown-item" href="{{ route('admin.users.blocked') }}">
-                            Blocked
-                        </a>
-                        <a class="dropdown-item" href="{{ route('admin.users.deleted') }}">
-                            Deleted
-                        </a>
-                    </div>
                 </li>
-
+                
                 <li class="nav-item">
                     <a class="nav-link" href="#">
                         <span class="nav-link-icon d-md-none d-lg-inline-block">
-                            <i class="ti ti-building-store"></i>
+                            <i class="ti ti-user-star"></i>
                         </span>
-                        <span class="nav-link-title">Company Profiles</span>
+                        <span class="nav-link-title">Seller User</span>
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.users.blocked') }}">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="ti ti-user-off"></i>
+                        </span>
+                        <span class="nav-link-title">Blocked Users</span>
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="ti ti-history"></i>
+                        </span>
+                        <span class="nav-link-title">Login History</span>
                     </a>
                 </li>
 
@@ -71,7 +78,7 @@
                         <span class="nav-link-icon d-md-none d-lg-inline-block">
                             <i class="ti ti-category"></i>
                         </span>
-                        <span class="nav-link-title">Categories</span>
+                        <span class="nav-link-title">Category</span>
                     </a>
                 </li>
 
@@ -80,7 +87,16 @@
                         <span class="nav-link-icon d-md-none d-lg-inline-block">
                             <i class="ti ti-packages"></i>
                         </span>
-                        <span class="nav-link-title">Products / Services</span>
+                        <span class="nav-link-title">Product</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="ti ti-clipboard-list"></i>
+                        </span>
+                        <span class="nav-link-title">Requirements</span>
                     </a>
                 </li>
 
@@ -96,25 +112,50 @@
                         <span class="nav-link-icon d-md-none d-lg-inline-block">
                             <i class="ti ti-bulb"></i>
                         </span>
-                        <span class="nav-link-title">Buy Leads / Enquiries</span>
+                        <span class="nav-link-title">Leads</span>
+                    </a>
+                </li>
+
+                {{-- ===================== --}}
+                {{-- TRASH --}}
+                {{-- ===================== --}}
+                <li class="nav-item mt-3 mb-1">
+                    <div class="nav-link text-uppercase text-muted fs-8 fw-bold">Trash</div>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="ti ti-trash"></i>
+                        </span>
+                        <span class="nav-link-title">Deleted Product</span>
                     </a>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link" href="#">
                         <span class="nav-link-icon d-md-none d-lg-inline-block">
-                            <i class="ti ti-wallet"></i>
+                            <i class="ti ti-trash"></i>
                         </span>
-                        <span class="nav-link-title">Wallets & Credits</span>
+                        <span class="nav-link-title">Deleted Category</span>
                     </a>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link" href="#">
                         <span class="nav-link-icon d-md-none d-lg-inline-block">
-                            <i class="ti ti-credit-card"></i>
+                            <i class="ti ti-trash"></i>
                         </span>
-                        <span class="nav-link-title">Subscriptions</span>
+                        <span class="nav-link-title">Deleted Requirements</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.users.deleted') }}">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="ti ti-trash"></i>
+                        </span>
+                        <span class="nav-link-title">Deleted User</span>
                     </a>
                 </li>
 
