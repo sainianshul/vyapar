@@ -83,6 +83,7 @@ class LeadController extends Controller
         tags: ['Leads'],
         parameters: [
             new OA\Parameter(name: 'status', in: 'query', required: false, schema: new OA\Schema(type: 'integer')),
+            new OA\Parameter(name: 'source', in: 'query', required: false, schema: new OA\Schema(type: 'integer'), description: '1:Inquiry Form, 2:Call, 3:Chat, 4:View Number'),
             new OA\Parameter(name: 'temperature', in: 'query', required: false, schema: new OA\Schema(type: 'integer')),
             new OA\Parameter(name: 'page', in: 'query', required: false, schema: new OA\Schema(type: 'integer')),
         ],
@@ -98,6 +99,10 @@ class LeadController extends Controller
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
+        }
+
+        if ($request->filled('source')) {
+            $query->where('source', $request->source);
         }
 
         if ($request->filled('temperature')) {
@@ -123,6 +128,9 @@ class LeadController extends Controller
         security: [['bearerAuth' => []]],
         tags: ['Leads'],
         parameters: [
+            new OA\Parameter(name: 'status', in: 'query', required: false, schema: new OA\Schema(type: 'integer')),
+            new OA\Parameter(name: 'source', in: 'query', required: false, schema: new OA\Schema(type: 'integer'), description: '1:Inquiry Form, 2:Call, 3:Chat, 4:View Number'),
+            new OA\Parameter(name: 'temperature', in: 'query', required: false, schema: new OA\Schema(type: 'integer')),
             new OA\Parameter(name: 'page', in: 'query', required: false, schema: new OA\Schema(type: 'integer')),
         ],
         responses: [
@@ -131,10 +139,23 @@ class LeadController extends Controller
     )]
     public function mySentLeads(Request $request): JsonResponse
     {
-        $leads = Lead::where('buyer_id', $request->user()->id)
+        $query = Lead::where('buyer_id', $request->user()->id)
             ->with(['seller:id,name,profile_photo,city,phone', 'product:id,title', 'requirement:id,title'])
-            ->orderByDesc('updated_at')
-            ->paginate(20);
+            ->orderByDesc('updated_at');
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('source')) {
+            $query->where('source', $request->source);
+        }
+
+        if ($request->filled('temperature')) {
+            $query->where('temperature', $request->temperature);
+        }
+
+        $leads = $query->paginate(20);
 
         return ApiResponse::success('Sent leads fetched successfully', [
             'leads' => $leads->getCollection()->map(fn($l) => $l->toApiResponse()),
