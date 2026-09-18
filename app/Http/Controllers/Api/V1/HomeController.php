@@ -174,12 +174,15 @@ class HomeController extends Controller
         if (!$lat || !$lng) {
             return [
                 'items'  => $this->getFallbackProducts(),
-                'source' => 'featured',
+                'source' => 'fallback',
             ];
         }
 
         $latitude  = (float) $lat;
         $longitude = (float) $lng;
+
+        $nearbyProducts = collect();
+        $source = '';
 
         // Try expanding radius: 10km → 50km → 100km
         foreach (self::RADIUS_TIERS as $radiusKm) {
@@ -190,20 +193,27 @@ class HomeController extends Controller
                     'source' => "nearby_{$radiusKm}km",
                 ];
             }
+            $nearbyProducts = $products;
+            $source = "nearby_{$radiusKm}km";
         }
 
-        // If we found some products in the last tier but < 10, use them
-        if (isset($products) && $products->count() > 0) {
+        // If we found some products but less than 10, fill the rest with fallback products
+        $remaining = self::PRODUCT_LIMIT - $nearbyProducts->count();
+        if ($remaining > 0) {
+            $excludeIds = $nearbyProducts->pluck('id')->toArray();
+            $fallback = $this->getFallbackProducts($remaining, $excludeIds);
+            
+            $items = array_merge($nearbyProducts->values()->toArray(), $fallback);
+            
             return [
-                'items'  => $products->values()->toArray(),
-                'source' => 'nearby_100km',
+                'items'  => $items,
+                'source' => $nearbyProducts->count() > 0 ? "nearby_and_fallback" : 'fallback',
             ];
         }
 
-        // Nothing nearby — fallback to featured + normal
         return [
-            'items'  => $this->getFallbackProducts(),
-            'source' => 'featured',
+            'items'  => $nearbyProducts->values()->toArray(),
+            'source' => $source,
         ];
     }
 
@@ -245,8 +255,8 @@ class HomeController extends Controller
                 )) AS distance_km"
             ))
             ->having('distance_km', '<=', $radiusKm)
-            ->orderByDesc('is_featured')
             ->orderBy('distance_km')
+            ->orderByDesc('is_featured')
             ->limit(self::PRODUCT_LIMIT)
             ->get()
             ->map(function (Product $p) {
@@ -259,22 +269,23 @@ class HomeController extends Controller
     /**
      * Fallback: featured products first, then latest products to fill limit.
      */
-    private function getFallbackProducts(): array
+    private function getFallbackProducts(int $limit = self::PRODUCT_LIMIT, array $excludeIds = []): array
     {
         $featured = Product::active()
             ->featured()
             ->with(['primaryImage:id,product_id,image_path,is_primary', 'seller:id,name,profile_photo,city'])
+            ->when(!empty($excludeIds), fn($q) => $q->whereNotIn('id', $excludeIds))
             ->latest()
-            ->limit(self::PRODUCT_LIMIT)
+            ->limit($limit)
             ->get();
 
-        $remaining = self::PRODUCT_LIMIT - $featured->count();
+        $remaining = $limit - $featured->count();
 
         if ($remaining > 0) {
-            $excludeIds = $featured->pluck('id')->toArray();
+            $excludeIds = array_merge($excludeIds, $featured->pluck('id')->toArray());
             $normal = Product::active()
                 ->with(['primaryImage:id,product_id,image_path,is_primary', 'seller:id,name,profile_photo,city'])
-                ->whereNotIn('id', $excludeIds)
+                ->when(!empty($excludeIds), fn($q) => $q->whereNotIn('id', $excludeIds))
                 ->latest()
                 ->limit($remaining)
                 ->get();
