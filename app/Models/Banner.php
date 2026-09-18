@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Banner extends Model
 {
-    protected $fillable = ['name', 'image', 'type', 'status'];
+    protected $fillable = ['name', 'image', 'type', 'reference_id', 'status'];
 
     public const TYPE_CATEGORY = 1;
     public const TYPE_PRODUCT = 2;

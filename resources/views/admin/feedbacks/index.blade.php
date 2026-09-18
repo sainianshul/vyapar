@@ -85,8 +85,13 @@
                         <input type="hidden" id="feedback-id" name="id">
                         
                         <div class="mb-3">
-                            <label class="form-label required">User ID</label>
-                            <input type="number" class="form-control" id="feedback-user_id" name="user_id" placeholder="Enter User ID" required>
+                            <label class="form-label required">Select User</label>
+                            <select class="form-select" id="feedback-user_id" name="user_id" required>
+                                <option value="">Choose User</option>
+                                @foreach($users as $user)
+                                    <option value="{{ $user->id }}">{{ $user->name }} (ID: {{ $user->id }})</option>
+                                @endforeach
+                            </select>
                         </div>
 
                         <div class="mb-3">

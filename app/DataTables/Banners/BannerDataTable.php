@@ -44,6 +44,7 @@ class BannerDataTable extends DataTable
                             data-id="' . $banner->id . '"
                             data-name="' . e($banner->name) . '"
                             data-type="' . $banner->type . '"
+                            data-reference_id="' . $banner->reference_id . '"
                             data-status="' . $banner->status . '"
                             data-bs-toggle="tooltip" title="Edit">
                             <i class="ti ti-pencil"></i>

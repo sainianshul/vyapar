@@ -8,11 +8,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\DataTables\Banners\BannerDataTable;
 
+use App\Models\Category;
+use App\Models\User;
+
 class BannerController extends Controller
 {
     public function index(BannerDataTable $dataTable)
     {
-        return $dataTable->render('admin.banners.index');
+        $categories = Category::select('id', 'name')->get();
+        $sellers = User::where('role', User::ROLE_USER)->select('id', 'name')->get();
+        return $dataTable->render('admin.banners.index', compact('categories', 'sellers'));
     }
 
     public function data(BannerDataTable $dataTable)
@@ -25,6 +30,7 @@ class BannerController extends Controller
         $request->validate([
             'name' => 'nullable|string|max:255',
             'type' => 'required|integer',
+            'reference_id' => 'nullable|integer',
             'status' => 'required|string|in:active,inactive,draft',
             'image' => 'nullable|image|max:2048',
         ]);
@@ -48,6 +54,7 @@ class BannerController extends Controller
         $request->validate([
             'name' => 'nullable|string|max:255',
             'type' => 'required|integer',
+            'reference_id' => 'nullable|integer',
             'status' => 'required|string|in:active,inactive,draft',
             'image' => 'nullable|image|max:2048',
         ]);

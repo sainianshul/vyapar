@@ -93,11 +93,38 @@
                         <div class="mb-3">
                             <label class="form-label required">Type</label>
                             <select class="form-select" id="banner-type" name="type" required>
+                                <option value="">Select Type</option>
                                 <option value="1">Category</option>
                                 <option value="2">Product</option>
                                 <option value="3">Seller</option>
                             </select>
                         </div>
+
+                        <div class="mb-3 d-none" id="reference-category-wrapper">
+                            <label class="form-label required">Select Category</label>
+                            <select class="form-select reference-input" id="reference-category">
+                                <option value="">Choose Category</option>
+                                @foreach($categories as $category)
+                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="mb-3 d-none" id="reference-product-wrapper">
+                            <label class="form-label required">Product ID</label>
+                            <input type="number" class="form-control reference-input" id="reference-product" placeholder="Enter Product ID">
+                        </div>
+
+                        <div class="mb-3 d-none" id="reference-seller-wrapper">
+                            <label class="form-label required">Select Seller</label>
+                            <select class="form-select reference-input" id="reference-seller">
+                                <option value="">Choose Seller</option>
+                                @foreach($sellers as $seller)
+                                    <option value="{{ $seller->id }}">{{ $seller->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <input type="hidden" name="reference_id" id="banner-reference-id">
 
                         <div class="mb-3">
                             <label class="form-label required">Status</label>
@@ -231,11 +258,37 @@
                 Swal.fire({ toast: true, position: 'top', showConfirmButton: false, timer: 1500, icon: 'success', title: 'Refreshed' });
             });
 
+            // Banner Type Change
+            $('#banner-type').on('change', function() {
+                let val = $(this).val();
+                $('#reference-category-wrapper, #reference-product-wrapper, #reference-seller-wrapper').addClass('d-none');
+                $('.reference-input').prop('required', false).val('');
+                $('#banner-reference-id').val('');
+
+                if (val == 1) {
+                    $('#reference-category-wrapper').removeClass('d-none');
+                    $('#reference-category').prop('required', true);
+                } else if (val == 2) {
+                    $('#reference-product-wrapper').removeClass('d-none');
+                    $('#reference-product').prop('required', true);
+                } else if (val == 3) {
+                    $('#reference-seller-wrapper').removeClass('d-none');
+                    $('#reference-seller').prop('required', true);
+                }
+            });
+
+            // Set Reference ID before submit
+            $('.reference-input').on('change input', function() {
+                $('#banner-reference-id').val($(this).val());
+            });
+
             // Add Banner Modal
             $('.btn-add-banner').on('click', function() {
                 $('#banner-form')[0].reset();
                 $('#banner-id').val('');
+                $('#banner-reference-id').val('');
                 $('#banner-image-preview').html('');
+                $('#banner-type').trigger('change');
                 $('#banner-modal-title').text('Add Banner');
                 $('#banner-modal').modal('show');
             });
@@ -248,11 +301,21 @@
                 let type = $(this).data('type');
                 let status = $(this).data('status');
                 let image = $(this).data('image');
+                let ref_id = $(this).data('reference_id');
 
                 $('#banner-id').val(id);
                 $('#banner-name').val(name);
-                $('#banner-type').val(type);
+                $('#banner-type').val(type).trigger('change');
                 $('#banner-status').val(status);
+                $('#banner-reference-id').val(ref_id);
+
+                if (type == 1) {
+                    $('#reference-category').val(ref_id);
+                } else if (type == 2) {
+                    $('#reference-product').val(ref_id);
+                } else if (type == 3) {
+                    $('#reference-seller').val(ref_id);
+                }
                 
                 if (image) {
                     $('#banner-image-preview').html('<img src="'+image+'" class="img-thumbnail mt-2" style="max-height: 80px">');

@@ -11,4 +11,9 @@ class Feedback extends Model
     public const STATUS_DRAFT = 'draft';
     public const STATUS_ACTIVE = 'active';
     public const STATUS_INACTIVE = 'inactive';
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

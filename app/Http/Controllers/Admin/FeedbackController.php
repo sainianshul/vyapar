@@ -7,11 +7,14 @@ use App\Models\Feedback;
 use Illuminate\Http\Request;
 use App\DataTables\Feedbacks\FeedbackDataTable;
 
+use App\Models\User;
+
 class FeedbackController extends Controller
 {
     public function index(FeedbackDataTable $dataTable)
     {
-        return $dataTable->render('admin.feedbacks.index');
+        $users = User::select('id', 'name')->get();
+        return $dataTable->render('admin.feedbacks.index', compact('users'));
     }
 
     public function data(FeedbackDataTable $dataTable)

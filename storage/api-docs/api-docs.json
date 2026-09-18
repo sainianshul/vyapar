@@ -592,6 +592,15 @@
                         }
                     },
                     {
+                        "name": "source",
+                        "in": "query",
+                        "description": "1:Inquiry Form, 2:Call, 3:Chat, 4:View Number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
                         "name": "temperature",
                         "in": "query",
                         "required": false,
@@ -628,6 +637,31 @@
                 "summary": "Get leads/inquiries sent by the logged-in user (buyer)",
                 "operationId": "mySentLeads",
                 "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "source",
+                        "in": "query",
+                        "description": "1:Inquiry Form, 2:Call, 3:Chat, 4:View Number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "temperature",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
                     {
                         "name": "page",
                         "in": "query",
@@ -691,6 +725,72 @@
                     },
                     "422": {
                         "description": "Validation Error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/my/products/{id}/leads": {
+            "get": {
+                "tags": [
+                    "Leads"
+                ],
+                "summary": "Get leads for a specific product",
+                "operationId": "myProductLeads",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Leads fetched successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/my/enquiries": {
+            "get": {
+                "tags": [
+                    "Leads"
+                ],
+                "summary": "Get all received enquiries (source = 1)",
+                "operationId": "myReceivedEnquiries",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Enquiries fetched successfully"
                     }
                 },
                 "security": [
@@ -1631,7 +1731,7 @@
                 "tags": [
                     "Requirements"
                 ],
-                "summary": "Get logged-in buyer requirements",
+                "summary": "Get own requirements",
                 "operationId": "getMyRequirements",
                 "responses": {
                     "200": {
@@ -2108,6 +2208,20 @@
                     }
                 ]
             }
+        },
+        "/api/v1/cron/calls/cleanup": {
+            "get": {
+                "tags": [
+                    "Cron Jobs"
+                ],
+                "summary": "Webhook to automatically mark stale ringing calls as missed",
+                "operationId": "cronCleanupCalls",
+                "responses": {
+                    "200": {
+                        "description": "Cleanup executed"
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -2158,6 +2272,10 @@
         {
             "name": "WebRTC Calling",
             "description": "WebRTC Calling"
+        },
+        {
+            "name": "Cron Jobs",
+            "description": "Cron Jobs"
         }
     ]
 }
