@@ -146,6 +146,7 @@ class Requirement extends Model
                 'name' => $this->user->name,
                 'profile_photo' => $this->user->profile_photo ? asset('storage/' . $this->user->profile_photo) : null,
                 'city' => $this->user->city,
+                'joined_at' => $this->user->created_at,
             ] : null,
             'category' => $this->relationLoaded('category') && $this->category ? [
                 'id' => $this->category->id,

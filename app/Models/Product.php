@@ -293,6 +293,7 @@ class Product extends Model
                 'name' => $this->seller->name,
                 'profile_photo' => $this->seller->profile_photo ? asset('storage/' . $this->seller->profile_photo) : null,
                 'city' => $this->seller->city,
+                'joined_at' => $this->seller->created_at,
             ] : null,
             'category' => $this->relationLoaded('category') && $this->category ? [
                 'id' => $this->category->id,
