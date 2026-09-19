@@ -1,0 +1,41 @@
+<?php
+
+namespace App\Http\Requests\Admin\Requirement;
+
+use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Foundation\Http\FormRequest;
+
+class StoreRequirementRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'user_id' => 'required|exists:users,id',
+            'category_id' => 'required|exists:categories,id',
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'target_budget' => 'required|numeric|min:0',
+                        'target_budget_unit' => 'nullable|string|max:50',
+                                    'quantity' => 'required|integer|min:1',
+            'delivery_location' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:100',
+            'delivery_pincode' => 'nullable|string|max:10',
+            'status' => 'required|integer|in:1,2,3,4',
+                                    'primary_image' => 'nullable|image|max:5120', // 5MB max
+            'additional_images.*' => 'nullable|image|max:5120', // 5MB max
+        ];
+    }
+}

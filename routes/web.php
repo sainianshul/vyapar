@@ -62,7 +62,11 @@ Route::prefix('admin')->group(function () {
         Route::post('feedbacks/{feedback}/status', [\App\Http\Controllers\Admin\FeedbackController::class, 'updateStatus'])->name('feedbacks.update-status');
         Route::resource('feedbacks', \App\Http\Controllers\Admin\FeedbackController::class)->except(['create', 'edit', 'show']);
 
-        // Add future routes here for Leads, Requirements, etc.
+        // Requirements CRUD
+        Route::get('requirements/data', [\App\Http\Controllers\Admin\RequirementController::class, 'data'])->name('requirements.data');
+        Route::post('requirements/{requirement}/status', [\App\Http\Controllers\Admin\RequirementController::class, 'updateStatus'])->name('requirements.update-status');
+        Route::resource('requirements', \App\Http\Controllers\Admin\RequirementController::class);
+
     });
     });
 });

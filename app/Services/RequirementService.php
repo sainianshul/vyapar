@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Exceptions\RequirementServiceException;
 use App\Models\Requirement;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -12,54 +11,85 @@ use Throwable;
 
 class RequirementService
 {
-    public function createRequirement(array $data, User $buyer, $images = null): Requirement
+    /**
+     * Create a new requirement.
+     *
+     * @param array $data
+     * @param User $buyer
+     * @param \Illuminate\Http\UploadedFile|null $primaryImage
+     * @param array|null $additionalImages
+     * @return Requirement
+     * @throws \Exception
+     */
+    public function createRequirement(array $data, User $buyer, $primaryImage = null, $additionalImages = null): Requirement
     {
         try {
             DB::beginTransaction();
 
-            $data['user_id'] = $buyer->id;
-            $data['status'] = $data['status'] ?? Requirement::STATUS_OPEN;
-            $data['expires_at'] = $data['expires_at'] ?? now()->addDays(30);
-            
+            // Fallback to buyer's delivery_location info if not provided
             $data['delivery_location'] = $data['delivery_location'] ?? $buyer->address;
             $data['city'] = $data['city'] ?? $buyer->city;
-            $data['delivery_pincode'] = $data['delivery_pincode'] ?? $buyer->pincode;
+            $data['delivery_pincode'] = $data['delivery_pincode'] ?? $buyer->delivery_pincode;
             $data['latitude'] = $data['latitude'] ?? $buyer->latitude;
             $data['longitude'] = $data['longitude'] ?? $buyer->longitude;
 
             if (empty($data['city']) || empty($data['latitude']) || empty($data['longitude'])) {
-                throw new \Exception('Location details are missing. Please provide address/location details for the requirement or update them in your profile.');
+                throw new \Exception('Location details are missing. Please provide address/delivery_location details for the requirement or update them in your profile.');
             }
+
+            // Set default data
+            $data['user_id'] = $buyer->id;
+            $data['status'] = $data['status'] ?? Requirement::STATUS_OPEN;
+            $data['expires_at'] = $data['expires_at'] ?? now()->addDays(30);
+            
+            // Set default booleans
+            $data['is_negotiable'] = $data['is_negotiable'] ?? false;
+            $data['is_featured'] = $data['is_featured'] ?? false;
 
             $requirement = Requirement::create($data);
 
-            if ($images && is_array($images)) {
-                foreach ($images as $index => $image) {
+            // Handle primary image
+            if ($primaryImage) {
+                $path = $primaryImage->store('requirements/images', 'public');
+                $requirement->images()->create([
+                    'image_path' => $path,
+                    'sort_order' => 0,
+                    'is_primary' => true,
+                ]);
+            }
+
+            // Handle additional images
+            if ($additionalImages && is_array($additionalImages)) {
+                $hasPrimary = $requirement->primaryImage()->exists();
+                
+                foreach ($additionalImages as $index => $image) {
                     $path = $image->store('requirements/images', 'public');
                     $requirement->images()->create([
                         'image_path' => $path,
-                        'sort_order' => $index,
+                        'sort_order' => $index + 1,
+                        'is_primary' => (!$hasPrimary && $index === 0 && !$primaryImage),
                     ]);
                 }
             }
 
             DB::commit();
 
-            return $requirement->load(['user', 'category', 'images']);
+            return $requirement->load(['buyer', 'category', 'images']);
         } catch (Throwable $e) {
             DB::rollBack();
             Log::error('Requirement creation failed: ' . $e->getMessage());
-            throw new RequirementServiceException('Failed to create requirement. ' . $e->getMessage());
+            throw new \Exception('Failed to create requirement. ' . $e->getMessage());
         }
     }
 
-    public function updateRequirement(Requirement $requirement, array $data, $newImages = null, $deletedImages = null): Requirement
+    public function updateRequirement(Requirement $requirement, array $data, $primaryImage = null, $additionalImages = null, $deletedImages = null): Requirement
     {
         try {
             DB::beginTransaction();
 
             $requirement->update($data);
 
+            // Handle deleted images
             if ($deletedImages && is_array($deletedImages)) {
                 $imagesToDelete = $requirement->images()->whereIn('id', $deletedImages)->get();
                 foreach ($imagesToDelete as $img) {
@@ -68,24 +98,50 @@ class RequirementService
                 }
             }
 
-            if ($newImages && is_array($newImages)) {
-                $maxSortOrder = $requirement->images()->max('sort_order') ?? -1;
-                foreach ($newImages as $index => $image) {
+            // Handle primary image update
+            if ($primaryImage) {
+                // Delete old primary
+                if ($oldPrimary = $requirement->primaryImage) {
+                    Storage::disk('public')->delete($oldPrimary->image_path);
+                    $oldPrimary->delete();
+                }
+
+                $path = $primaryImage->store('requirements/images', 'public');
+                $requirement->images()->create([
+                    'image_path' => $path,
+                    'sort_order' => 0,
+                    'is_primary' => true,
+                ]);
+            } else {
+                // If the primary image was deleted but no new one provided, make the first available image primary
+                if (!$requirement->primaryImage()->exists() && $firstImage = $requirement->images()->first()) {
+                    $firstImage->update(['is_primary' => true, 'sort_order' => 0]);
+                }
+            }
+
+            // Handle new additional images
+            if ($additionalImages && is_array($additionalImages)) {
+                $maxSortOrder = $requirement->images()->max('sort_order') ?? 0;
+                $hasPrimary = $requirement->primaryImage()->exists();
+
+                foreach ($additionalImages as $index => $image) {
                     $path = $image->store('requirements/images', 'public');
                     $requirement->images()->create([
                         'image_path' => $path,
                         'sort_order' => $maxSortOrder + $index + 1,
+                        'is_primary' => (!$hasPrimary && $index === 0),
                     ]);
+                    $hasPrimary = true; // Set to true if it just became primary
                 }
             }
 
             DB::commit();
 
-            return $requirement->load(['user', 'category', 'images' => fn($q) => $q->orderBy('sort_order')]);
+            return $requirement->load(['buyer', 'category', 'images' => fn($q) => $q->orderBy('sort_order')]);
         } catch (Throwable $e) {
             DB::rollBack();
             Log::error('Requirement update failed: ' . $e->getMessage());
-            throw new RequirementServiceException('Failed to update requirement. ' . $e->getMessage());
+            throw new \Exception('Failed to update requirement. ' . $e->getMessage());
         }
     }
 }
