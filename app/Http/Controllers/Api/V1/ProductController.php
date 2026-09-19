@@ -203,6 +203,7 @@ class ProductController extends Controller
                     required: ['category_id', 'title', 'price', 'condition'],
                     properties: [
                         new OA\Property(property: 'category_id', type: 'integer', example: 1),
+                        new OA\Property(property: 'other_category_name', type: 'string', nullable: true),
                         new OA\Property(property: 'title', type: 'string', example: 'iPhone 13 Pro'),
                         new OA\Property(property: 'description', type: 'string', nullable: true, example: 'Used for 1 year, in good condition'),
                         new OA\Property(property: 'price', type: 'number', format: 'float', example: 50000),
@@ -342,6 +343,7 @@ class ProductController extends Controller
                 schema: new OA\Schema(
                     properties: [
                         new OA\Property(property: 'category_id', type: 'integer', nullable: true),
+                        new OA\Property(property: 'other_category_name', type: 'string', nullable: true),
                         new OA\Property(property: 'title', type: 'string', nullable: true),
                         new OA\Property(property: 'description', type: 'string', nullable: true),
                         new OA\Property(property: 'price', type: 'number', format: 'float', nullable: true),

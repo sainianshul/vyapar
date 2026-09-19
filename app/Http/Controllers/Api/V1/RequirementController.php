@@ -144,6 +144,7 @@ class RequirementController extends Controller
                     required: ['title'],
                     properties: [
                         new OA\Property(property: 'category_id', type: 'integer', nullable: true),
+                        new OA\Property(property: 'other_category_name', type: 'string', nullable: true),
                         new OA\Property(property: 'title', type: 'string', example: 'Need 100 T-shirts'),
                         new OA\Property(property: 'description', type: 'string', nullable: true),
                         new OA\Property(property: 'quantity', type: 'integer', example: 100),
@@ -255,6 +256,7 @@ class RequirementController extends Controller
                 schema: new OA\Schema(
                     properties: [
                         new OA\Property(property: 'category_id', type: 'integer', nullable: true),
+                        new OA\Property(property: 'other_category_name', type: 'string', nullable: true),
                         new OA\Property(property: 'title', type: 'string', nullable: true),
                         new OA\Property(property: 'description', type: 'string', nullable: true),
                         new OA\Property(property: 'quantity', type: 'integer', nullable: true),
