@@ -52,8 +52,6 @@
                                 </div>
                                 @error('target_budget') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                             </div>
-                             @enderror
-                            </div>
                         </div>
 
                         <div class="row">
@@ -151,9 +149,6 @@
                                 @endforeach
                             </select>
                             @error('status') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
-
-                         @enderror
                         </div>
 
                         <div class="mb-3">
