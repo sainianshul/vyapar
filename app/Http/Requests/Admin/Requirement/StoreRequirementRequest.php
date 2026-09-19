@@ -25,6 +25,7 @@ class StoreRequirementRequest extends FormRequest
         return [
             'user_id' => 'required|exists:users,id',
             'category_id' => 'required|exists:categories,id',
+            'other_category_name' => 'nullable|string|max:100',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'target_budget' => 'required|numeric|min:0',

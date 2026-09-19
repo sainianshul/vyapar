@@ -23,6 +23,7 @@ class UpdateProductRequest extends FormRequest
     {
         return [
             'category_id' => 'sometimes|exists:categories,id',
+            'other_category_name' => 'nullable|string|max:100',
             'title' => 'sometimes|string|max:255',
             'description' => 'nullable|string',
             'price' => 'sometimes|numeric|min:0',

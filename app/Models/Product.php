@@ -39,6 +39,7 @@ class Product extends Model
     protected $fillable = [
         'user_id',
         'category_id',
+        'other_category_name',
         'title',
         'slug',
         'description',
@@ -117,7 +118,7 @@ class Product extends Model
             if ($product->isDirty('title')) {
                 $product->slug = self::generateUniqueSlug($product->title, $product->id);
             }
-            if ($product->isDirty(['title', 'category_id'])) {
+            if ($product->isDirty(['title', 'category_id', 'other_category_name'])) {
                 $product->search_tags = self::generateSearchTags($product);
             }
         });
@@ -135,6 +136,10 @@ class Product extends Model
             }
         }
         
+        if (!empty($product->other_category_name)) {
+            $tags[] = $product->other_category_name;
+        }
+
         return implode(' ', array_filter($tags));
     }
 

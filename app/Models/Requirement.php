@@ -16,6 +16,7 @@ class Requirement extends Model
     protected $fillable = [
         'user_id',
         'category_id',
+        'other_category_name',
         'title',
         'description',
         'quantity',
@@ -66,7 +67,7 @@ class Requirement extends Model
         });
 
         static::updating(function ($req) {
-            if ($req->isDirty(['title', 'category_id'])) {
+            if ($req->isDirty(['title', 'category_id', 'other_category_name'])) {
                 $req->search_tags = self::generateSearchTags($req);
             }
         });
@@ -84,6 +85,10 @@ class Requirement extends Model
                     $tags[] = $category->parent->name;
                 }
             }
+        }
+        
+        if (!empty($req->other_category_name)) {
+            $tags[] = $req->other_category_name;
         }
         
         return implode(' ', array_filter($tags));

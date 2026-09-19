@@ -254,6 +254,7 @@ Used by sellers to add a new product. This is a `multipart/form-data` request.
     - `Content-Type: multipart/form-data`
 - **Form-Data Parameters:**
     - `category_id` _(integer, required)_: Selected Category ID.
+   - `other_category_name` _(string, optional)_: Name of the category if "Other" is selected.
     - `title` _(string, required)_: Name/Title of the product.
     - `price` _(float, required)_: Price of the product.
     - `condition` _(integer, required)_: `1` (New) or `2` (Used).
@@ -317,7 +318,7 @@ Used by sellers to edit a product. Also a `multipart/form-data` request.
 - **Path Parameters:**
     - `id` _(integer, required)_: Product ID.
 - **Form-Data Parameters (All Optional for Update):**
-    - `category_id`, `title`, `price`, `condition`, `description`, etc. (Same as Add Product).
+    - `category_id`, `other_category_name`, `title`, `price`, `condition`, `description`, etc. (Same as Add Product).
     - `primary_image` _(file)_: New main image.
     - `additional_images[]` _(file array)_: New additional images to append.
     - `deleted_images[]` _(integer array)_: Pass IDs of existing additional images you want to delete.
@@ -411,6 +412,7 @@ Used by buyers to post a new buying need. This is a `multipart/form-data` reques
 - **Form-Data Parameters:**
     - `title` _(string, required)_: Brief title (e.g., "Need 100 T-shirts").
     - `category_id` _(integer, optional)_: Related Category ID.
+   - `other_category_name` _(string, optional)_: Name of the category if "Other" is selected.
     - `description` _(string, optional)_: Detailed description of what is needed.
     - `quantity` _(integer, optional)_: Approximate quantity needed (e.g., 100).
     - `target_budget` _(float, optional)_: Total budget or price expectation.
@@ -462,7 +464,7 @@ Used to edit an existing requirement. Also a `multipart/form-data` request.
 - **Path Parameters:**
     - `id` _(integer, required)_: Requirement ID.
 - **Form-Data Parameters (All Optional for Update):**
-    - `title`, `category_id`, `description`, `quantity`, `target_budget`, etc. (Same as Add Requirement).
+    - `title`, `category_id`, `other_category_name`, `description`, `quantity`, `target_budget`, etc. (Same as Add Requirement).
     - `new_images[]` _(file array)_: New images to append.
     - `deleted_images[]` _(integer array)_: IDs of existing images you want to delete.
 
@@ -946,4 +948,3 @@ Check if the API is up and running. No authentication required.
 ---
 
 _End of Documentation_
-

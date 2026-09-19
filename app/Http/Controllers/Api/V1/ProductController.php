@@ -53,7 +53,14 @@ class ProductController extends Controller
             ->with(['primaryImage', 'seller:id,name,profile_photo,city,created_at']);
 
         if ($request->filled('category_id')) {
-            $query->where('category_id', $request->category_id);
+            $categoryId = $request->category_id;
+            $category = \App\Models\Category::with('children')->find($categoryId);
+            if ($category) {
+                $categoryIds = array_merge([$categoryId], $category->getAllChildrenIds());
+                $query->whereIn('category_id', $categoryIds);
+            } else {
+                $query->where('category_id', $categoryId);
+            }
         }
 
         if ($request->filled('search')) {
