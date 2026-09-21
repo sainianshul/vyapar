@@ -49,7 +49,6 @@ class AuthService
         $smartpingPass = config('services.smartping.pass');
         $smartpingFrom = config('services.smartping.from');
 
-        /* 
         // Uncomment in production to enable actual SMS sending
         if ($smartpingUser && $smartpingPass) {
             $url = "https://api.smartping.ai/fe/api/v1/send?"
@@ -64,14 +63,19 @@ class AuthService
                 $response = \Illuminate\Support\Facades\Http::get($url);
                 if ($response->successful()) {
                     \Illuminate\Support\Facades\Log::info('SmartPing OTP sent successfully', ['phone' => $phone, 'response' => $response->body()]);
+                    \App\Models\CommunicationLog::log($phone, $messageText, \App\Models\CommunicationLog::STATUS_SENT);
                 } else {
                     \Illuminate\Support\Facades\Log::error('SmartPing OTP failed', ['phone' => $phone, 'response' => $response->body()]);
+                    \App\Models\CommunicationLog::log($phone, $messageText, \App\Models\CommunicationLog::STATUS_FAILED);
                 }
             } catch (\Exception $e) {
                 \Illuminate\Support\Facades\Log::error('SmartPing API Exception', ['error' => $e->getMessage()]);
+                \App\Models\CommunicationLog::log($phone, $messageText, \App\Models\CommunicationLog::STATUS_FAILED);
             }
+        } else {
+            // Log pending if credentials missing
+            \App\Models\CommunicationLog::log($phone, $messageText, \App\Models\CommunicationLog::STATUS_PENDING);
         }
-        */
         
         return [
             'otp' => $otp,
