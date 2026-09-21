@@ -25,7 +25,7 @@ class CommunicationLogDataTable extends DataTable
             })
             ->addColumn('status', function (CommunicationLog $log) {
                 $color = $log->status_color;
-                return '<span class="badge bg-' . $color . '-lt"><i class="ti ti-circle-filled fs-5 me-1"></i>' . e($log->status_name) . '</span>';
+                return '<span class="badge badge-outline text-' . $color . '"><i class="ti ti-circle-filled fs-5 me-1"></i>' . e($log->status_name) . '</span>';
             })
             ->editColumn('created_at', function (CommunicationLog $log) {
                 return $log->created_at ? $log->created_at->format('d M Y, h:i A') : '<span class="text-muted">—</span>';

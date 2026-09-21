@@ -9,9 +9,6 @@
             <div class="col">
                 <x-breadcrumb :items="[['label' => 'Communication Logs']]" />
                 <h2 class="page-title">Communication Logs</h2>
-                <div class="text-secondary mt-1">
-                    System logs for SMS, OTPs, and other messages sent to users.
-                </div>
             </div>
             
             <div class="col-auto ms-auto d-print-none">
@@ -30,9 +27,8 @@
     </div>
 
     <div class="card shadow-sm">
-        <div class="card-body p-0">
-            
-            <div class="p-3 border-bottom d-flex align-items-center justify-content-between flex-wrap gap-3 bg-light">
+        <div class="card-header">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 w-100">
                 <div class="d-flex align-items-center flex-wrap gap-2">
                     <div class="input-icon" style="min-width: 250px;">
                         <span class="input-icon-addon"><i class="ti ti-search"></i></span>
@@ -46,6 +42,9 @@
                     </button>
                 </div>
             </div>
+        </div>
+
+        <div class="card-body">
 
             <div id="communicationlog-loader" class="d-flex justify-content-center align-items-center p-5">
                 <div class="spinner-border text-primary" role="status">
@@ -55,7 +54,7 @@
 
             {{-- Table --}}
             <div id="communicationlog-table-wrapper" class="table-responsive d-none">
-                {{ $dataTable->table(['class' => 'table table-vcenter table-hover card-table w-100']) }}
+                {{ $dataTable->table(['class' => 'table table-vcenter w-100']) }}
             </div>
 
             @include('admin.layouts.partials._table-empty', [
