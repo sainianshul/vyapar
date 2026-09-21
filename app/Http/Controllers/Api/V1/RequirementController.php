@@ -141,14 +141,14 @@ class RequirementController extends Controller
             content: new OA\MediaType(
                 mediaType: 'multipart/form-data',
                 schema: new OA\Schema(
-                    required: ['title'],
+                    required: ['category_id', 'title', 'description', 'target_budget'],
                     properties: [
-                        new OA\Property(property: 'category_id', type: 'integer', nullable: true),
+                        new OA\Property(property: 'category_id', type: 'integer'),
                         new OA\Property(property: 'other_category_name', type: 'string', nullable: true),
                         new OA\Property(property: 'title', type: 'string', example: 'Need 100 T-shirts'),
-                        new OA\Property(property: 'description', type: 'string', nullable: true),
-                        new OA\Property(property: 'quantity', type: 'integer', example: 100),
-                        new OA\Property(property: 'target_budget', type: 'number', format: 'float', nullable: true, example: 5000),
+                        new OA\Property(property: 'description', type: 'string'),
+                        new OA\Property(property: 'quantity', type: 'integer', example: 100, nullable: true),
+                        new OA\Property(property: 'target_budget', type: 'number', format: 'float', example: 5000),
                         new OA\Property(property: 'delivery_location', type: 'string', nullable: true),
                         new OA\Property(property: 'delivery_pincode', type: 'string', nullable: true),
                         new OA\Property(property: 'city', type: 'string', nullable: true),

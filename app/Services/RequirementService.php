@@ -34,7 +34,9 @@ class RequirementService
             $data['longitude'] = $data['longitude'] ?? $buyer->longitude;
 
             if (empty($data['city']) || empty($data['latitude']) || empty($data['longitude'])) {
-                throw new \Exception('Location details are missing. Please provide address/delivery_location details for the requirement or update them in your profile.');
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'location' => 'Location details are missing. Please provide address/delivery_location details for the requirement or update them in your profile.'
+                ]);
             }
 
             // Set default data
@@ -75,6 +77,9 @@ class RequirementService
             DB::commit();
 
             return $requirement->load(['buyer', 'category', 'images']);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            throw $e;
         } catch (Throwable $e) {
             DB::rollBack();
             Log::error('Requirement creation failed: ' . $e->getMessage());
@@ -138,6 +143,9 @@ class RequirementService
             DB::commit();
 
             return $requirement->load(['buyer', 'category', 'images' => fn($q) => $q->orderBy('sort_order')]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            throw $e;
         } catch (Throwable $e) {
             DB::rollBack();
             Log::error('Requirement update failed: ' . $e->getMessage());

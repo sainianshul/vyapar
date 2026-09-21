@@ -18,11 +18,11 @@ class UpdateRequirementRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category_id' => 'nullable|exists:categories,id',
-            'title' => 'nullable|string|max:255',
-            'description' => 'nullable|string',
+            'category_id' => 'sometimes|required|exists:categories,id',
+            'title' => 'sometimes|required|string|max:255',
+            'description' => 'sometimes|required|string',
             'quantity' => 'nullable|integer|min:1',
-            'target_budget' => 'nullable|numeric|min:0',
+            'target_budget' => 'sometimes|required|numeric|min:0',
             'delivery_location' => 'nullable|string|max:255',
             'delivery_pincode' => 'nullable|string|max:10',
             'city' => 'nullable|string|max:100',

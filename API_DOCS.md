@@ -411,11 +411,11 @@ Used by buyers to post a new buying need. This is a `multipart/form-data` reques
     - `Content-Type: multipart/form-data`
 - **Form-Data Parameters:**
     - `title` _(string, required)_: Brief title (e.g., "Need 100 T-shirts").
-    - `category_id` _(integer, optional)_: Related Category ID.
+    - `category_id` _(integer, required)_: Related Category ID.
    - `other_category_name` _(string, optional)_: Name of the category if "Other" is selected.
-    - `description` _(string, optional)_: Detailed description of what is needed.
+    - `description` _(string, required)_: Detailed description of what is needed.
     - `quantity` _(integer, optional)_: Approximate quantity needed (e.g., 100).
-    - `target_budget` _(float, optional)_: Total budget or price expectation.
+    - `target_budget` _(float, required)_: Total budget or price expectation.
     - `delivery_location` _(string, optional)_: Full address for delivery.
     - `delivery_pincode` _(string, optional)_: Area pincode for delivery.
     - `city` _(string, optional)_: Delivery City.

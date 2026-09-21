@@ -23,11 +23,11 @@ class StoreRequirementRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category_id' => 'nullable|exists:categories,id',
+            'category_id' => 'required|exists:categories,id',
             'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'description' => 'required|string',
             'quantity' => 'nullable|integer|min:1',
-            'target_budget' => 'nullable|numeric|min:0',
+            'target_budget' => 'required|numeric|min:0',
             'delivery_location' => 'nullable|string|max:255',
             'delivery_pincode' => 'nullable|string|max:10',
             'city' => 'nullable|string|max:100',
