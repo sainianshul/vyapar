@@ -33,13 +33,13 @@
                                 <li>
                                     <a class="dropdown-item status-change-btn" href="#"
                                        data-id="{{ $requirement->id }}" data-status="{{ $value }}">
-                                        @if($value == \App\Models\Requirement::STATUS_ACTIVE)
+                                        @if($value == \App\Models\Requirement::STATUS_OPEN)
                                             <i class="ti ti-check me-2 text-success"></i>
-                                        @elseif($value == \App\Models\Requirement::STATUS_SOLD)
+                                        @elseif($value == \App\Models\Requirement::STATUS_FULFILLED)
                                             <i class="ti ti-tag me-2 text-info"></i>
                                         @elseif($value == \App\Models\Requirement::STATUS_EXPIRED)
                                             <i class="ti ti-clock-off me-2 text-warning"></i>
-                                        @elseif($value == \App\Models\Requirement::STATUS_BLOCKED)
+                                        @elseif($value == \App\Models\Requirement::STATUS_CLOSED)
                                             <i class="ti ti-ban me-2 text-danger"></i>
                                         @endif
                                         {{ $label }}
