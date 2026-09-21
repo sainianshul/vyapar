@@ -42,7 +42,7 @@ class ProductLeadDataTable extends DataTable
                 ';
             })
             ->addColumn('source', function (Lead $lead) {
-                return '<span class="badge bg-secondary-lt">' . e($lead->source_name) . '</span>';
+                return '<span class="badge badge-outline text-secondary">' . e($lead->source_name) . '</span>';
             })
             ->addColumn('temperature', function (Lead $lead) {
                 $tempColors = [
@@ -51,7 +51,7 @@ class ProductLeadDataTable extends DataTable
                     Lead::TEMP_HOT => 'red',
                 ];
                 $color = $tempColors[$lead->temperature] ?? 'secondary';
-                return '<span class="badge bg-' . $color . '-lt">' . e($lead->temperature_name) . '</span>';
+                return '<span class="badge badge-outline text-' . $color . '">' . e($lead->temperature_name) . '</span>';
             })
             ->addColumn('status', function (Lead $lead) {
                 $statusColors = [
@@ -61,12 +61,21 @@ class ProductLeadDataTable extends DataTable
                     Lead::STATUS_REJECTED => 'red',
                 ];
                 $color = $statusColors[$lead->status] ?? 'secondary';
-                return '<span class="badge bg-' . $color . '-lt">' . e($lead->status_name) . '</span>';
+                return '<span class="badge badge-outline text-' . $color . '">' . e($lead->status_name) . '</span>';
             })
             ->editColumn('created_at', function (Lead $lead) {
                 return $lead->created_at->format('d M Y, h:i A');
             })
-            ->rawColumns(['buyer', 'source', 'temperature', 'status'])
+            ->addColumn('actions', function (Lead $lead) {
+                return '
+                    <div class="d-flex gap-1 justify-content-end">
+                        <a href="#" class="btn btn-icon btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="View Lead">
+                            <i class="ti ti-eye"></i>
+                        </a>
+                    </div>
+                ';
+            })
+            ->rawColumns(['buyer', 'source', 'temperature', 'status', 'actions'])
             ->setRowId('id');
     }
 
@@ -114,6 +123,11 @@ class ProductLeadDataTable extends DataTable
             Column::make('quantity')->title('Quantity')->searchable(false),
             Column::make('status')->title('Status')->searchable(false),
             Column::make('created_at')->title('Received At')->searchable(false),
+            Column::computed('actions')->title('Actions')
+                  ->exportable(false)
+                  ->printable(false)
+                  ->width(60)
+                  ->addClass('text-end'),
         ];
     }
 

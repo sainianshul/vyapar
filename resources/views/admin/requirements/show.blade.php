@@ -75,9 +75,7 @@
                         @if($requirement->is_featured)
                             <span class="badge bg-yellow-lt"><i class="ti ti-star-filled me-1"></i>Featured</span>
                         @endif
-                        <span class="badge bg-{{ $requirement->condition == \App\Models\Requirement::CONDITION_NEW ? 'green' : 'orange' }}-lt">
-                            {{ $requirement->condition_name }}
-                        </span>
+
                     </div>
                     <div class="d-flex flex-wrap gap-3 text-secondary small mt-1">
                         <span><i class="ti ti-currency-rupee me-1"></i>{{ number_format($requirement->target_budget, 2) }}{{ $requirement->target_budget_unit ? ' / ' . $requirement->target_budget_unit : '' }}</span>

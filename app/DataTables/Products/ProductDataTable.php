@@ -38,7 +38,8 @@ class ProductDataTable extends DataTable
                 return $product->category ? e($product->category->name) : '<span class="text-muted">—</span>';
             })
             ->addColumn('condition', function (Product $product) {
-                return '<span class="badge bg-' . ($product->condition == \App\Models\Product::CONDITION_NEW ? 'green' : 'orange') . '-lt">' . e($product->condition_name) . '</span>';
+                $color = $product->condition == \App\Models\Product::CONDITION_NEW ? 'green' : 'orange';
+                return '<span class="badge badge-outline text-' . $color . '">' . e($product->condition_name) . '</span>';
             })
             ->editColumn('price', function (Product $product) {
                 return '₹' . number_format($product->price, 2) . ($product->price_unit ? ' / ' . e($product->price_unit) : '');

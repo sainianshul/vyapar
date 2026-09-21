@@ -417,7 +417,6 @@
                 <div class="tab-pane fade" id="tab-leads" role="tabpanel">
                     <div class="mb-3">
                         <h3 class="mb-1">Leads & Enquiries</h3>
-                        <p class="text-secondary">Enquiries and buy leads received for this product.</p>
                     </div>
                     <div class="table-responsive">
                         {{ $leadTable->table(['class' => 'table table-vcenter card-table w-100']) }}
