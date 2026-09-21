@@ -16,15 +16,15 @@ class RequirementDataTable extends DataTable
             })
             ->editColumn('title', function (Requirement $requirement) {
                 $imageUrl = ($requirement->images->isNotEmpty()) ? $requirement->images->first()->url : null;
-                $showUrl = 'javascript:void(0)'; // can be replaced with show route
+                $showUrl = route('admin.requirements.show', $requirement->id);
                 $imageHtml = $imageUrl 
-                    ? '<a href="javascript:void(0)" class="d-block"><div class="avatar avatar-sm me-2" style="background-image: url(' . e($imageUrl) . ')"></div></a>'
-                    : '<a href="javascript:void(0)" class="d-block"><div class="avatar avatar-sm me-2 bg-light text-muted"><i class="ti ti-photo"></i></div></a>';
+                    ? '<a href="' . $showUrl . '" class="d-block"><div class="avatar avatar-sm me-2" style="background-image: url(' . e($imageUrl) . ')"></div></a>'
+                    : '<a href="' . $showUrl . '" class="d-block"><div class="avatar avatar-sm me-2 bg-light text-muted"><i class="ti ti-photo"></i></div></a>';
                 
                 return '
                     <div class="d-flex align-items-center">
                         ' . $imageHtml . '
-                        <a href="javascript:void(0)" class="fw-semibold text-truncate d-block text-reset text-decoration-none" style="max-width: 150px;">' . e($requirement->title) . '</a>
+                        <a href="' . $showUrl . '" class="fw-semibold text-truncate d-block text-reset text-decoration-none" style="max-width: 150px;">' . e($requirement->title) . '</a>
                     </div>
                 ';
             })

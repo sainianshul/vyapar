@@ -67,7 +67,7 @@ class ProductViewDataTable extends DataTable
         return $this->builder()
                     ->setTableId('productview-table')
                     ->columns($this->getColumns())
-                    ->minifiedAjax()
+                    ->ajax(route('admin.products.views-data', $this->product_id))
                     ->orderBy(1, 'desc')
                     ->parameters([
                         'dom' => '<"d-flex justify-content-between align-items-center mb-3"lf>rt<"d-flex justify-content-between align-items-center mt-3"ip>',

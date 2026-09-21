@@ -51,13 +51,26 @@ class ProductController extends Controller
             ->with('success', 'Product created successfully.');
     }
 
-    public function show(Product $product, \App\DataTables\Products\ProductViewDataTable $dataTable)
+    public function show(Product $product, \App\DataTables\Products\ProductViewDataTable $viewDataTable, \App\DataTables\Products\ProductLeadDataTable $leadDataTable)
     {
         $product->load(['seller', 'category', 'images' => function ($q) {
             $q->orderBy('is_primary', 'desc')->orderBy('sort_order');
         }]);
 
-        return $dataTable->with('product_id', $product->id)->render('admin.products.show', compact('product'));
+        $viewTable = $viewDataTable->with('product_id', $product->id)->html();
+        $leadTable = $leadDataTable->with('product_id', $product->id)->html();
+
+        return view('admin.products.show', compact('product', 'viewTable', 'leadTable'));
+    }
+
+    public function viewsData(Product $product, \App\DataTables\Products\ProductViewDataTable $dataTable)
+    {
+        return $dataTable->with('product_id', $product->id)->ajax();
+    }
+
+    public function leadsData(Product $product, \App\DataTables\Products\ProductLeadDataTable $dataTable)
+    {
+        return $dataTable->with('product_id', $product->id)->ajax();
     }
 
     public function edit(Product $product)

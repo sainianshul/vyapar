@@ -409,7 +409,7 @@
                         <p class="text-secondary">Users who viewed this product listing.</p>
                     </div>
                     <div class="table-responsive">
-                        {{ $dataTable->table(['class' => 'table table-vcenter card-table w-100']) }}
+                        {{ $viewTable->table(['class' => 'table table-vcenter card-table w-100']) }}
                     </div>
                 </div>
 
@@ -419,14 +419,8 @@
                         <h3 class="mb-1">Leads & Enquiries</h3>
                         <p class="text-secondary">Enquiries and buy leads received for this product.</p>
                     </div>
-                    <div class="empty py-5">
-                        <div class="empty-icon">
-                            <i class="ti ti-bulb text-muted" style="font-size: 3rem;"></i>
-                        </div>
-                        <p class="empty-title">No Leads or Enquiries</p>
-                        <p class="empty-subtitle text-secondary">
-                            Buy leads and enquiries for this product will appear here once the leads module is active.
-                        </p>
+                    <div class="table-responsive">
+                        {{ $leadTable->table(['class' => 'table table-vcenter card-table w-100']) }}
                     </div>
                 </div>
 
@@ -448,7 +442,8 @@
 @endpush
 
 @push('scripts')
-{{ $dataTable->scripts() }}
+{{ $viewTable->scripts() }}
+{{ $leadTable->scripts() }}
 <script>
     $(function() {
         // Status change from dropdown

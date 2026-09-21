@@ -50,6 +50,8 @@ Route::prefix('admin')->group(function () {
         Route::get('products/data', [\App\Http\Controllers\Admin\ProductController::class, 'data'])->name('products.data');
         Route::post('products/{product}/status', [\App\Http\Controllers\Admin\ProductController::class, 'updateStatus'])->name('products.update-status');
         Route::post('products/{product}/featured', [\App\Http\Controllers\Admin\ProductController::class, 'updateFeatured'])->name('products.update-featured');
+        Route::get('products/{product}/views-data', [\App\Http\Controllers\Admin\ProductController::class, 'viewsData'])->name('products.views-data');
+        Route::get('products/{product}/leads-data', [\App\Http\Controllers\Admin\ProductController::class, 'leadsData'])->name('products.leads-data');
         Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
 
         // Banners CRUD
@@ -57,7 +59,10 @@ Route::prefix('admin')->group(function () {
         Route::post('banners/{banner}/status', [\App\Http\Controllers\Admin\BannerController::class, 'updateStatus'])->name('banners.update-status');
         Route::resource('banners', \App\Http\Controllers\Admin\BannerController::class)->except(['create', 'edit', 'show']);
 
-        // Feedbacks CRUD
+        // Communication Logs
+        Route::post('communication-logs/truncate', [\App\Http\Controllers\Admin\CommunicationLogController::class, 'truncate'])->name('communication-logs.truncate');
+        Route::resource('communication-logs', \App\Http\Controllers\Admin\CommunicationLogController::class)->only(['index', 'destroy']);
+
         Route::get('feedbacks/data', [\App\Http\Controllers\Admin\FeedbackController::class, 'data'])->name('feedbacks.data');
         Route::post('feedbacks/{feedback}/status', [\App\Http\Controllers\Admin\FeedbackController::class, 'updateStatus'])->name('feedbacks.update-status');
         Route::resource('feedbacks', \App\Http\Controllers\Admin\FeedbackController::class)->except(['create', 'edit', 'show']);

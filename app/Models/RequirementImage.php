@@ -10,6 +10,11 @@ class RequirementImage extends Model
         'requirement_id',
         'image_path',
         'sort_order',
+        'is_primary'
+    ];
+
+    protected $casts = [
+        'is_primary' => 'boolean',
     ];
 
     public function requirement()

@@ -194,6 +194,15 @@
                 </li>
                 
                 <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.communication-logs.index') }}">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="ti ti-message-dots"></i>
+                        </span>
+                        <span class="nav-link-title">Communication Logs</span>
+                    </a>
+                </li>
+                
+                <li class="nav-item">
                     <a class="nav-link" href="{{ url('/api/documentation') }}" target="_blank">
                         <span class="nav-link-icon d-md-none d-lg-inline-block">
                             <i class="ti ti-api-app"></i>

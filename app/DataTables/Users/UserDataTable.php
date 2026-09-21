@@ -21,11 +21,12 @@ class UserDataTable extends DataTable
                 });
             })
             ->editColumn('name', function (User $user) {
+                $showUrl = route('admin.users.show', $user->id);
                 return '
                     <div class="d-flex align-items-center">
-                        <span class="avatar avatar-sm me-2">' . $user->avatar_html . '</span>
+                        <a href="' . $showUrl . '" class="d-block"><span class="avatar avatar-sm me-2">' . $user->avatar_html . '</span></a>
                         <div>
-                            <div class="fw-semibold">' . e($user->name ?? 'Unknown') . '</div>
+                            <a href="' . $showUrl . '" class="fw-semibold text-reset text-decoration-none">' . e($user->name ?? 'Unknown') . '</a>
                         </div>
                     </div>
                 ';

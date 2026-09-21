@@ -202,7 +202,7 @@ Used to fetch a paginated list of products with extensive filtering and sorting 
     - `Authorization: Bearer <your_token>` _(optional for public search, but good practice)_
 - **Query Parameters (All Optional):**
     - `category_id` _(integer)_: Filter by a specific category.
-    - `search` _(string)_: Search text (matches product title/tags).
+    - `search` _(string)_: Search text (matches product title/tags/other category name).
     - `condition` _(integer)_: `1` for New, `2` for Used.
     - `price_min` _(float)_: Minimum price filter.
     - `price_max` _(float)_: Maximum price filter.
@@ -374,7 +374,7 @@ Used by sellers to find buyers' requirements. Similar to product search but for 
     - `Authorization: Bearer <your_token>`
 - **Query Parameters (All Optional):**
     - `category_id` _(integer)_: Filter by a specific category.
-    - `search` _(string)_: Search text (matches title/tags).
+    - `search` _(string)_: Search text (matches title/tags/other category name).
     - `city` _(string)_: Exact match for the city name.
     - `latitude` _(float)_, `longitude` _(float)_, `radius` _(integer)_: Must pass all three together to find requirements within a specific radius (in KM).
     - `sort` _(string)_: Sorting order. Allowed values: `latest` (default), `nearest` (requires lat/lng).
