@@ -32,6 +32,12 @@ class AuthService
         OtpVerification::clearPhoneOtps($phone);
 
         $otp = (string) random_int(100000, 999999);
+        
+        // PlayStore Review / Apple App Store bypass
+        if ($phone === '9999999999') {
+            $otp = '123456';
+        }
+
         $expiryTime = now()->addMinutes(self::OTP_EXPIRY_MINUTES);
 
         // store otp in database (plain text)
@@ -50,7 +56,7 @@ class AuthService
         $smartpingFrom = config('services.smartping.from');
 
         // Uncomment in production to enable actual SMS sending
-        if ($smartpingUser && $smartpingPass) {
+        if ($phone !== '9999999999' && $smartpingUser && $smartpingPass) {
             $url = "https://api.smartping.ai/fe/api/v1/send?"
                 . "username={$smartpingUser}"
                 . "&password={$smartpingPass}"
