@@ -177,7 +177,8 @@ class RequirementController extends Controller
         $requirement = $this->requirementService->createRequirement(
             $request->validated(),
             $request->user(),
-            $request->file('images')
+            null, // primaryImage
+            $request->file('images') // additionalImages
         );
 
         return ApiResponse::success('Requirement added successfully', [
@@ -302,8 +303,9 @@ class RequirementController extends Controller
         $updatedReq = $this->requirementService->updateRequirement(
             $requirement,
             $request->validated(),
-            $request->file('new_images'),
-            $request->input('deleted_images')
+            null, // primaryImage
+            $request->file('new_images'), // additionalImages
+            $request->input('deleted_images') // deletedImages
         );
 
         return ApiResponse::success('Requirement updated successfully', [
