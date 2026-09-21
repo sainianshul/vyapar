@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -140,7 +140,7 @@
     // =========================================================================
     // ðŸš€ FLUTTER DEVELOPER MASTER CHEAT SHEET (APIs & WEBSOCKETS)
     // =========================================================================
-    // Base URL: https://onesuite.winntus.in/public/api
+    // Base URL: https://vyapar.rezel.online/api/v1
     // Headers Required: Authorization: Bearer {token}, Accept: application/json
     //
     // --- 1. REST APIs (HTTP POST/GET) ---
@@ -172,7 +172,7 @@
     //
     // --- 2. PUSHER WEBSOCKET EVENTS ---
     // Key: 39e47d55853774809727 | Cluster: ap2
-    // Channel to Subscribe: 'wintus-call.{myUserId}' (e.g. wintus-call.164)
+    // Channel to Subscribe: 'private-vyaparmitra_user.{myUserId}'
     //
     // EVENT 1: 'incoming-call' (Receiver gets this when Caller hits /initiate)
     // Payload: { 
@@ -200,7 +200,7 @@
     // Action: Close RTCPeerConnection, dismiss call screen.
     // =========================================================================
 
-    const API_BASE_URL = 'https://onesuite.winntus.in/public/api/call';
+    const API_BASE_URL = 'https://vyapar.rezel.online/api/v1/call';
     const PUSHER_KEY = '39e47d55853774809727';
     const PUSHER_CLUSTER = 'ap2';
 
@@ -304,16 +304,26 @@
     // ==========================================
     // Flutter: Use pusher_channels_flutter package
     //   - PusherChannelsFlutter.init(apiKey, cluster)
-    //   - pusher.subscribe(channelName: 'wintus-call.{myUserId}')
+    //   - pusher.subscribe(channelName: 'private-vyaparmitra_user.{myUserId}')
     //   - pusher.onEvent = (event) { ... }
     function connectPusher() {
         myUserId = document.getElementById('myUserId').value;
+        const apiToken = document.getElementById('apiToken').value;
         if (!myUserId) return alert("Enter My User ID");
+        if (!apiToken) return alert("Enter Bearer Token to connect Pusher");
 
-        pusher = new Pusher(PUSHER_KEY, { cluster: PUSHER_CLUSTER });
-        myChannel = pusher.subscribe('wintus-call.' + myUserId);
+        pusher = new Pusher(PUSHER_KEY, { 
+            cluster: PUSHER_CLUSTER,
+            authEndpoint: 'https://vyapar.rezel.online/api/v1/broadcasting/auth',
+            auth: {
+                headers: {
+                    Authorization: `Bearer ${apiToken}`
+                }
+            }
+        });
+        myChannel = pusher.subscribe('private-vyaparmitra_user.' + myUserId);
 
-        log("âœ… Connected! Listening on channel: wintus-call." + myUserId);
+        log("✅ Connected! Listening on channel: private-vyaparmitra_user." + myUserId);
         document.getElementById('btnCall').disabled = false;
 
         // -----------------------------------------------
@@ -478,13 +488,13 @@
             });
             const data = await res.json();
 
-            if (data.status) {
-                currentCallId = data.call_id;
-                log("âœ… Call initiated. Waiting for answer... (Call ID: " + currentCallId + ")");
+            if (data.success) {
+                currentCallId = data.data.call_id;
+                log("✅ Call initiated. Waiting for answer... (Call ID: " + currentCallId + ")");
                 document.getElementById('btnEnd').disabled = false;
                 updateStatus('Caller', currentCallId, 'Ringing');
             } else {
-                log("âŒ Error: " + data.message);
+                log("❌ Error: " + data.message);
                 myRole = null;
                 document.getElementById('btnCall').disabled = false;
                 updateStatus('-', '-', 'Failed');
@@ -627,9 +637,9 @@
             });
             const response = await res.json();
 
-            if (response.status && response.data && response.data.length > 0) {
+            if (response.success && response.data && response.data.history && response.data.history.length > 0) {
                 historyList.innerHTML = '';
-                response.data.forEach(call => {
+                response.data.history.forEach(call => {
                     const statusClass = {
                         'ended': 'status-ended',
                         'missed': 'status-missed',
@@ -644,7 +654,7 @@
                         <div class="history-item">
                             <div>
                                 <b>${icon} ${dir} ${call.other_user.name}</b><br>
-                                <span style="color: #888; font-size: 11px;">${call.date} at ${call.time}</span>
+                                <span style="color: #888; font-size: 11px;">${call.created_at}</span>
                             </div>
                             <div style="text-align: right;">
                                 <span class="status-badge ${statusClass}">${call.status.toUpperCase()}</span>

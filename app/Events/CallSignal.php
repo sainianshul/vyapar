@@ -34,6 +34,6 @@ class CallSignal implements ShouldBroadcastNow
 
     public function broadcastAs()
     {
-        return 'webrtc-signal';
+        return 'call-signal';
     }
 }
