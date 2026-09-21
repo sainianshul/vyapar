@@ -23,7 +23,7 @@ class ProfileController extends Controller
                 new OA\MediaType(
                     mediaType: 'multipart/form-data',
                     schema: new OA\Schema(
-                        required: ['name', 'address', 'state', 'city', 'pincode'],
+                        required: ['name'],
                         properties: [
                             new OA\Property(property: 'name', type: 'string', example: 'John Doe'),
                             new OA\Property(property: 'email', type: 'string', nullable: true, example: 'john@example.com'),

@@ -31,9 +31,10 @@ class UpdateRequirementRequest extends FormRequest
             'target_budget' => 'required|numeric|min:0',
             'target_budget_unit' => 'nullable|string|max:50',
                                     'quantity' => 'required|integer|min:1',
-            'delivery_location' => 'nullable|string|max:255',
+            'address' => 'nullable|string|max:255',
+            'state' => 'nullable|string|max:100',
             'city' => 'nullable|string|max:100',
-            'delivery_pincode' => 'nullable|string|max:10',
+            'pincode' => 'nullable|string|max:10',
             'status' => 'required|integer|in:1,2,3,4',
                                     'primary_image' => 'nullable|image|max:5120', // 5MB max
             'additional_images.*' => 'nullable|image|max:5120', // 5MB max

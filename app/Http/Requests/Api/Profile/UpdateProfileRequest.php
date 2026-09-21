@@ -24,12 +24,12 @@ class UpdateProfileRequest extends FormRequest
         return [
             'name' => 'required|string|max:100',
             'email' => 'nullable|email|max:255|unique:users,email,' . $this->user()->id,
-            'address' => 'nullable|string|max:1000',
-            'state' => 'nullable|string|max:100',
-            'city' => 'nullable|string|max:100',
-            'pincode' => 'nullable|string|max:10',
-            'latitude' => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180',
+            'address' => 'nullable|required_with:city,pincode,latitude,longitude|string|max:1000',
+            'state' => 'nullable|required_with:address|string|max:100',
+            'city' => 'nullable|required_with:address|string|max:100',
+            'pincode' => 'nullable|required_with:address|string|max:10',
+            'latitude' => 'nullable|required_with:address|numeric|between:-90,90',
+            'longitude' => 'nullable|required_with:address|numeric|between:-180,180',
             'profile_photo' => 'nullable|image|max:2048',
         ];
     }

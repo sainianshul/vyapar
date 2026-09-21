@@ -28,14 +28,17 @@ class ProductService
             DB::beginTransaction();
 
             // Fallback to seller's location info if not provided
-            $data['location'] = $data['location'] ?? $seller->address;
+            $data['address'] = $data['address'] ?? $seller->address;
             $data['city'] = $data['city'] ?? $seller->city;
+            $data['state'] = $data['state'] ?? $seller->state;
             $data['pincode'] = $data['pincode'] ?? $seller->pincode;
             $data['latitude'] = $data['latitude'] ?? $seller->latitude;
             $data['longitude'] = $data['longitude'] ?? $seller->longitude;
 
             if (empty($data['city']) || empty($data['latitude']) || empty($data['longitude'])) {
-                throw new \Exception('Location details are missing. Please provide address/location details for the product or update them in your profile.');
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'location' => 'Location is required. Please provide latitude, longitude and city with your listing, or complete your profile with location details first.'
+                ]);
             }
 
             // Set default data

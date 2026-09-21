@@ -27,15 +27,16 @@ class RequirementService
             DB::beginTransaction();
 
             // Fallback to buyer's delivery_location info if not provided
-            $data['delivery_location'] = $data['delivery_location'] ?? $buyer->address;
+            $data['address'] = $data['address'] ?? $buyer->address;
             $data['city'] = $data['city'] ?? $buyer->city;
-            $data['delivery_pincode'] = $data['delivery_pincode'] ?? $buyer->delivery_pincode;
+            $data['state'] = $data['state'] ?? $buyer->state;
+            $data['pincode'] = $data['pincode'] ?? $buyer->pincode;
             $data['latitude'] = $data['latitude'] ?? $buyer->latitude;
             $data['longitude'] = $data['longitude'] ?? $buyer->longitude;
 
             if (empty($data['city']) || empty($data['latitude']) || empty($data['longitude'])) {
                 throw \Illuminate\Validation\ValidationException::withMessages([
-                    'location' => 'Location details are missing. Please provide address/delivery_location details for the requirement or update them in your profile.'
+                    'location' => 'Location is required. Please provide latitude, longitude and city with your requirement, or complete your profile with location details first.'
                 ]);
             }
 

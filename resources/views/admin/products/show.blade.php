@@ -268,12 +268,16 @@
                                     </div>
                                 </div>
                                 <div class="datagrid-item">
-                                    <div class="datagrid-title">Location</div>
-                                    <div class="datagrid-content">{{ $product->location ?? 'Not provided' }}</div>
+                                    <div class="datagrid-title">Address</div>
+                                    <div class="datagrid-content">{{ $product->address ?? 'Not provided' }}</div>
                                 </div>
                                 <div class="datagrid-item">
                                     <div class="datagrid-title">City</div>
                                     <div class="datagrid-content">{{ $product->city ?? 'N/A' }}</div>
+                                </div>
+                                <div class="datagrid-item">
+                                    <div class="datagrid-title">State</div>
+                                    <div class="datagrid-content">{{ $product->state ?? 'N/A' }}</div>
                                 </div>
                                 <div class="datagrid-item">
                                     <div class="datagrid-title">Pincode</div>

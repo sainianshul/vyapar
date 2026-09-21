@@ -55,17 +55,23 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label">City</label>
                                 <input type="text" name="city" class="form-control @error('city') is-invalid @enderror" 
                                     value="{{ old('city') }}" placeholder="City name">
                                 @error('city') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">State</label>
+                                <input type="text" name="state" class="form-control @error('state') is-invalid @enderror" 
+                                    value="{{ old('state') }}" placeholder="State name">
+                                @error('state') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            </div>
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label">Pincode</label>
-                                <input type="text" name="delivery_pincode" class="form-control @error('delivery_pincode') is-invalid @enderror" 
-                                    value="{{ old('delivery_pincode') }}" placeholder="Pincode">
-                                @error('delivery_pincode') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                <input type="text" name="pincode" class="form-control @error('pincode') is-invalid @enderror" 
+                                    value="{{ old('pincode') }}" placeholder="Pincode">
+                                @error('pincode') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
                         </div>
 

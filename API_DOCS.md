@@ -93,7 +93,9 @@ Used to update the user's basic details (Name, Address, Photo). This is a `multi
     - `latitude` _(float, optional)_: Location latitude.
     - `longitude` _(float, optional)_: Location longitude.
     - `profile_photo` _(file, optional)_: Image file (jpeg, png, jpg). Max 2MB.
-- **Notes:** After calling this successfully the first time, the backend automatically marks `profile_completed_at`, so `is_profile_complete` becomes true for future logins.
+- **Notes:** 
+    - After calling this successfully the first time, the backend automatically marks `profile_completed_at`, so `is_profile_complete` becomes true for future logins.
+    - Location details are optional initially. However, if you choose to provide location information, **you must provide all of them together** (`address`, `city`, `pincode`, `latitude`, `longitude`). Partial location data will result in a validation error.
 
 ---
 
@@ -262,7 +264,8 @@ Used by sellers to add a new product. This is a `multipart/form-data` request.
     - `price_unit` _(string, optional)_: e.g., 'per piece', 'per kg'.
     - `is_negotiable` _(boolean, optional)_: `1` (true) or `0` (false).
     - `minimum_quantity` _(integer, optional)_: Minimum order quantity.
-    - `location` _(string, optional)_: Address/Location line.
+    - `address` _(string, optional)_: Address/Location line.
+    - `state` _(string, optional)_: State name.
     - `city` _(string, optional)_: City name.
     - `pincode` _(string, optional)_: Area pincode.
     - `latitude` _(float, optional)_: GPS Latitude.
@@ -416,9 +419,10 @@ Used by buyers to post a new buying need. This is a `multipart/form-data` reques
     - `description` _(string, required)_: Detailed description of what is needed.
     - `quantity` _(integer, optional)_: Approximate quantity needed (e.g., 100).
     - `target_budget` _(float, required)_: Total budget or price expectation.
-    - `delivery_location` _(string, optional)_: Full address for delivery.
-    - `delivery_pincode` _(string, optional)_: Area pincode for delivery.
+    - `address` _(string, optional)_: Full address for delivery.
+    - `state` _(string, optional)_: State name for delivery.
     - `city` _(string, optional)_: Delivery City.
+    - `pincode` _(string, optional)_: Area pincode for delivery.
     - `latitude` _(float, optional)_: GPS Latitude for delivery.
     - `longitude` _(float, optional)_: GPS Longitude for delivery.
     - `images[]` _(file array, optional)_: Up to 5 images for reference. (Use key `images[]` multiple times for multiple files).

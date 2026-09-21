@@ -83,7 +83,7 @@
                             <span class="text-success"><i class="ti ti-arrows-exchange me-1"></i>Negotiable</span>
                         @endif
                         <span><i class="ti ti-category me-1"></i>{{ $requirement->category->name ?? 'N/A' }}</span>
-                        <span><i class="ti ti-map-pin me-1"></i>{{ $requirement->city ?? 'No City' }}@if($requirement->delivery_pincode), {{ $requirement->delivery_pincode }}@endif</span>
+                        <span><i class="ti ti-map-pin me-1"></i>{{ $requirement->city ?? 'No City' }}@if($requirement->pincode), {{ $requirement->pincode }}@endif</span>
                         <span><i class="ti ti-clock me-1"></i>Listed {{ $requirement->created_at->format('d M Y') }}</span>
                     </div>
                 </div>
@@ -266,16 +266,20 @@
                                     </div>
                                 </div>
                                 <div class="datagrid-item">
-                                    <div class="datagrid-title">Location</div>
-                                    <div class="datagrid-content">{{ $requirement->delivery_location ?? 'Not provided' }}</div>
+                                    <div class="datagrid-title">Address</div>
+                                    <div class="datagrid-content">{{ $requirement->address ?? 'Not provided' }}</div>
                                 </div>
                                 <div class="datagrid-item">
                                     <div class="datagrid-title">City</div>
                                     <div class="datagrid-content">{{ $requirement->city ?? 'N/A' }}</div>
                                 </div>
                                 <div class="datagrid-item">
+                                    <div class="datagrid-title">State</div>
+                                    <div class="datagrid-content">{{ $requirement->state ?? 'N/A' }}</div>
+                                </div>
+                                <div class="datagrid-item">
                                     <div class="datagrid-title">Pincode</div>
-                                    <div class="datagrid-content">{{ $requirement->delivery_pincode ?? 'N/A' }}</div>
+                                    <div class="datagrid-content">{{ $requirement->pincode ?? 'N/A' }}</div>
                                 </div>
                                 <div class="datagrid-item">
                                     <div class="datagrid-title">Created</div>
