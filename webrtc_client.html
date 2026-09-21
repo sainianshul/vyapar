@@ -239,8 +239,12 @@
     let myChannel = null;
     let currentCallId = null;
     let myRole = null;           // 'caller' or 'receiver' â€” tracks who I am in this call
-    let currentCallType = null;  // 'audio' or 'video' â€” tracks the active call type
+    let currentCallType = null;  // 'audio' or 'video' — tracks the active call type
     let myUserId = null;         // My own user ID (set on connect)
+    
+    // WebRTC connection state variables
+    let pendingIceCandidates = [];
+    let hasRemoteDescription = false;
 
     // DOM
     const logBox = document.getElementById('logs');
@@ -413,17 +417,26 @@
             if (data.signalType === 'offer') {
                 // WEBRTC: Receiver gets Offer -> sets it -> creates Answer
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(signalData));
+                hasRemoteDescription = true;
                 await createAnswer();
                 updateStatus('Receiver', currentCallId, 'Connected');
+                processIceCandidates();
             }
             else if (data.signalType === 'answer') {
                 // WEBRTC: Caller gets Answer -> sets it -> connection completes
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(signalData));
+                hasRemoteDescription = true;
                 updateStatus('Caller', currentCallId, 'Connected');
+                processIceCandidates();
             }
             else if (data.signalType === 'ice-candidate') {
                 // WEBRTC: Network path candidate from the other side
-                await peerConnection.addIceCandidate(new RTCIceCandidate(signalData));
+                if (hasRemoteDescription) {
+                    await peerConnection.addIceCandidate(new RTCIceCandidate(signalData));
+                } else {
+                    log("   ⏳ Buffering ICE candidate (waiting for SDP)...");
+                    pendingIceCandidates.push(signalData);
+                }
             }
         });
 
@@ -703,6 +716,16 @@
     // ==========================================
     // 4. WEBRTC INTERNAL LOGIC
     // ==========================================
+    
+    async function processIceCandidates() {
+        if (pendingIceCandidates.length > 0) {
+            log(`   ▶️ Processing ${pendingIceCandidates.length} buffered ICE candidates...`);
+        }
+        while (pendingIceCandidates.length > 0) {
+            const candidate = pendingIceCandidates.shift();
+            await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+        }
+    }
     // Flutter: Use flutter_webrtc package for all of this
     //   - RTCPeerConnection (same API as browser)
     //   - RTCSessionDescription, RTCIceCandidate (same API)
@@ -772,6 +795,8 @@
         currentCallId = null;
         myRole = null;
         currentCallType = null;
+        pendingIceCandidates = [];
+        hasRemoteDescription = false;
 
         if (peerConnection) {
             peerConnection.close();
