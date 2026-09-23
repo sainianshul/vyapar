@@ -296,7 +296,7 @@
                 {{-- Tab: Products --}}
                 <div class="tab-pane fade" id="tab-products" role="tabpanel">
                     <div class="table-responsive py-4">
-                        <table class="table table-sm table-vcenter card-table" id="user-products-table" style="width: 100%; font-size: 13px;">
+                        <table class="table table-sm table-vcenter card-table" id="user-products-table" style="width: 100%; font-size: 15px;">
                             <thead>
                                 <tr>
                                     <th>Product</th>
@@ -316,7 +316,7 @@
                 {{-- Tab: Requirements --}}
                 <div class="tab-pane fade" id="tab-requirements" role="tabpanel">
                     <div class="table-responsive py-4">
-                        <table class="table table-sm table-vcenter card-table" id="user-requirements-table" style="width: 100%; font-size: 13px;">
+                        <table class="table table-sm table-vcenter card-table" id="user-requirements-table" style="width: 100%; font-size: 15px;">
                             <thead>
                                 <tr>
                                     <th>Requirement</th>
@@ -334,7 +334,7 @@
                 {{-- Tab: Leads / Enquiries --}}
                 <div class="tab-pane fade" id="tab-leads" role="tabpanel">
                     <div class="table-responsive py-4">
-                        <table class="table table-sm table-vcenter card-table" id="user-leads-table" style="width: 100%; font-size: 13px;">
+                        <table class="table table-sm table-vcenter card-table" id="user-leads-table" style="width: 100%; font-size: 15px;">
                             <thead>
                                 <tr>
                                     <th>User Name</th>
@@ -357,7 +357,7 @@
                     @endphp
                     @if($tokens->count() > 0)
                         <div class="table-responsive py-4">
-                            <table class="table table-sm table-vcenter" style="font-size: 13px;">
+                            <table class="table table-sm table-vcenter" style="font-size: 15px;">
                                 <thead>
                                     <tr>
                                         <th>Device</th>
@@ -636,7 +636,8 @@
 
         // Refresh datatable when tab is shown
         $('a[data-bs-toggle="tab"][href="#tab-products"]').on('shown.bs.tab', function (e) {
-            table.columns.adjust().responsive.recalc();
+            table.columns.adjust();
+            if (table.responsive) table.responsive.recalc();
         });
         
         // DataTable Initialization for Requirements
@@ -662,7 +663,8 @@
 
         // Refresh datatable when tab is shown
         $('a[data-bs-toggle="tab"][href="#tab-requirements"]').on('shown.bs.tab', function (e) {
-            reqTable.columns.adjust().responsive.recalc();
+            reqTable.columns.adjust();
+            if (reqTable.responsive) reqTable.responsive.recalc();
         });
 
         // DataTable Initialization for Leads
@@ -689,7 +691,8 @@
 
         // Refresh datatable when tab is shown
         $('a[data-bs-toggle="tab"][href="#tab-leads"]').on('shown.bs.tab', function (e) {
-            leadsTable.columns.adjust().responsive.recalc();
+            leadsTable.columns.adjust();
+            if (leadsTable.responsive) leadsTable.responsive.recalc();
         });
 
         // Requirement Actions
