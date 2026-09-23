@@ -18,6 +18,11 @@ Route::prefix('admin')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
         Route::get('/dashboard/stats', [\App\Http\Controllers\Admin\DashboardController::class, 'stats'])->name('dashboard.stats');
 
+        // Profile
+        Route::get('profile', [\App\Http\Controllers\Admin\ProfileController::class, 'index'])->name('profile.index');
+        Route::post('profile', [\App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
+
+
         // Users (Buyers/Sellers) CRUD
         Route::prefix('users')->name('users.')->group(function () {
             Route::get('data', [\App\Http\Controllers\Admin\UserController::class, 'data'])->name('data');
