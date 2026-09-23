@@ -55,9 +55,9 @@ return [
             'docs' => 'swagger-docs',
             'oauth2_callback' => 'api/oauth2-callback',
             'middleware' => [
-                'api' => [],
+                'api' => ['web', 'auth'],
                 'asset' => [],
-                'docs' => [],
+                'docs' => ['web', 'auth'],
                 'oauth2_callback' => [],
             ],
             'group_options' => [],

@@ -41,7 +41,7 @@
                         <div class="mb-3">
                             <label class="form-label">Email address</label>
                             <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
-                                   value="{{ old('email', 'admin@gmail.com') }}" placeholder="your@email.com" autocomplete="off">
+                                   value="{{ old('email') }}" placeholder="your@email.com" autocomplete="off">
                             @error('email')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -52,7 +52,6 @@
                             <div class="input-group input-group-flat">
                                 <input type="password" name="password" id="password"
                                        class="form-control @error('password') is-invalid @enderror"
-                                       value="12345678"
                                        placeholder="Your password" autocomplete="off">
                                 <span class="input-group-text">
                                     <a href="#" class="link-secondary" id="toggle-password" title="Show password"

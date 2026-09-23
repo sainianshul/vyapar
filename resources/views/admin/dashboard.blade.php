@@ -90,7 +90,6 @@
                             <div class="text-secondary">New Leads (Today)</div>
                         </div>
                     </div>
-                    <a href="#" class="text-muted small mt-2 d-block">View all →</a>
                 </div>
             </div>
         </div>

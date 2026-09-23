@@ -193,11 +193,6 @@
                     </a>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <a class="nav-link" data-bs-toggle="tab" href="#tab-login-history" role="tab">
-                        <i class="ti ti-history me-1"></i>Login History
-                    </a>
-                </li>
-                <li class="nav-item" role="presentation">
                     <a class="nav-link" data-bs-toggle="tab" href="#tab-activity" role="tab">
                         <i class="ti ti-activity me-1"></i>Activity
                     </a>
@@ -423,18 +418,6 @@
                     @endif
                 </div>
 
-                {{-- Tab: Login History --}}
-                <div class="tab-pane fade" id="tab-login-history" role="tabpanel">
-                    <div class="empty py-5">
-                        <div class="empty-icon">
-                            <i class="ti ti-history text-muted" style="font-size: 3rem;"></i>
-                        </div>
-                        <p class="empty-title">No Login History</p>
-                        <p class="empty-subtitle text-secondary">
-                            Login history records for this user will appear here. This will be populated once the login tracking module is integrated.
-                        </p>
-                    </div>
-                </div>
 
                 {{-- Tab: Activity --}}
                 <div class="tab-pane fade" id="tab-activity" role="tabpanel">
