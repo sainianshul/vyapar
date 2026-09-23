@@ -357,7 +357,7 @@
                     @endphp
                     @if($tokens->count() > 0)
                         <div class="table-responsive py-4">
-                            <table class="table table-vcenter">
+                            <table class="table table-sm table-vcenter" style="font-size: 13px;">
                                 <thead>
                                     <tr>
                                         <th>Device</th>
