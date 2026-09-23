@@ -57,15 +57,6 @@
                     </a>
                 </li>
                 
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <span class="nav-link-icon d-md-none d-lg-inline-block">
-                            <i class="ti ti-history"></i>
-                        </span>
-                        <span class="nav-link-title">Login History</span>
-                    </a>
-                </li>
-
                 {{-- ===================== --}}
                 {{-- CATALOG --}}
                 {{-- ===================== --}}
@@ -119,53 +110,10 @@
                 </li>
 
                 {{-- ===================== --}}
-                {{-- LEADS & BUSINESS --}}
-                {{-- ===================== --}}
-                <li class="nav-item mt-3 mb-1">
-                    <div class="nav-link text-uppercase text-muted fs-8 fw-bold">Leads & Business</div>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <span class="nav-link-icon d-md-none d-lg-inline-block">
-                            <i class="ti ti-bulb"></i>
-                        </span>
-                        <span class="nav-link-title">Leads</span>
-                    </a>
-                </li>
-
-                {{-- ===================== --}}
                 {{-- TRASH --}}
                 {{-- ===================== --}}
                 <li class="nav-item mt-3 mb-1">
                     <div class="nav-link text-uppercase text-muted fs-8 fw-bold">Trash</div>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <span class="nav-link-icon d-md-none d-lg-inline-block">
-                            <i class="ti ti-trash"></i>
-                        </span>
-                        <span class="nav-link-title">Deleted Product</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <span class="nav-link-icon d-md-none d-lg-inline-block">
-                            <i class="ti ti-trash"></i>
-                        </span>
-                        <span class="nav-link-title">Deleted Category</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <span class="nav-link-icon d-md-none d-lg-inline-block">
-                            <i class="ti ti-trash"></i>
-                        </span>
-                        <span class="nav-link-title">Deleted Requirements</span>
-                    </a>
                 </li>
 
                 <li class="nav-item">
@@ -184,15 +132,6 @@
                     <div class="nav-link text-uppercase text-muted fs-8 fw-bold">System</div>
                 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <span class="nav-link-icon d-md-none d-lg-inline-block">
-                            <i class="ti ti-server"></i>
-                        </span>
-                        <span class="nav-link-title">Error Logs</span>
-                    </a>
-                </li>
-                
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('admin.communication-logs.index') }}">
                         <span class="nav-link-icon d-md-none d-lg-inline-block">

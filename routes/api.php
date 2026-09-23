@@ -57,6 +57,12 @@ Route::prefix('v1')->group(function () {
             Route::delete('{id}', [\App\Http\Controllers\Api\V1\RequirementController::class, 'destroy']);
         });
 
+        // Favorites / Wishlist
+        Route::prefix('favorites')->group(function () {
+            Route::post('/toggle', [\App\Http\Controllers\Api\V1\FavoriteController::class, 'toggle']);
+            Route::get('/', [\App\Http\Controllers\Api\V1\FavoriteController::class, 'index']);
+        });
+
         // WebRTC Calling
         Route::prefix('call')->group(function () {
             Route::post('/initiate', [\App\Http\Controllers\Api\V1\WebRTCCallController::class, 'initiateCall']);

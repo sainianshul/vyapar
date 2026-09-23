@@ -111,13 +111,13 @@
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-auto">
-                            <span class="bg-green-lt text-green avatar">
-                                <i class="ti ti-bulb"></i>
+                            <span class="bg-indigo-lt text-indigo avatar">
+                                <i class="ti ti-list-check"></i>
                             </span>
                         </div>
                         <div class="col">
-                            <div class="fw-bold fs-3">0</div>
-                            <div class="text-secondary">Leads Received</div>
+                            <div class="fw-bold fs-3">{{ \App\Models\Requirement::where('user_id', $user->id)->count() }}</div>
+                            <div class="text-secondary">Requirements</div>
                         </div>
                     </div>
                 </div>
@@ -128,13 +128,13 @@
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-auto">
-                            <span class="bg-yellow-lt text-yellow avatar">
-                                <i class="ti ti-send"></i>
+                            <span class="bg-green-lt text-green avatar">
+                                <i class="ti ti-bulb"></i>
                             </span>
                         </div>
                         <div class="col">
-                            <div class="fw-bold fs-3">0</div>
-                            <div class="text-secondary">Enquiries Sent</div>
+                            <div class="fw-bold fs-3">{{ \App\Models\Lead::where('seller_id', $user->id)->count() }}</div>
+                            <div class="text-secondary">Leads Received</div>
                         </div>
                     </div>
                 </div>
@@ -175,6 +175,11 @@
                 <li class="nav-item" role="presentation">
                     <a class="nav-link" data-bs-toggle="tab" href="#tab-products" role="tab">
                         <i class="ti ti-package me-1"></i>Products
+                    </a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" data-bs-toggle="tab" href="#tab-requirements" role="tab">
+                        <i class="ti ti-list-check me-1"></i>Requirements
                     </a>
                 </li>
                 <li class="nav-item" role="presentation">
@@ -290,95 +295,58 @@
 
                 {{-- Tab: Products --}}
                 <div class="tab-pane fade" id="tab-products" role="tabpanel">
-                    @php
-                        $products = $user->products()->latest()->get();
-                    @endphp
-                    @if($products->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table table-vcenter card-table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Product</th>
-                                        <th>Price</th>
-                                        <th>Condition</th>
-                                        <th>Status</th>
-                                        <th>Stats</th>
-                                        <th>Listed On</th>
-                                        <th class="w-1"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($products as $product)
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex py-1 align-items-center">
-                                                @if($product->primaryImage)
-                                                    <span class="avatar me-2" style="background-image: url({{ asset('storage/' . $product->primaryImage->image_path) }})"></span>
-                                                @else
-                                                    <span class="avatar me-2 bg-secondary-lt"><i class="ti ti-photo"></i></span>
-                                                @endif
-                                                <div class="flex-fill">
-                                                    <div class="font-weight-medium">{{ $product->title }}</div>
-                                                    <div class="text-secondary"><a href="#" class="text-reset">{{ $product->category->name ?? 'N/A' }}</a></div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div>₹{{ number_format($product->price, 2) }}</div>
-                                            <div class="text-secondary">{{ $product->price_unit ?? '' }}</div>
-                                        </td>
-                                        <td class="text-secondary">
-                                            {{ $product->condition_name }}
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-{{ $product->status == 1 ? 'green' : ($product->status == 2 ? 'blue' : 'secondary') }}-lt">
-                                                {{ $product->status_name }}
-                                            </span>
-                                            @if($product->is_featured)
-                                                <span class="badge bg-yellow-lt ms-1" title="Featured"><i class="ti ti-star"></i></span>
-                                            @endif
-                                            @if($product->is_verified)
-                                                <span class="badge bg-blue-lt ms-1" title="Verified"><i class="ti ti-shield-check"></i></span>
-                                            @endif
-                                        </td>
-                                        <td class="text-secondary">
-                                            <div><i class="ti ti-eye me-1"></i>{{ $product->views_count }}</div>
-                                            <div><i class="ti ti-message me-1"></i>{{ $product->leads_count }}</div>
-                                        </td>
-                                        <td class="text-secondary">
-                                            {{ $product->created_at->format('d M Y') }}
-                                        </td>
-                                        <td>
-                                            <a href="#" class="btn btn-sm btn-outline-secondary">View</a>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @else
-                        <div class="empty py-5">
-                            <div class="empty-icon">
-                                <i class="ti ti-package text-muted" style="font-size: 3rem;"></i>
-                            </div>
-                            <p class="empty-title">No Products Listed</p>
-                            <p class="empty-subtitle text-secondary">
-                                This user has not listed any products yet.
-                            </p>
-                        </div>
-                    @endif
+                    <div class="table-responsive py-4">
+                        <table class="table table-sm table-vcenter card-table small" id="user-products-table" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Condition</th>
+                                    <th>Featured</th>
+                                    <th>Status</th>
+                                    <th>Stats</th>
+                                    <th>Listed On</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+                
+                {{-- Tab: Requirements --}}
+                <div class="tab-pane fade" id="tab-requirements" role="tabpanel">
+                    <div class="table-responsive py-4">
+                        <table class="table table-sm table-vcenter card-table small" id="user-requirements-table" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>Requirement</th>
+                                    <th>Target Budget</th>
+                                    <th>Quantity</th>
+                                    <th>Status</th>
+                                    <th>Posted On</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
                 </div>
 
                 {{-- Tab: Leads / Enquiries --}}
                 <div class="tab-pane fade" id="tab-leads" role="tabpanel">
-                    <div class="empty py-5">
-                        <div class="empty-icon">
-                            <i class="ti ti-bulb text-muted" style="font-size: 3rem;"></i>
-                        </div>
-                        <p class="empty-title">No Leads or Enquiries</p>
-                        <p class="empty-subtitle text-secondary">
-                            Buy leads received and enquiries sent by this user will be listed here once the leads module is active.
-                        </p>
+                    <div class="table-responsive py-4">
+                        <table class="table table-sm table-vcenter card-table small" id="user-leads-table" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>User Name</th>
+                                    <th>Product/Requirement</th>
+                                    <th>Source</th>
+                                    <th>Temperature</th>
+                                    <th>Status</th>
+                                    <th>Created At</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                        </table>
                     </div>
                 </div>
 
@@ -388,7 +356,7 @@
                         $tokens = $user->tokens()->latest()->get();
                     @endphp
                     @if($tokens->count() > 0)
-                        <div class="table-responsive">
+                        <div class="table-responsive py-4">
                             <table class="table table-vcenter">
                                 <thead>
                                     <tr>
@@ -490,6 +458,100 @@
 
 @endsection
 
+    {{-- Product Status Update Modal --}}
+    <div class="modal modal-blur fade" id="status-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <form id="status-modal-form">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Change Product Status</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="status-modal-id">
+                        <div class="mb-3">
+                            <label class="form-label">Select Status</label>
+                            <select id="status-modal-select" class="form-select">
+                                @foreach (\App\Models\Product::getStatusList() as $value => $label)
+                                    <option value="{{ $value }}">{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link link-secondary me-auto" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- Product Featured Update Modal --}}
+    <div class="modal modal-blur fade" id="featured-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <form id="featured-modal-form">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Change Featured Status</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="featured-modal-id">
+                        <div class="mb-3">
+                            <label class="form-label">Is Featured?</label>
+                            <select id="featured-modal-select" class="form-select">
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link link-secondary me-auto" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- Requirement Status Update Modal --}}
+    <div class="modal modal-blur fade" id="status-req-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <form id="status-req-modal-form">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Change Requirement Status</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="status-req-modal-id">
+                        <div class="mb-3">
+                            <label class="form-label">Select Status</label>
+                            <select id="status-req-modal-select" class="form-select">
+                                @foreach (\App\Models\Requirement::getStatusList() as $value => $label)
+                                    <option value="{{ $value }}">{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link link-secondary me-auto" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+@push('datatables_css')
+    @include('admin.layouts.partials._datatable-cdn-css')
+@endpush
+
+@push('datatables_js')
+    @include('admin.layouts.partials._datatable-cdn-js')
+@endpush
+
 @push('scripts')
 <script>
     $(function() {
@@ -545,6 +607,263 @@
                     .fail(function () {
                         Swal.fire({ toast: true, position: 'top', showConfirmButton: false, timer: 1500, icon: 'error', title: 'Something went wrong' });
                     });
+            });
+        });
+
+        // DataTable Initialization for Products
+        let table = $('#user-products-table').DataTable({
+            processing: false,
+            serverSide: true,
+            responsive: true,
+            autoWidth: false,
+            ajax: '{{ route('admin.users.products.data', $user->id) }}',
+            columns: [
+                { data: 'title', name: 'title' },
+                { data: 'price', name: 'price' },
+                { data: 'condition', name: 'condition', orderable: false, searchable: false },
+                { data: 'is_featured', name: 'is_featured', orderable: false, searchable: false },
+                { data: 'status', name: 'status', orderable: false, searchable: false },
+                { data: 'stats', name: 'stats', orderable: false, searchable: false },
+                { data: 'created_at', name: 'created_at', searchable: false },
+                { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-end' }
+            ],
+            order: [[6, 'desc']],
+            dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+            initComplete: function() {
+                // Remove tab data refresh if already loaded once
+            }
+        });
+
+        // Refresh datatable when tab is shown
+        $('a[data-bs-toggle="tab"][href="#tab-products"]').on('shown.bs.tab', function (e) {
+            table.columns.adjust().responsive.recalc();
+        });
+        
+        // DataTable Initialization for Requirements
+        let reqTable = $('#user-requirements-table').DataTable({
+            processing: false,
+            serverSide: true,
+            responsive: true,
+            autoWidth: false,
+            ajax: '{{ route('admin.users.requirements.data', $user->id) }}',
+            columns: [
+                { data: 'title', name: 'title' },
+                { data: 'target_budget', name: 'target_budget' },
+                { data: 'quantity', name: 'quantity' },
+                { data: 'status', name: 'status', orderable: false, searchable: false },
+                { data: 'created_at', name: 'created_at', searchable: false },
+                { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-end' }
+            ],
+            order: [[4, 'desc']],
+            dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+            initComplete: function() {
+            }
+        });
+
+        // Refresh datatable when tab is shown
+        $('a[data-bs-toggle="tab"][href="#tab-requirements"]').on('shown.bs.tab', function (e) {
+            reqTable.columns.adjust().responsive.recalc();
+        });
+
+        // DataTable Initialization for Leads
+        let leadsTable = $('#user-leads-table').DataTable({
+            processing: false,
+            serverSide: true,
+            responsive: true,
+            autoWidth: false,
+            ajax: '{{ route('admin.users.leads.data', $user->id) }}',
+            columns: [
+                { data: 'buyer_id', name: 'buyer.name' },
+                { data: 'item', name: 'item', orderable: false, searchable: false },
+                { data: 'source', name: 'source', orderable: false, searchable: false },
+                { data: 'temperature', name: 'temperature', orderable: false, searchable: false },
+                { data: 'status', name: 'status', orderable: false, searchable: false },
+                { data: 'created_at', name: 'created_at' },
+                { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-end' }
+            ],
+            order: [[5, 'desc']],
+            dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+            initComplete: function() {
+            }
+        });
+
+        // Refresh datatable when tab is shown
+        $('a[data-bs-toggle="tab"][href="#tab-leads"]').on('shown.bs.tab', function (e) {
+            leadsTable.columns.adjust().responsive.recalc();
+        });
+
+        // Requirement Actions
+        // Open Requirement Status Modal
+        $(document).on('click', '.status-req-modal-btn', function (e) {
+            e.preventDefault();
+            let id = $(this).data('id');
+            let currentStatus = $(this).data('status');
+            
+            $('#status-req-modal-id').val(id);
+            $('#status-req-modal-select').val(currentStatus);
+            $('#status-req-modal').modal('show');
+        });
+
+        // Submit Requirement Status Modal
+        $('#status-req-modal-form').on('submit', function (e) {
+            e.preventDefault();
+            let id = $('#status-req-modal-id').val();
+            let status = $('#status-req-modal-select').val();
+            let submitBtn = $(this).find('button[type="submit"]');
+            let originalText = submitBtn.html();
+            
+            submitBtn.html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Saving...').prop('disabled', true);
+
+            $.ajax({
+                url: '/admin/requirements/' + id + '/status',
+                type: 'POST',
+                data: { status: status, _token: '{{ csrf_token() }}' },
+                success: function (res) {
+                    $('#status-req-modal').modal('hide');
+                    reqTable.ajax.reload(null, false);
+                    Swal.fire({ toast: true, position: 'top', showConfirmButton: false, timer: 1500, icon: 'success', title: 'Status updated' });
+                },
+                error: function () {
+                    Swal.fire({ toast: true, position: 'top', showConfirmButton: false, timer: 1500, icon: 'error', title: 'Failed to update' });
+                },
+                complete: function () {
+                    submitBtn.html(originalText).prop('disabled', false);
+                }
+            });
+        });
+
+        $(document).on('click', '.btn-req-delete', function(e) {
+            e.preventDefault();
+            let id = $(this).data('id');
+            let name = $(this).data('name');
+
+            Swal.fire({
+                title: 'Delete Requirement?',
+                text: 'Are you sure you want to delete "' + name + '"?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Delete',
+                customClass: { confirmButton: 'btn btn-danger', cancelButton: 'btn btn-light ms-2' },
+                buttonsStyling: false,
+            }).then(function (result) {
+                if (!result.isConfirmed) return;
+                
+                $.ajax({
+                    url: '/admin/requirements/' + id,
+                    type: 'DELETE',
+                    data: { _token: '{{ csrf_token() }}' },
+                    success: function (res) {
+                        reqTable.ajax.reload(null, false);
+                        Swal.fire({ toast: true, position: 'top', showConfirmButton: false, timer: 1500, icon: 'success', title: 'Requirement deleted' });
+                    }
+                });
+            });
+        });
+
+        // Product Actions
+        // Open Status Modal
+        $(document).on('click', '.status-modal-btn', function (e) {
+            e.preventDefault();
+            let id = $(this).data('id');
+            let currentStatus = $(this).data('status');
+            
+            $('#status-modal-id').val(id);
+            $('#status-modal-select').val(currentStatus);
+            $('#status-modal').modal('show');
+        });
+
+        // Submit Status Modal
+        $('#status-modal-form').on('submit', function (e) {
+            e.preventDefault();
+            let id = $('#status-modal-id').val();
+            let status = $('#status-modal-select').val();
+            let submitBtn = $(this).find('button[type="submit"]');
+            let originalText = submitBtn.html();
+            
+            submitBtn.html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Saving...').prop('disabled', true);
+
+            $.ajax({
+                url: '/admin/products/' + id + '/status',
+                type: 'POST',
+                data: { status: status, _token: '{{ csrf_token() }}' },
+                success: function (res) {
+                    $('#status-modal').modal('hide');
+                    table.ajax.reload(null, false);
+                    Swal.fire({ toast: true, position: 'top', showConfirmButton: false, timer: 1500, icon: 'success', title: 'Status updated' });
+                },
+                error: function () {
+                    Swal.fire({ toast: true, position: 'top', showConfirmButton: false, timer: 1500, icon: 'error', title: 'Failed to update' });
+                },
+                complete: function () {
+                    submitBtn.html(originalText).prop('disabled', false);
+                }
+            });
+        });
+
+        // Open Featured Modal
+        $(document).on('click', '.featured-modal-btn', function (e) {
+            e.preventDefault();
+            let id = $(this).data('id');
+            let isFeatured = $(this).data('featured');
+            
+            $('#featured-modal-id').val(id);
+            $('#featured-modal-select').val(isFeatured);
+            $('#featured-modal').modal('show');
+        });
+
+        // Submit Featured Modal
+        $('#featured-modal-form').on('submit', function (e) {
+            e.preventDefault();
+            let id = $('#featured-modal-id').val();
+            let featured = $('#featured-modal-select').val();
+            let submitBtn = $(this).find('button[type="submit"]');
+            let originalText = submitBtn.html();
+            
+            submitBtn.html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Saving...').prop('disabled', true);
+
+            $.ajax({
+                url: '/admin/products/' + id + '/featured',
+                type: 'POST',
+                data: { is_featured: featured, _token: '{{ csrf_token() }}' },
+                success: function (res) {
+                    $('#featured-modal').modal('hide');
+                    table.ajax.reload(null, false);
+                    Swal.fire({ toast: true, position: 'top', showConfirmButton: false, timer: 1500, icon: 'success', title: 'Updated' });
+                },
+                error: function () {
+                    Swal.fire({ toast: true, position: 'top', showConfirmButton: false, timer: 1500, icon: 'error', title: 'Failed to update' });
+                },
+                complete: function () {
+                    submitBtn.html(originalText).prop('disabled', false);
+                }
+            });
+        });
+        
+        $(document).on('click', '.btn-delete', function(e) {
+            e.preventDefault();
+            let id = $(this).data('id');
+            let name = $(this).data('name');
+
+            Swal.fire({
+                title: 'Delete Product?',
+                text: 'Are you sure you want to delete "' + name + '"? This action cannot be undone.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Delete',
+                customClass: { confirmButton: 'btn btn-danger', cancelButton: 'btn btn-light ms-2' },
+                buttonsStyling: false,
+            }).then(function (result) {
+                if (!result.isConfirmed) return;
+                
+                $.ajax({
+                    url: '/admin/products/' + id,
+                    type: 'DELETE',
+                    data: { _token: '{{ csrf_token() }}' },
+                    success: function (res) {
+                        table.ajax.reload(null, false);
+                        Swal.fire({ toast: true, position: 'top', showConfirmButton: false, timer: 1500, icon: 'success', title: 'Product deleted' });
+                    }
+                });
             });
         });
     });

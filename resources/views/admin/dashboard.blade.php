@@ -12,7 +12,7 @@
         </div>
     </div>
 
-    {{-- Stats Row --}}
+    {{-- Stats Row (Skeleton Loaders Initialized) --}}
     <div class="row row-deck row-cards mb-3">
         <div class="col-sm-6 col-lg-3">
             <div class="card">
@@ -20,7 +20,9 @@
                     <div class="d-flex align-items-center">
                         <div class="subheader">Total Users</div>
                     </div>
-                    <div class="h1 mb-3">1,204</div>
+                    <div class="h1 mb-3" id="stat-total-users">
+                        <div class="spinner-border spinner-border-sm text-secondary" role="status"></div>
+                    </div>
                     <a href="{{ route('admin.users.index') }}" class="text-muted small">View all →</a>
                 </div>
             </div>
@@ -29,10 +31,12 @@
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
-                        <div class="subheader">Total Companies</div>
+                        <div class="subheader">Total Requirements</div>
                     </div>
-                    <div class="h1 mb-3">850</div>
-                    <a href="#" class="text-muted small">View all →</a>
+                    <div class="h1 mb-3" id="stat-total-requirements">
+                        <div class="spinner-border spinner-border-sm text-secondary" role="status"></div>
+                    </div>
+                    <a href="{{ route('admin.requirements.index') }}" class="text-muted small">View all →</a>
                 </div>
             </div>
         </div>
@@ -42,8 +46,10 @@
                     <div class="d-flex align-items-center">
                         <div class="subheader">Active Products</div>
                     </div>
-                    <div class="h1 mb-3">5,432</div>
-                    <a href="#" class="text-muted small">View all →</a>
+                    <div class="h1 mb-3" id="stat-active-products">
+                        <div class="spinner-border spinner-border-sm text-secondary" role="status"></div>
+                    </div>
+                    <a href="{{ route('admin.products.index') }}" class="text-muted small">View all →</a>
                 </div>
             </div>
         </div>
@@ -53,7 +59,9 @@
                     <div class="d-flex align-items-center">
                         <div class="subheader">New Leads (Today)</div>
                     </div>
-                    <div class="h1 mb-3">124</div>
+                    <div class="h1 mb-3" id="stat-new-leads">
+                        <div class="spinner-border spinner-border-sm text-secondary" role="status"></div>
+                    </div>
                     <a href="#" class="text-muted small">View all →</a>
                 </div>
             </div>
@@ -62,60 +70,15 @@
 
     {{-- Revenue + Chart Row --}}
     <div class="row row-deck row-cards mb-3">
-        <div class="col-lg-8">
+        <div class="col-lg-12">
             <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">User Growth & Engagement</h3>
+                <div class="card-header border-0">
+                    <h3 class="card-title">User Growth (Last 30 Days)</h3>
                 </div>
                 <div class="card-body p-0">
-                    <div id="chart-users" style="height: 300px">
-                        <!-- Dummy chart visualization -->
-                        <div class="d-flex justify-content-center align-items-center h-100 bg-light rounded m-3">
-                            <span class="text-muted"><i class="ti ti-chart-line fs-1 d-block text-center mb-2"></i>[ Chart Placeholder: Monthly Active Users ]</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Activity Summary</h3>
-                </div>
-                <div class="list-group list-group-flush">
-                    <div class="list-group-item">
-                        <div class="row align-items-center">
-                            <div class="col-auto"><span class="status-dot status-dot-animated bg-success d-block"></span></div>
-                            <div class="col text-truncate">
-                                <div class="text-reset d-block">Active Users</div>
-                                <div class="d-block text-muted text-truncate mt-n1">Currently online</div>
-                            </div>
-                            <div class="col-auto">
-                                <strong>340</strong>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="list-group-item">
-                        <div class="row align-items-center">
-                            <div class="col-auto"><span class="status-dot status-dot-animated bg-primary d-block"></span></div>
-                            <div class="col text-truncate">
-                                <div class="text-reset d-block">New Registrations</div>
-                                <div class="d-block text-muted text-truncate mt-n1">{{ now()->format('F Y') }}</div>
-                            </div>
-                            <div class="col-auto">
-                                <strong>+85</strong>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="list-group-item">
-                        <div class="row align-items-center">
-                            <div class="col-auto"><span class="status-dot status-dot-animated bg-warning d-block"></span></div>
-                            <div class="col text-truncate">
-                                <div class="text-reset d-block">Pending KYC</div>
-                            </div>
-                            <div class="col-auto">
-                                <strong>12</strong>
-                            </div>
+                    <div id="chart-users" style="min-height: 250px;">
+                        <div class="d-flex justify-content-center align-items-center h-100 py-5">
+                            <div class="spinner-border text-secondary" role="status"></div>
                         </div>
                     </div>
                 </div>
@@ -128,59 +91,25 @@
         <div class="col-lg-6">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Recent Companies Added</h3>
+                    <h3 class="card-title">Recent Users</h3>
                     <div class="card-actions">
-                        <a href="#" class="btn btn-sm">View All</a>
+                        <a href="{{ route('admin.users.index') }}" class="btn btn-sm">View All</a>
                     </div>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-vcenter card-table">
                         <thead>
                             <tr>
-                                <th>Company</th>
-                                <th>City</th>
-                                <th>Status</th>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Joined</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="table-recent-users">
                             <tr>
-                                <td>
-                                    <div class="d-flex py-1 align-items-center">
-                                        <span class="avatar me-2">SM</span>
-                                        <div class="flex-fill">
-                                            <div class="font-weight-medium">Super Mart India</div>
-                                            <div class="text-secondary">Retail & FMCG</div>
-                                        </div>
-                                    </div>
+                                <td colspan="3" class="text-center py-4">
+                                    <div class="spinner-border text-secondary" role="status"></div>
                                 </td>
-                                <td class="text-secondary">Delhi</td>
-                                <td><span class="badge bg-success-lt">Active</span></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="d-flex py-1 align-items-center">
-                                        <span class="avatar me-2">TE</span>
-                                        <div class="flex-fill">
-                                            <div class="font-weight-medium">TechNova Electronics</div>
-                                            <div class="text-secondary">Manufacturing</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="text-secondary">Mumbai</td>
-                                <td><span class="badge bg-warning-lt">Pending</span></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="d-flex py-1 align-items-center">
-                                        <span class="avatar me-2">GT</span>
-                                        <div class="flex-fill">
-                                            <div class="font-weight-medium">Global Traders</div>
-                                            <div class="text-secondary">Wholesale</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="text-secondary">Jaipur</td>
-                                <td><span class="badge bg-success-lt">Active</span></td>
                             </tr>
                         </tbody>
                     </table>
@@ -190,44 +119,25 @@
         <div class="col-lg-6">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Recent Lead Requirements</h3>
+                    <h3 class="card-title">Recent Products</h3>
                     <div class="card-actions">
-                        <a href="#" class="btn btn-sm">View All</a>
+                        <a href="{{ route('admin.products.index') }}" class="btn btn-sm">View All</a>
                     </div>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-vcenter card-table">
                         <thead>
                             <tr>
-                                <th>Requirement</th>
-                                <th>Buyer</th>
-                                <th>Date</th>
+                                <th>Image</th>
+                                <th>Product Name</th>
+                                <th>Created At</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="table-recent-products">
                             <tr>
-                                <td>
-                                    <div>Need 500 pcs Cotton T-Shirts</div>
-                                    <div class="text-secondary small">Apparel & Clothing</div>
+                                <td colspan="3" class="text-center py-4">
+                                    <div class="spinner-border text-secondary" role="status"></div>
                                 </td>
-                                <td class="text-secondary">Amit Kumar</td>
-                                <td>Today</td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div>Looking for PVC Pipes Supplier</div>
-                                    <div class="text-secondary small">Construction Material</div>
-                                </td>
-                                <td class="text-secondary">Rajesh Singh</td>
-                                <td>Yesterday</td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div>Bulk order of A4 Printer Paper</div>
-                                    <div class="text-secondary small">Office Supplies</div>
-                                </td>
-                                <td class="text-secondary">Neha Sharma</td>
-                                <td>2 days ago</td>
                             </tr>
                         </tbody>
                     </table>
@@ -237,3 +147,128 @@
     </div>
 
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch("{{ route('admin.dashboard.stats') }}")
+            .then(response => response.json())
+            .then(data => {
+                // Update Top Stats
+                document.getElementById('stat-total-users').innerText = data.total_users;
+                document.getElementById('stat-total-requirements').innerText = data.total_requirements;
+                document.getElementById('stat-active-products').innerText = data.active_products;
+                document.getElementById('stat-new-leads').innerText = data.new_leads_today;
+
+                // Update Recent Users
+                const usersTbody = document.getElementById('table-recent-users');
+                if (data.recent_users && data.recent_users.length > 0) {
+                    let userHtml = '';
+                    data.recent_users.forEach(user => {
+                        userHtml += `
+                            <tr>
+                                <td>
+                                    <div class="d-flex py-1 align-items-center">
+                                        <span class="avatar me-2 bg-primary-lt">${user.initials}</span>
+                                        <div class="flex-fill">
+                                            <div class="font-weight-medium"><a href="/admin/users/${user.id}" class="text-reset">${user.name}</a></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-secondary">${user.phone ?? 'N/A'}</td>
+                                <td>${user.joined}</td>
+                            </tr>
+                        `;
+                    });
+                    usersTbody.innerHTML = userHtml;
+                } else {
+                    usersTbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-3">No recent users found</td></tr>';
+                }
+
+                // Update Recent Products
+                const productsTbody = document.getElementById('table-recent-products');
+                if (data.recent_products && data.recent_products.length > 0) {
+                    let productHtml = '';
+                    data.recent_products.forEach(product => {
+                        let imgHtml = product.image 
+                            ? `<span class="avatar me-2" style="background-image: url(${product.image})"></span>`
+                            : `<span class="avatar me-2 bg-light text-muted"><i class="ti ti-photo"></i></span>`;
+                            
+                        productHtml += `
+                            <tr>
+                                <td>
+                                    ${imgHtml}
+                                </td>
+                                <td>
+                                    <div><a href="/admin/products/${product.id}" class="text-reset fw-medium">${product.name}</a></div>
+                                </td>
+                                <td class="text-secondary">${product.created_at}</td>
+                            </tr>
+                        `;
+                    });
+                    productsTbody.innerHTML = productHtml;
+                } else {
+                    productsTbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-3">No recent products found</td></tr>';
+                }
+
+                // Render Chart
+                if (window.ApexCharts) {
+                    document.getElementById('chart-users').innerHTML = ''; // Clear loader
+                    new ApexCharts(document.getElementById('chart-users'), {
+                        chart: {
+                            type: "area",
+                            fontFamily: 'inherit',
+                            height: 250,
+                            parentHeightOffset: 0,
+                            toolbar: { show: false },
+                            animations: { enabled: true }
+                        },
+                        dataLabels: { enabled: false },
+                        fill: {
+                            type: 'gradient',
+                            gradient: {
+                                shadeIntensity: 1,
+                                opacityFrom: 0.3,
+                                opacityTo: 0.1,
+                                stops: [0, 90, 100]
+                            }
+                        },
+                        stroke: {
+                            width: 2,
+                            lineCap: "round",
+                            curve: "smooth",
+                        },
+                        series: [{
+                            name: "New Users",
+                            data: data.chart.counts
+                        }],
+                        tooltip: { theme: 'dark' },
+                        grid: {
+                            strokeDashArray: 4,
+                            padding: { top: -20, right: 0, left: -4, bottom: -4 }
+                        },
+                        xaxis: {
+                            labels: { padding: 0 },
+                            tooltip: { enabled: false },
+                            axisBorder: { show: false },
+                            categories: data.chart.dates
+                        },
+                        yaxis: {
+                            labels: { padding: 4 }
+                        },
+                        colors: ['#206bc4']
+                    }).render();
+                }
+            })
+            .catch(error => {
+                console.error("Error loading dashboard stats:", error);
+                // Fallback text if error
+                document.getElementById('stat-total-users').innerText = 'Error';
+                document.getElementById('stat-total-requirements').innerText = 'Error';
+                document.getElementById('stat-active-products').innerText = 'Error';
+                document.getElementById('stat-new-leads').innerText = 'Error';
+                document.getElementById('chart-users').innerHTML = '<div class="text-center text-danger py-4">Failed to load chart</div>';
+            });
+    });
+</script>
+@endpush

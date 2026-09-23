@@ -15,9 +15,8 @@ Route::prefix('admin')->group(function () {
     Route::name('admin.')->group(function () {
 
     Route::middleware(['auth'])->group(function () {
-        Route::get('/', function () {
-            return view('admin.dashboard');
-        })->name('dashboard');
+        Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard/stats', [\App\Http\Controllers\Admin\DashboardController::class, 'stats'])->name('dashboard.stats');
 
         // Users (Buyers/Sellers) CRUD
         Route::prefix('users')->name('users.')->group(function () {
@@ -33,6 +32,9 @@ Route::prefix('admin')->group(function () {
             
             Route::post('{user}/status', [\App\Http\Controllers\Admin\UserController::class, 'updateStatus'])->name('update-status');
             Route::post('{user}/revoke-token', [\App\Http\Controllers\Admin\UserController::class, 'revokeToken'])->name('revoke-token');
+            Route::get('{user}/products/data', [\App\Http\Controllers\Admin\UserController::class, 'userProductsData'])->name('products.data');
+            Route::get('{user}/requirements/data', [\App\Http\Controllers\Admin\UserController::class, 'userRequirementsData'])->name('requirements.data');
+            Route::get('{user}/leads/data', [\App\Http\Controllers\Admin\UserController::class, 'userLeadsData'])->name('leads.data');
         });
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
 
@@ -53,6 +55,9 @@ Route::prefix('admin')->group(function () {
         Route::get('products/{product}/views-data', [\App\Http\Controllers\Admin\ProductController::class, 'viewsData'])->name('products.views-data');
         Route::get('products/{product}/leads-data', [\App\Http\Controllers\Admin\ProductController::class, 'leadsData'])->name('products.leads-data');
         Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
+
+        // Leads
+        Route::get('leads/{lead}', [\App\Http\Controllers\Admin\LeadController::class, 'show'])->name('leads.show');
 
         // Banners CRUD
         Route::get('banners/data', [\App\Http\Controllers\Admin\BannerController::class, 'data'])->name('banners.data');

@@ -167,4 +167,25 @@ class UserController extends Controller
             'message' => 'Device session revoked successfully.'
         ]);
     }
+
+    public function userProductsData(User $user, \App\DataTables\Users\UserProductsDataTable $dataTable)
+    {
+        abort_unless($user->isUser(), 404);
+        $dataTable->userId = $user->id;
+        return $dataTable->ajax();
+    }
+
+    public function userRequirementsData(User $user, \App\DataTables\Users\UserRequirementsDataTable $dataTable)
+    {
+        abort_unless($user->isUser(), 404);
+        $dataTable->userId = $user->id;
+        return $dataTable->ajax();
+    }
+
+    public function userLeadsData(User $user, \App\DataTables\Users\UserLeadsDataTable $dataTable)
+    {
+        abort_unless($user->isUser(), 404);
+        $dataTable->userId = $user->id;
+        return $dataTable->ajax();
+    }
 }

@@ -69,7 +69,7 @@ class ProductLeadDataTable extends DataTable
             ->addColumn('actions', function (Lead $lead) {
                 return '
                     <div class="d-flex gap-1 justify-content-end">
-                        <a href="#" class="btn btn-icon btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="View Lead">
+                        <a href="' . route('admin.leads.show', $lead->id) . '" class="btn btn-icon btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="View Lead">
                             <i class="ti ti-eye"></i>
                         </a>
                     </div>

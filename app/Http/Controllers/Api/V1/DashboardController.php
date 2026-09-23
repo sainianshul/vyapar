@@ -57,13 +57,13 @@ class DashboardController extends Controller
                 ->orderByDesc('views_count')
                 ->first();
 
-            // 6. Recent Leads (Top 5)
-            $recentLeads = Lead::where('seller_id', $userId)
-                ->with(['buyer:id,name,profile_photo', 'product:id,title'])
-                ->orderByDesc('updated_at')
-                ->limit(5)
-                ->get()
-                ->map(fn($lead) => $lead->toApiResponse());
+            // 5b. Lowest Viewed Product
+            $lowestViewedProduct = Product::where('user_id', $userId)
+                ->with('primaryImage')
+                ->orderBy('views_count', 'asc')
+                ->first();
+
+
 
             return [
                 'total_products' => $totalProducts,
@@ -72,7 +72,7 @@ class DashboardController extends Controller
                 'total_product_views' => (int) $totalViews,
                 'total_unread_chats' => $unreadChats,
                 'most_viewed_product' => $mostViewedProduct ? $mostViewedProduct->toSellerListArray() : null,
-                'recent_leads' => $recentLeads,
+                'lowest_viewed_product' => $lowestViewedProduct ? $lowestViewedProduct->toSellerListArray() : null,
             ];
         });
 
