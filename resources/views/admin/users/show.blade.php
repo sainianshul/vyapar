@@ -296,7 +296,7 @@
                 {{-- Tab: Products --}}
                 <div class="tab-pane fade" id="tab-products" role="tabpanel">
                     <div class="table-responsive py-4">
-                        <table class="table table-vcenter card-table" id="user-products-table" style="width: 100%;">
+                        <table class="table table-sm table-vcenter card-table" id="user-products-table" style="width: 100%; font-size: 13px;">
                             <thead>
                                 <tr>
                                     <th>Product</th>
@@ -316,7 +316,7 @@
                 {{-- Tab: Requirements --}}
                 <div class="tab-pane fade" id="tab-requirements" role="tabpanel">
                     <div class="table-responsive py-4">
-                        <table class="table table-vcenter card-table" id="user-requirements-table" style="width: 100%;">
+                        <table class="table table-sm table-vcenter card-table" id="user-requirements-table" style="width: 100%; font-size: 13px;">
                             <thead>
                                 <tr>
                                     <th>Requirement</th>
@@ -334,7 +334,7 @@
                 {{-- Tab: Leads / Enquiries --}}
                 <div class="tab-pane fade" id="tab-leads" role="tabpanel">
                     <div class="table-responsive py-4">
-                        <table class="table table-vcenter card-table" id="user-leads-table" style="width: 100%;">
+                        <table class="table table-sm table-vcenter card-table" id="user-leads-table" style="width: 100%; font-size: 13px;">
                             <thead>
                                 <tr>
                                     <th>User Name</th>
