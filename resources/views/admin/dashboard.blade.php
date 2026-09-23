@@ -12,57 +12,85 @@
         </div>
     </div>
 
-    {{-- Stats Row (Skeleton Loaders Initialized) --}}
+    {{-- Stats Row --}}
     <div class="row row-deck row-cards mb-3">
         <div class="col-sm-6 col-lg-3">
-            <div class="card">
+            <div class="card card-sm">
                 <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="subheader">Total Users</div>
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <span class="bg-primary-lt text-primary avatar avatar-md">
+                                <i class="ti ti-users fs-2"></i>
+                            </span>
+                        </div>
+                        <div class="col">
+                            <div class="fw-bold fs-2" id="stat-total-users">
+                                <div class="spinner-border spinner-border-sm text-secondary" role="status"></div>
+                            </div>
+                            <div class="text-secondary">Total Users</div>
+                        </div>
                     </div>
-                    <div class="h1 mb-3" id="stat-total-users">
-                        <div class="spinner-border spinner-border-sm text-secondary" role="status"></div>
-                    </div>
-                    <a href="{{ route('admin.users.index') }}" class="text-muted small">View all →</a>
+                    <a href="{{ route('admin.users.index') }}" class="text-muted small mt-2 d-block">View all →</a>
                 </div>
             </div>
         </div>
         <div class="col-sm-6 col-lg-3">
-            <div class="card">
+            <div class="card card-sm">
                 <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="subheader">Total Requirements</div>
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <span class="bg-indigo-lt text-indigo avatar avatar-md">
+                                <i class="ti ti-list-check fs-2"></i>
+                            </span>
+                        </div>
+                        <div class="col">
+                            <div class="fw-bold fs-2" id="stat-total-requirements">
+                                <div class="spinner-border spinner-border-sm text-secondary" role="status"></div>
+                            </div>
+                            <div class="text-secondary">Total Requirements</div>
+                        </div>
                     </div>
-                    <div class="h1 mb-3" id="stat-total-requirements">
-                        <div class="spinner-border spinner-border-sm text-secondary" role="status"></div>
-                    </div>
-                    <a href="{{ route('admin.requirements.index') }}" class="text-muted small">View all →</a>
+                    <a href="{{ route('admin.requirements.index') }}" class="text-muted small mt-2 d-block">View all →</a>
                 </div>
             </div>
         </div>
         <div class="col-sm-6 col-lg-3">
-            <div class="card">
+            <div class="card card-sm">
                 <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="subheader">Active Products</div>
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <span class="bg-green-lt text-green avatar avatar-md">
+                                <i class="ti ti-package fs-2"></i>
+                            </span>
+                        </div>
+                        <div class="col">
+                            <div class="fw-bold fs-2" id="stat-active-products">
+                                <div class="spinner-border spinner-border-sm text-secondary" role="status"></div>
+                            </div>
+                            <div class="text-secondary">Active Products</div>
+                        </div>
                     </div>
-                    <div class="h1 mb-3" id="stat-active-products">
-                        <div class="spinner-border spinner-border-sm text-secondary" role="status"></div>
-                    </div>
-                    <a href="{{ route('admin.products.index') }}" class="text-muted small">View all →</a>
+                    <a href="{{ route('admin.products.index') }}" class="text-muted small mt-2 d-block">View all →</a>
                 </div>
             </div>
         </div>
         <div class="col-sm-6 col-lg-3">
-            <div class="card">
+            <div class="card card-sm">
                 <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="subheader">New Leads (Today)</div>
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <span class="bg-yellow-lt text-yellow avatar avatar-md">
+                                <i class="ti ti-bulb fs-2"></i>
+                            </span>
+                        </div>
+                        <div class="col">
+                            <div class="fw-bold fs-2" id="stat-new-leads">
+                                <div class="spinner-border spinner-border-sm text-secondary" role="status"></div>
+                            </div>
+                            <div class="text-secondary">New Leads (Today)</div>
+                        </div>
                     </div>
-                    <div class="h1 mb-3" id="stat-new-leads">
-                        <div class="spinner-border spinner-border-sm text-secondary" role="status"></div>
-                    </div>
-                    <a href="#" class="text-muted small">View all →</a>
+                    <a href="#" class="text-muted small mt-2 d-block">View all →</a>
                 </div>
             </div>
         </div>
@@ -149,6 +177,7 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/apexcharts@3.44.0/dist/apexcharts.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         fetch("{{ route('admin.dashboard.stats') }}")
@@ -212,8 +241,8 @@
                 }
 
                 // Render Chart
-                if (window.ApexCharts) {
-                    document.getElementById('chart-users').innerHTML = ''; // Clear loader
+                if (typeof ApexCharts !== 'undefined') {
+                    document.getElementById('chart-users').innerHTML = '';
                     new ApexCharts(document.getElementById('chart-users'), {
                         chart: {
                             type: "area",
@@ -258,11 +287,12 @@
                         },
                         colors: ['#206bc4']
                     }).render();
+                } else {
+                    document.getElementById('chart-users').innerHTML = '<div class="text-center text-danger py-4">Chart library failed to load</div>';
                 }
             })
             .catch(error => {
                 console.error("Error loading dashboard stats:", error);
-                // Fallback text if error
                 document.getElementById('stat-total-users').innerText = 'Error';
                 document.getElementById('stat-total-requirements').innerText = 'Error';
                 document.getElementById('stat-active-products').innerText = 'Error';
