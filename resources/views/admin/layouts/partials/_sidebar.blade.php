@@ -39,15 +39,7 @@
                     </a>
                 </li>
                 
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <span class="nav-link-icon d-md-none d-lg-inline-block">
-                            <i class="ti ti-user-star"></i>
-                        </span>
-                        <span class="nav-link-title">Seller User</span>
-                    </a>
-                </li>
-                
+
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('admin.users.blocked') }}">
                         <span class="nav-link-icon d-md-none d-lg-inline-block">
