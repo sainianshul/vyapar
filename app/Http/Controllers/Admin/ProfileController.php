@@ -12,17 +12,17 @@ class ProfileController extends Controller
 {
     public function index()
     {
-        $admin = Auth::guard('admin')->user();
+        $admin = Auth::user();
         return view('admin.profile.index', compact('admin'));
     }
 
     public function update(Request $request)
     {
-        $admin = Auth::guard('admin')->user();
+        $admin = Auth::user();
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => ['required', 'email', 'max:255', Rule::unique('admins')->ignore($admin->id)],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($admin->id)],
             'current_password' => 'nullable|required_with:password',
             'password' => 'nullable|min:8|confirmed',
         ]);
