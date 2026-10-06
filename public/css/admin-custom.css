@@ -198,8 +198,8 @@
         flex-wrap: wrap;
     }
 
-    /* --- Nurse Review: horizontal scrollable tabs on mobile --- */
-    #verification-nav {
+    /* --- Tabs: horizontal scrollable on mobile --- */
+    .nav-tabs.card-header-tabs {
         display: flex !important;
         flex-direction: row !important;
         overflow-x: auto !important;
@@ -209,11 +209,16 @@
         scrollbar-width: none;
     }
 
-    #verification-nav::-webkit-scrollbar {
+    .nav-tabs.card-header-tabs::-webkit-scrollbar {
         display: none;
     }
 
-    #verification-nav .list-group-item {
+    .nav-tabs.card-header-tabs .nav-item {
+        flex: 0 0 auto;
+        white-space: nowrap;
+    }
+
+    .nav-tabs.card-header-tabs .nav-link {
         flex: 0 0 auto;
         white-space: nowrap;
         border-bottom: 2px solid transparent;
@@ -222,28 +227,28 @@
         min-width: max-content;
     }
 
-    #verification-nav .list-group-item.active {
+    .nav-tabs.card-header-tabs .nav-link.active {
         border-bottom-color: var(--tblr-primary);
         background: var(--tblr-primary-lt, rgba(32, 107, 196, 0.06));
     }
 
-    #verification-nav .list-group-item .avatar {
+    .nav-tabs.card-header-tabs .nav-link .avatar {
         width: 1.5rem !important;
         height: 1.5rem !important;
         font-size: 0.75rem;
     }
 
-    #verification-nav .list-group-item .fw-medium {
+    .nav-tabs.card-header-tabs .nav-link .fw-medium {
         font-size: 0.8125rem !important;
     }
 
-    #verification-nav .list-group-item .badge {
+    .nav-tabs.card-header-tabs .nav-link .badge {
         font-size: 0.625rem;
         padding: 0.15rem 0.4rem;
     }
 
     /* Review page: card-footer for final decision */
-    #verification-nav + .card-footer,
+    .nav-tabs.card-header-tabs + .card-footer,
     .card-footer .list-group-item {
         white-space: nowrap;
     }
