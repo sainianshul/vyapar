@@ -92,6 +92,9 @@
     }
 
     .page-header .col-auto .btn {
+        display: block;
+        width: 100%;
+        text-align: center;
         flex: 1 1 auto;
         min-width: 0;
         font-size: 0.8125rem;
@@ -360,6 +363,9 @@
 
     /* Page header buttons: full width */
     .page-header .col-auto .btn {
+        display: block;
+        width: 100%;
+        text-align: center;
         font-size: 0.75rem;
         padding: 0.3rem 0.5rem;
     }

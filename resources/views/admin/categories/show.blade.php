@@ -85,10 +85,7 @@
                                     <div class="datagrid-title">Name</div>
                                     <div class="datagrid-content">{{ $category->name }}</div>
                                 </div>
-                                <div class="datagrid-item">
-                                    <div class="datagrid-title">Slug</div>
-                                    <div class="datagrid-content"><code>{{ $category->slug }}</code></div>
-                                </div>
+
                                 <div class="datagrid-item">
                                     <div class="datagrid-title">Parent Category</div>
                                     <div class="datagrid-content">
@@ -118,7 +115,7 @@
                                 <div class="datagrid-item">
                                     <div class="datagrid-title">Status</div>
                                     <div class="datagrid-content">
-                                        <span class="badge bg-{{ $category->status_color }}-lt">
+                                        <span class="badge badge-outline text-{{ $category->status_color }}">
                                             <i class="{{ $category->status_icon }} me-1"></i>{{ $category->status_name }}
                                         </span>
                                     </div>
