@@ -40,6 +40,7 @@ Route::prefix('admin')->group(function () {
             Route::get('{user}/products/data', [\App\Http\Controllers\Admin\UserController::class, 'userProductsData'])->name('products.data');
             Route::get('{user}/requirements/data', [\App\Http\Controllers\Admin\UserController::class, 'userRequirementsData'])->name('requirements.data');
             Route::get('{user}/leads/data', [\App\Http\Controllers\Admin\UserController::class, 'userLeadsData'])->name('leads.data');
+            Route::get('{user}/recent-views/data', [\App\Http\Controllers\Admin\UserController::class, 'userRecentViewsData'])->name('recent-views.data');
         });
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
 

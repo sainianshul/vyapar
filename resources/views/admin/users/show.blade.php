@@ -193,8 +193,8 @@
                     </a>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <a class="nav-link" data-bs-toggle="tab" href="#tab-activity" role="tab">
-                        <i class="ti ti-activity me-1"></i>Activity
+                    <a class="nav-link" data-bs-toggle="tab" href="#tab-recent-views" role="tab">
+                        <i class="ti ti-history me-1"></i>Recent Views
                     </a>
                 </li>
             </ul>
@@ -290,8 +290,13 @@
 
                 {{-- Tab: Products --}}
                 <div class="tab-pane fade" id="tab-products" role="tabpanel">
+                    <div class="d-flex justify-content-end mb-3 mt-3">
+                        <a href="{{ route('admin.products.create', ['user_id' => $user->id]) }}" class="btn btn-primary btn-sm">
+                            <i class="ti ti-plus me-1"></i>Add Product
+                        </a>
+                    </div>
                     <div class="table-responsive py-4">
-                        <table class="table table-sm table-vcenter card-table" id="user-products-table" style="width: 100%; font-size: 15px;">
+                        <table class="table table-sm table-vcenter card-table" id="user-products-table" style="width: 100%; font-size: 14px;">
                             <thead>
                                 <tr>
                                     <th>Product</th>
@@ -310,8 +315,13 @@
                 
                 {{-- Tab: Requirements --}}
                 <div class="tab-pane fade" id="tab-requirements" role="tabpanel">
+                    <div class="d-flex justify-content-end mb-3 mt-3">
+                        <a href="{{ route('admin.requirements.create', ['user_id' => $user->id]) }}" class="btn btn-primary btn-sm">
+                            <i class="ti ti-plus me-1"></i>Add Requirement
+                        </a>
+                    </div>
                     <div class="table-responsive py-4">
-                        <table class="table table-sm table-vcenter card-table" id="user-requirements-table" style="width: 100%; font-size: 15px;">
+                        <table class="table table-sm table-vcenter card-table" id="user-requirements-table" style="width: 100%; font-size: 14px;">
                             <thead>
                                 <tr>
                                     <th>Requirement</th>
@@ -329,7 +339,7 @@
                 {{-- Tab: Leads / Enquiries --}}
                 <div class="tab-pane fade" id="tab-leads" role="tabpanel">
                     <div class="table-responsive py-4">
-                        <table class="table table-sm table-vcenter card-table" id="user-leads-table" style="width: 100%; font-size: 15px;">
+                        <table class="table table-sm table-vcenter card-table" id="user-leads-table" style="width: 100%; font-size: 14px;">
                             <thead>
                                 <tr>
                                     <th>User Name</th>
@@ -352,7 +362,7 @@
                     @endphp
                     @if($tokens->count() > 0)
                         <div class="table-responsive py-4">
-                            <table class="table table-sm table-vcenter" style="font-size: 15px;">
+                            <table class="table table-sm table-vcenter" style="font-size: 14px;">
                                 <thead>
                                     <tr>
                                         <th>Device</th>
@@ -381,9 +391,9 @@
                                             </td>
                                             <td>
                                                 @if($token->fcm_token)
-                                                    <span class="badge bg-green-lt"><i class="ti ti-bell me-1"></i>Active</span>
+                                                    <span class="badge bg-green-lt border-transparent"><i class="ti ti-bell me-1"></i>Active</span>
                                                 @else
-                                                    <span class="badge bg-secondary-lt">Not Set</span>
+                                                    <span class="badge bg-secondary-lt border-transparent">Not Set</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -418,17 +428,19 @@
                     @endif
                 </div>
 
-
-                {{-- Tab: Activity --}}
-                <div class="tab-pane fade" id="tab-activity" role="tabpanel">
-                    <div class="empty py-5">
-                        <div class="empty-icon">
-                            <i class="ti ti-activity text-muted" style="font-size: 3rem;"></i>
-                        </div>
-                        <p class="empty-title">No Recent Activity</p>
-                        <p class="empty-subtitle text-secondary">
-                            System activities and audit trail for this user will appear here in the future.
-                        </p>
+                {{-- Tab: Recent Views --}}
+                <div class="tab-pane fade" id="tab-recent-views" role="tabpanel">
+                    <div class="table-responsive py-4">
+                        <table class="table table-sm table-vcenter card-table" id="user-recent-views-table" style="width: 100%; font-size: 14px;">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Viewed On</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                        </table>
                     </div>
                 </div>
 
@@ -676,6 +688,29 @@
         $('a[data-bs-toggle="tab"][href="#tab-leads"]').on('shown.bs.tab', function (e) {
             leadsTable.columns.adjust();
             if (leadsTable.responsive) leadsTable.responsive.recalc();
+        });
+
+        // DataTable Initialization for Recent Views
+        let recentViewsTable = $('#user-recent-views-table').DataTable({
+            processing: false,
+            serverSide: true,
+            responsive: true,
+            autoWidth: false,
+            ajax: '{{ route('admin.users.recent-views.data', $user->id) }}',
+            columns: [
+                { data: 'title', name: 'product.title' },
+                { data: 'price', name: 'product.price', orderable: false },
+                { data: 'created_at', name: 'created_at' },
+                { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-end' }
+            ],
+            order: [[2, 'desc']],
+            dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+            initComplete: function() {}
+        });
+
+        $('a[data-bs-toggle="tab"][href="#tab-recent-views"]').on('shown.bs.tab', function (e) {
+            recentViewsTable.columns.adjust();
+            if (recentViewsTable.responsive) recentViewsTable.responsive.recalc();
         });
 
         // Requirement Actions

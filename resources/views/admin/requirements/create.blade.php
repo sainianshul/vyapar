@@ -122,7 +122,7 @@
                             <select name="user_id" class="form-select select2 @error('user_id') is-invalid @enderror" required>
                                 <option value="">Select Buyer</option>
                                 @foreach ($users as $user)
-                                    <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>
+                                    <option value="{{ $user->id }}" {{ old('user_id', request('user_id')) == $user->id ? 'selected' : '' }}>
                                         {{ $user->name }} ({{ $user->phone }})
                                     </option>
                                 @endforeach

@@ -222,14 +222,7 @@
                                         {{ $requirement->category->name ?? 'N/A' }}
                                     </div>
                                 </div>
-                                <div class="datagrid-item">
-                                    <div class="datagrid-title">Condition</div>
-                                    <div class="datagrid-content">
-                                        <span class="badge bg-{{ $requirement->condition == \App\Models\Requirement::CONDITION_NEW ? 'green' : 'orange' }}-lt">
-                                            {{ $requirement->condition_name }}
-                                        </span>
-                                    </div>
-                                </div>
+
                                 <div class="datagrid-item">
                                     <div class="datagrid-title">Minimum Quantity</div>
                                     <div class="datagrid-content">{{ $requirement->quantity }}</div>

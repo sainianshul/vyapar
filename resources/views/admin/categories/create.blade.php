@@ -14,7 +14,7 @@
                 <h2 class="page-title">Add New Category</h2>
             </div>
             <div class="col-auto">
-                <a href="{{ route('admin.categories.index') }}" class="btn btn-light">
+                <a href="{{ route('admin.categories.index') }}" class="btn">
                     <i class="ti ti-arrow-left me-1"></i>Back
                 </a>
             </div>
@@ -49,7 +49,7 @@
                         <select name="parent_id" class="form-select @error('parent_id') is-invalid @enderror">
                             <option value="">— None (Root Category) —</option>
                             @foreach($parentCategories as $cat)
-                                <option value="{{ $cat['id'] }}" {{ old('parent_id') == $cat['id'] ? 'selected' : '' }}>
+                                <option value="{{ $cat['id'] }}" {{ old('parent_id', request('parent_id')) == $cat['id'] ? 'selected' : '' }}>
                                     {{ $cat['name'] }}
                                 </option>
                             @endforeach

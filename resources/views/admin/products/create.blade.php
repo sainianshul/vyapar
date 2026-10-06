@@ -126,7 +126,7 @@
                             <select name="user_id" class="form-select select2 @error('user_id') is-invalid @enderror" required>
                                 <option value="">Select Seller</option>
                                 @foreach ($users as $user)
-                                    <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>
+                                    <option value="{{ $user->id }}" {{ old('user_id', request('user_id')) == $user->id ? 'selected' : '' }}>
                                         {{ $user->name }} ({{ $user->phone }})
                                     </option>
                                 @endforeach
@@ -137,13 +137,13 @@
                         <div class="mb-3">
                             <label class="form-label required">Category</label>
                             
-                            <input type="hidden" name="category_id" id="final_category_id" value="{{ old('category_id') }}" required>
+                            <input type="hidden" name="category_id" id="final_category_id" value="{{ old('category_id', request('category_id')) }}" required>
                             
                             <div id="category-cascader">
                                 <select class="form-select category-select mb-2" data-level="0">
                                     <option value="">Select Category</option>
                                     @foreach ($categories as $cat)
-                                        <option value="{{ $cat['id'] }}">{{ $cat['name'] }}</option>
+                                        <option value="{{ $cat['id'] }}" {{ isset($selectedCategoryPath[0]) && $selectedCategoryPath[0] == $cat['id'] ? 'selected' : '' }}>{{ $cat['name'] }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -303,6 +303,25 @@ $(function() {
     });
 
     // Cascading Categories
+    let selectedCategoryPath = @json($selectedCategoryPath ?? []);
+    
+    function loadChildren(categoryId, currentLevel, selectedChildId = null) {
+        return $.get(`/admin/categories/${categoryId}/children`, function(data) {
+            if (data.length > 0) {
+                let newLevel = currentLevel + 1;
+                let options = '<option value="">Select Subcategory</option>';
+                
+                data.forEach(function(cat) {
+                    let selected = (selectedChildId == cat.id) ? 'selected' : '';
+                    options += `<option value="${cat.id}" ${selected}>${cat.name}</option>`;
+                });
+                
+                let newSelect = `<select class="form-select category-select mb-2" data-level="${newLevel}">${options}</select>`;
+                $('#category-cascader').append(newSelect);
+            }
+        });
+    }
+
     $(document).on('change', '.category-select', function() {
         let select = $(this);
         let categoryId = select.val();
@@ -319,22 +338,24 @@ $(function() {
         $('#final_category_id').val(finalId);
         
         if (categoryId) {
-            // Check for children
-            $.get(`/admin/categories/${categoryId}/children`, function(data) {
-                if (data.length > 0) {
-                    let newLevel = currentLevel + 1;
-                    let options = '<option value="">Select Subcategory</option>';
-                    
-                    data.forEach(function(cat) {
-                        options += `<option value="${cat.id}">${cat.name}</option>`;
-                    });
-                    
-                    let newSelect = `<select class="form-select category-select mb-2" data-level="${newLevel}">${options}</select>`;
-                    $('#category-cascader').append(newSelect);
-                }
-            });
+            loadChildren(categoryId, currentLevel);
         }
     });
+
+    // Initial Load for Create (Rebuild cascading dropdowns based on path)
+    if (selectedCategoryPath.length > 1) {
+        let loadSequence = Promise.resolve();
+        
+        for (let i = 0; i < selectedCategoryPath.length - 1; i++) {
+            let parentId = selectedCategoryPath[i];
+            let childId = selectedCategoryPath[i + 1];
+            let level = i;
+            
+            loadSequence = loadSequence.then(() => {
+                return loadChildren(parentId, level, childId);
+            });
+        }
+    }
 });
 </script>
 @endpush

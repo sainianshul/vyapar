@@ -14,7 +14,7 @@
                 <h2 class="page-title">Blocked Users</h2>
             </div>
             <div class="col-auto">
-                <a href="{{ route('admin.users.index') }}" class="btn btn-light">
+                <a href="{{ route('admin.users.index') }}" class="btn">
                     <i class="ti ti-arrow-left me-1"></i>Back to Users
                 </a>
             </div>

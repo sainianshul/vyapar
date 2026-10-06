@@ -1,0 +1,182 @@
+# API Details for App Development
+
+Here are the details for the issues mentioned, please use these to integrate with the App.
+
+## 1. Edit Product (My Products)
+To make the product editable, you need to use the Update Product API.
+
+**Endpoint:** `POST /api/v1/products/{id}`
+**Method:** `POST` (Make sure to use `multipart/form-data` as the Content-Type, especially if updating images).
+**Authorization:** Bearer Token required.
+
+**Request Parameters (Form Data - send only the fields you want to update):**
+- `category_id` (integer, optional)
+- `other_category_name` (string, optional)
+- `title` (string, optional) - Title of the product
+- `description` (string, optional) - Description of the product
+- `price` (float, optional) - Price of the product
+- `price_unit` (string, optional) - e.g., 'per piece', 'per kg'
+- `is_negotiable` (boolean, optional) - 1 for true, 0 for false
+- `condition` (integer, optional) - 1 for New, 2 for Used
+- `minimum_quantity` (integer, optional)
+- `address` (string, optional)
+- `state` (string, optional)
+- `city` (string, optional)
+- `pincode` (string, optional)
+- `latitude` (float, optional)
+- `longitude` (float, optional)
+- `primary_image` (file, optional) - To update the primary image
+- `deleted_images[]` (array of integers, optional) - Send IDs of additional images that user wants to delete
+- `additional_images[]` (array of files, optional) - To add new additional images
+
+**Success Response (200 OK):**
+```json
+{
+    "status": true,
+    "message": "Product updated successfully",
+    "data": {
+        "product": { ... updated product details ... }
+    }
+}
+```
+
+
+## 2. Product Search
+To implement better search hitting the API directly, use the Products listing endpoint and pass the search query.
+
+**Endpoint:** `GET /api/v1/products`
+**Method:** `GET`
+**Authorization:** Bearer Token required.
+
+**How to use:**
+When a user types in the search bar, append the text as a `search` query parameter. You can also append other filters if needed.
+Example: `/api/v1/products?search=mobile&sort=latest&page=1`
+
+**Available Query Parameters:**
+- `search` (string, optional) - The text to search for (matches with product tags).
+- `category_id` (integer, optional) - Filter by category.
+- `condition` (integer, optional) - Filter by condition (1 or 2).
+- `price_min` (number, optional) - Minimum price.
+- `price_max` (number, optional) - Maximum price.
+- `city` (string, optional) - Filter by city.
+- `latitude` (number, optional) - For location-based search.
+- `longitude` (number, optional) - For location-based search.
+- `radius` (integer, optional) - Radius in km for location search (requires lat/long).
+- `sort` (string, optional) - Allowed values: 'latest', 'price_low', 'price_high', 'nearest'.
+- `page` (integer, optional) - For pagination.
+- `per_page` (integer, optional) - Items per page.
+
+**Success Response (200 OK):**
+```json
+{
+    "status": true,
+    "message": "Products fetched",
+    "data": {
+        "products": [
+            { ... product details ... }
+        ],
+        "pagination": {
+            "current_page": 1,
+            "last_page": 5,
+            "per_page": 20,
+            "total": 100
+        }
+    }
+}
+```
+
+## 3. Requirement View UI Update
+**Note for App Developer:** In the Requirement View, please do NOT show 'Like' or 'Comment' buttons. Instead, prioritize and clearly display the "Contact" buttons (e.g., Call, Message) as this is a requirement posting and contact is the primary action.
+
+## 4. Requirement Details
+To show the full description and details of a requirement when a user clicks on it, use the Requirement Details API.
+
+**Endpoint:** `GET /api/v1/requirements/{id}`
+**Method:** `GET`
+**Authorization:** Bearer Token required.
+
+**Success Response (200 OK):**
+```json
+{
+    "status": true,
+    "message": "Requirement detail",
+    "data": {
+        "requirement": {
+            "id": 1,
+            "title": "Need 100 T-shirts",
+            "description": "Full description of the requirement...",
+            "target_budget": 5000,
+            "...": "..."
+        }
+    }
+}
+```
+
+## 5. Requirement Pagination
+The requirements list API already supports pagination. To load more requirements as the user scrolls, use the `page` parameter.
+
+**Endpoint:** `GET /api/v1/requirements`
+**Method:** `GET`
+**Authorization:** Bearer Token required.
+
+**How to use:**
+Append the `page` query parameter (e.g., `?page=1`, `?page=2`).
+Example: `/api/v1/requirements?page=2`
+
+**Success Response (200 OK):**
+```json
+{
+    "status": true,
+    "message": "Requirements fetched",
+    "data": {
+        "requirements": [ ... ],
+        "pagination": {
+            "current_page": 2,
+            "last_page": 10,
+            "per_page": 20,
+            "total": 200
+        }
+    }
+}
+```
+
+## 6. Banner Click Action
+**Note for App Developer:** When a user clicks on a banner, the app must navigate to the correct page based on the banner's data. 
+In the `GET /api/v1/banners` response, you receive `type`, `type_name`, and `reference_id` for each banner. 
+- If `type_name` is "Category", navigate to the Category Details page using `reference_id` as the Category ID.
+- If `type_name` is "Product", navigate to the Product Details page using `reference_id` as the Product ID.
+- If it's an external link, open the link accordingly.
+
+## 7. Product Details Multi-Image Slider (Bug Fix)
+**Note for App Developer:** In the Buyer's Product View, the multi-image slider is currently not working properly. Please fix the image slider component in the UI so users can swipe through all additional images of the product smoothly.
+
+## 8. My Requirements (Buyer View, Edit, Delete)
+A buyer can manage their own requirements using the following endpoints:
+
+**View Requirement List:**
+- **Endpoint:** `GET /api/v1/my/requirements` (Supports `?page=x` for pagination)
+- **Method:** `GET`
+- **Authorization:** Bearer Token
+
+**Edit Requirement:**
+- **Endpoint:** `POST /api/v1/my/requirements/{id}`
+- **Method:** `POST` (Use `multipart/form-data`)
+- **Parameters:** Similar to the create requirement API (`title`, `description`, `target_budget`, etc. Send only updated fields. Use `new_images[]` for new images and `deleted_images[]` to remove old images).
+- **Authorization:** Bearer Token
+
+**Delete Requirement:**
+- **Endpoint:** `DELETE /api/v1/my/requirements/{id}`
+- **Method:** `DELETE`
+- **Authorization:** Bearer Token
+
+## 9. Dashboard Highest View Product Action
+**Note for App Developer:** In the Seller Dashboard, when a user clicks on the "Highest View Product" card, do NOT open a list of products. Instead, open the specific product details view. The data for this specific product is already provided in the `GET /api/v1/dashboard/seller` API response under the `most_viewed_product` parameter.
+
+## 10. Dashboard Lowest View Product Action
+**Note for App Developer:** Similarly, for the "Lowest View Product" card in the Seller Dashboard, open the specific product details directly on click. The data for this product is provided in the `GET /api/v1/dashboard/seller` API response under the `lowest_viewed_product` parameter.
+
+## 11. Unread Chats Count on Tab
+**Note for App Developer:** To show the badge/count of unread chats on the bottom navigation "Chat" tab, use the value provided in the `GET /api/v1/dashboard/seller` API response under the `total_unread_chats` parameter.
+
+## 12. Calling UI Name Display
+**Note for App Developer:** In the WebRTC / Audio Calling dialer screen, you must display the actual name of the Caller or Receiver instead of generic text like "Buyer" or "Seller". Ensure you are extracting the `name` from the user object in the call initiation or receiving socket/API payload and displaying it on the calling UI.

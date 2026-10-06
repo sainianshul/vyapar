@@ -188,4 +188,11 @@ class UserController extends Controller
         $dataTable->userId = $user->id;
         return $dataTable->ajax();
     }
+
+    public function userRecentViewsData(User $user, \App\DataTables\Users\UserRecentViewsDataTable $dataTable)
+    {
+        abort_unless($user->isUser(), 404);
+        $dataTable->userId = $user->id;
+        return $dataTable->ajax();
+    }
 }

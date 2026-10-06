@@ -25,11 +25,22 @@ class ProductController extends Controller
         return $dataTable->ajax();
     }
 
-    public function create()
+    public function create(\Illuminate\Http\Request $request)
     {
         $categories = Category::root()->orderBy('name')->get();
         $users = User::users()->active()->orderBy('name')->get();
-        return view('admin.products.create', compact('categories', 'users'));
+        
+        $selectedCategoryPath = [];
+        if ($request->has('category_id')) {
+            $category = Category::find($request->category_id);
+            if ($category) {
+                $path = $category->ancestors->pluck('id')->toArray();
+                $path[] = $category->id;
+                $selectedCategoryPath = $path;
+            }
+        }
+
+        return view('admin.products.create', compact('categories', 'users', 'selectedCategoryPath'));
     }
 
     public function store(StoreProductRequest $request, \App\Services\ProductService $productService)

@@ -30,7 +30,7 @@
 
         {{-- Comments List --}}
         <div class="d-flex flex-column gap-4">
-            @forelse($comments as $comment)
+            @foreach($comments as $comment)
                 <div class="d-flex align-items-start gap-3">
                     <span class="avatar bg-secondary-lt text-secondary fw-bold flex-shrink-0">
                         {{ mb_strtoupper(mb_substr($comment->creator->name ?? '?', 0, 1)) }}
@@ -59,17 +59,7 @@
                         </div>
                     </div>
                 </div>
-            @empty
-                <div class="empty py-4">
-                    <div class="empty-icon">
-                        <i class="ti ti-notes-off" style="font-size: 2.5rem; color: var(--tblr-secondary);"></i>
-                    </div>
-                    <p class="empty-title">No notes yet</p>
-                    <p class="empty-subtitle text-secondary">
-                        Add a note above to start the conversation.
-                    </p>
-                </div>
-            @endforelse
+            @endforeach
         </div>
     </div>
 </div>

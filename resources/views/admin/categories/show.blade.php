@@ -44,11 +44,6 @@
                     </div>
                     <div class="d-flex flex-wrap gap-3 text-secondary small mt-1">
                         <span><i class="ti ti-link me-1"></i>Slug: <code>{{ $category->slug }}</code></span>
-                        @if($category->parent)
-                            <span><i class="ti ti-corner-left-up me-1"></i>Parent: <a href="{{ route('admin.categories.show', $category->parent_id) }}" class="text-reset text-decoration-none">{{ $category->parent->name }}</a></span>
-                        @endif
-                        <span><i class="ti ti-list-numbers me-1"></i>Sort Order: {{ $category->sort_order }}</span>
-                        <span><i class="ti ti-clock me-1"></i>Created: {{ $category->created_at->format('d M Y') }}</span>
                     </div>
                 </div>
             </div>
@@ -146,6 +141,10 @@
                                     <div class="datagrid-title">Level</div>
                                     <div class="datagrid-content">{{ $category->level }}</div>
                                 </div>
+                                <div class="datagrid-item">
+                                    <div class="datagrid-title">Created At</div>
+                                    <div class="datagrid-content">{{ $category->created_at->format('d M Y, h:i A') }}</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -162,12 +161,8 @@
 
                 {{-- Tab: Subcategories --}}
                 <div class="tab-pane fade" id="tab-subcategories" role="tabpanel">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <div>
-                            <h3 class="mb-1">Subcategories</h3>
-                            <p class="text-secondary mb-0">Direct subcategories of this category.</p>
-                        </div>
-                        <a href="{{ route('admin.categories.create') }}" class="btn btn-primary btn-sm">
+                    <div class="d-flex justify-content-end mb-3 mt-3">
+                        <a href="{{ route('admin.categories.create', ['parent_id' => $category->id]) }}" class="btn btn-primary btn-sm">
                             <i class="ti ti-plus me-1"></i>Add Subcategory
                         </a>
                     </div>
@@ -239,9 +234,10 @@
 
                 {{-- Tab: Products --}}
                 <div class="tab-pane fade" id="tab-products" role="tabpanel">
-                    <div class="mb-3">
-                        <h3 class="mb-1">Products</h3>
-                        <p class="text-secondary mb-0">Products linked to this category and all its subcategories.</p>
+                    <div class="d-flex justify-content-end mb-3 mt-3">
+                        <a href="{{ route('admin.products.create', ['category_id' => $category->id]) }}" class="btn btn-primary btn-sm">
+                            <i class="ti ti-plus me-1"></i>Add Product
+                        </a>
                     </div>
 
                     {{-- Loading Spinner --}}
