@@ -155,5 +155,9 @@ class RequirementController extends Controller
         ]);
     }
 
-    
+    public function leadsData(Requirement $requirement, \App\DataTables\Requirements\RequirementLeadDataTable $dataTable)
+    {
+        $dataTable->requirement_id = $requirement->id;
+        return $dataTable->ajax();
+    }
 }

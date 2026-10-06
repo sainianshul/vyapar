@@ -187,8 +187,8 @@
                     </a>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <a class="nav-link" data-bs-toggle="tab" href="#tab-views" role="tab">
-                        <i class="ti ti-eye me-1"></i>Views
+                    <a class="nav-link" data-bs-toggle="tab" href="#tab-buyer" role="tab">
+                        <i class="ti ti-user me-1"></i>Buyer Info
                     </a>
                 </li>
                 <li class="nav-item" role="presentation">
@@ -212,10 +212,7 @@
                                     <div class="datagrid-title">Title</div>
                                     <div class="datagrid-content">{{ $requirement->title }}</div>
                                 </div>
-                                <div class="datagrid-item">
-                                    <div class="datagrid-title">Slug</div>
-                                    <div class="datagrid-content"><code>{{ $requirement->slug }}</code></div>
-                                </div>
+
                                 <div class="datagrid-item">
                                     <div class="datagrid-title">Category</div>
                                     <div class="datagrid-content">
@@ -335,29 +332,29 @@
 
                 {{-- Tab: Buyer Info --}}
                 <div class="tab-pane fade" id="tab-buyer" role="tabpanel">
-                    @if($requirement->buyer)
+                    @if($requirement->user)
                         <div class="row g-4">
                             <div class="col-12">
                                 <div class="card shadow-sm">
                                     <div class="card-body">
                                         <div class="d-flex align-items-center mb-3">
-                                            @if($requirement->buyer->profile_photo)
-                                                <span class="avatar avatar-lg rounded-circle me-3" style="background-image: url({{ asset('storage/' . $requirement->buyer->profile_photo) }})"></span>
+                                            @if($requirement->user->profile_photo)
+                                                <span class="avatar avatar-lg rounded-circle me-3" style="background-image: url({{ asset('storage/' . $requirement->user->profile_photo) }})"></span>
                                             @else
                                                 <span class="avatar avatar-lg rounded-circle bg-primary-lt fs-3 fw-bold me-3">
-                                                    {{ mb_strtoupper(mb_substr($requirement->buyer->name ?? 'U', 0, 2)) }}
+                                                    {{ mb_strtoupper(mb_substr($requirement->user->name ?? 'U', 0, 2)) }}
                                                 </span>
                                             @endif
                                             <div>
-                                                <h3 class="mb-0">{{ $requirement->buyer->name ?? 'Unknown User' }}</h3>
+                                                <h3 class="mb-0">{{ $requirement->user->name ?? 'Unknown User' }}</h3>
                                                 <div class="text-secondary small">
-                                                    <span class="badge bg-{{ $requirement->buyer->status_color ?? 'secondary' }}-lt">
-                                                        {{ $requirement->buyer->status_name ?? 'Unknown' }}
+                                                    <span class="badge bg-{{ $requirement->user->status_color ?? 'secondary' }}-lt">
+                                                        {{ $requirement->user->status_name ?? 'Unknown' }}
                                                     </span>
                                                 </div>
                                             </div>
                                             <div class="ms-auto">
-                                                <a href="{{ route('admin.users.show', $requirement->buyer->id) }}" class="btn btn-outline-primary">
+                                                <a href="{{ route('admin.users.show', $requirement->user->id) }}" class="btn btn-outline-primary">
                                                     <i class="ti ti-external-link me-1"></i>View Full Profile
                                                 </a>
                                             </div>
@@ -365,19 +362,19 @@
                                         <div class="datagrid">
                                             <div class="datagrid-item">
                                                 <div class="datagrid-title">Phone</div>
-                                                <div class="datagrid-content">{{ $requirement->buyer->phone ?? 'N/A' }}</div>
+                                                <div class="datagrid-content">{{ $requirement->user->phone ?? 'N/A' }}</div>
                                             </div>
                                             <div class="datagrid-item">
                                                 <div class="datagrid-title">Email</div>
-                                                <div class="datagrid-content">{{ $requirement->buyer->email ?? 'Not provided' }}</div>
+                                                <div class="datagrid-content">{{ $requirement->user->email ?? 'Not provided' }}</div>
                                             </div>
                                             <div class="datagrid-item">
                                                 <div class="datagrid-title">City</div>
-                                                <div class="datagrid-content">{{ $requirement->buyer->city ?? 'N/A' }}</div>
+                                                <div class="datagrid-content">{{ $requirement->user->city ?? 'N/A' }}</div>
                                             </div>
                                             <div class="datagrid-item">
                                                 <div class="datagrid-title">Joined</div>
-                                                <div class="datagrid-content">{{ $requirement->buyer->created_at->format('d M Y') }}</div>
+                                                <div class="datagrid-content">{{ $requirement->user->created_at->format('d M Y') }}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -397,28 +394,23 @@
                     @endif
                 </div>
 
-                {{-- Tab: Views (Dummy for now) --}}
-                <div class="tab-pane fade" id="tab-views" role="tabpanel">
-                    <div class="mb-3">
-                        <h3 class="mb-1">Recent Views</h3>
-                        <p class="text-secondary">Users who viewed this requirement listing.</p>
-                    </div>
-                        <p class="text-secondary">No views tracked for requirements.</p>
 
-                {{-- Tab: Leads / Enquiries (Dummy for now) --}}
+                {{-- Tab: Leads / Enquiries --}}
                 <div class="tab-pane fade" id="tab-leads" role="tabpanel">
-                    <div class="mb-3">
-                        <h3 class="mb-1">Leads & Enquiries</h3>
-                        <p class="text-secondary">Enquiries and buy leads received for this requirement.</p>
-                    </div>
-                    <div class="empty py-5">
-                        <div class="empty-icon">
-                            <i class="ti ti-bulb text-muted" style="font-size: 3rem;"></i>
-                        </div>
-                        <p class="empty-title">No Leads or Enquiries</p>
-                        <p class="empty-subtitle text-secondary">
-                            Buy leads and enquiries for this requirement will appear here once the leads module is active.
-                        </p>
+                    <div class="table-responsive py-4">
+                        <table class="table table-sm table-vcenter card-table" id="requirement-leads-table" style="width: 100%; font-size: 14px;">
+                            <thead>
+                                <tr>
+                                    <th>Lead Source User</th>
+                                    <th>Source</th>
+                                    <th>Temperature</th>
+                                    <th>Quantity</th>
+                                    <th>Status</th>
+                                    <th>Received At</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                        </table>
                     </div>
                 </div>
 
@@ -470,6 +462,32 @@
             if($.fn.dataTable) {
                 $($.fn.dataTable.tables(true)).DataTable().columns.adjust();
             }
+        });
+
+        // DataTable Initialization for Leads
+        let leadsTable = $('#requirement-leads-table').DataTable({
+            processing: false,
+            serverSide: true,
+            responsive: true,
+            autoWidth: false,
+            ajax: '{{ route('admin.requirements.leads-data', $requirement->id) }}',
+            columns: [
+                { data: 'buyer', name: 'buyer.name', orderable: false, searchable: false },
+                { data: 'source', name: 'source', orderable: false, searchable: false },
+                { data: 'temperature', name: 'temperature', orderable: false, searchable: false },
+                { data: 'quantity', name: 'quantity', orderable: false, searchable: false },
+                { data: 'status', name: 'status', orderable: false, searchable: false },
+                { data: 'created_at', name: 'created_at' },
+                { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-end' }
+            ],
+            order: [[5, 'desc']],
+            dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+            initComplete: function() {}
+        });
+
+        $('a[data-bs-toggle="tab"][href="#tab-leads"]').on('shown.bs.tab', function (e) {
+            leadsTable.columns.adjust();
+            if (leadsTable.responsive) leadsTable.responsive.recalc();
         });
     });
 </script>

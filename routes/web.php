@@ -80,6 +80,7 @@ Route::prefix('admin')->group(function () {
 
         // Requirements CRUD
         Route::get('requirements/data', [\App\Http\Controllers\Admin\RequirementController::class, 'data'])->name('requirements.data');
+        Route::get('requirements/{requirement}/leads-data', [\App\Http\Controllers\Admin\RequirementController::class, 'leadsData'])->name('requirements.leads-data');
         Route::post('requirements/{requirement}/status', [\App\Http\Controllers\Admin\RequirementController::class, 'updateStatus'])->name('requirements.update-status');
         Route::resource('requirements', \App\Http\Controllers\Admin\RequirementController::class);
 
