@@ -195,4 +195,33 @@ class UserController extends Controller
         $dataTable->userId = $user->id;
         return $dataTable->ajax();
     }
+
+    public function search(Request $request)
+    {
+        $search = $request->input('q');
+        
+        $query = User::users();
+        
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+        
+        $users = $query->limit(50)->get();
+        
+        $results = [];
+        foreach ($users as $user) {
+            $results[] = [
+                'id' => $user->id,
+                'text' => ($user->name ?? 'Unknown') . ' (' . ($user->phone ?? 'N/A') . ')'
+            ];
+        }
+        
+        return response()->json([
+            'results' => $results
+        ]);
+    }
 }

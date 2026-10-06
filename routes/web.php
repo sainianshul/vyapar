@@ -27,6 +27,7 @@ Route::prefix('admin')->group(function () {
         Route::prefix('users')->name('users.')->group(function () {
             Route::get('data', [\App\Http\Controllers\Admin\UserController::class, 'data'])->name('data');
             
+            Route::get('search', [\App\Http\Controllers\Admin\UserController::class, 'search'])->name('search');
             Route::get('blocked', [\App\Http\Controllers\Admin\UserController::class, 'blocked'])->name('blocked');
             Route::get('blocked/data', [\App\Http\Controllers\Admin\UserController::class, 'blockedData'])->name('blocked.data');
             Route::post('{user}/unblock', [\App\Http\Controllers\Admin\UserController::class, 'unblock'])->name('unblock');

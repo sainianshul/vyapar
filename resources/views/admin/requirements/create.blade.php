@@ -119,13 +119,17 @@
                         
                         <div class="mb-3">
                             <label class="form-label required">Buyer (User)</label>
-                            <select name="user_id" class="form-select select2 @error('user_id') is-invalid @enderror" required>
-                                <option value="">Select Buyer</option>
-                                @foreach ($users as $user)
-                                    <option value="{{ $user->id }}" {{ old('user_id', request('user_id')) == $user->id ? 'selected' : '' }}>
-                                        {{ $user->name }} ({{ $user->phone }})
+                            <select name="user_id" class="form-select select2-ajax @error('user_id') is-invalid @enderror" required>
+                                <option value="">Search Buyer</option>
+                                @php
+                                    $selectedUserId = old('user_id', request('user_id'));
+                                    $selectedUser = $selectedUserId ? \App\Models\User::find($selectedUserId) : null;
+                                @endphp
+                                @if($selectedUser)
+                                    <option value="{{ $selectedUser->id }}" selected>
+                                        {{ $selectedUser->name }} ({{ $selectedUser->phone }})
                                     </option>
-                                @endforeach
+                                @endif
                             </select>
                             @error('user_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
@@ -184,6 +188,7 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 $(function() {
     // Primary Image Preview
@@ -303,6 +308,40 @@ $(function() {
             });
         }
     });
+
+    $('.select2-ajax').select2({
+        placeholder: 'Search for a user by name, email or phone...',
+        allowClear: true,
+        ajax: {
+            url: '{{ route('admin.users.search') }}',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return { q: params.term };
+            },
+            processResults: function (data) {
+                return { results: data.results };
+            },
+            cache: true
+        }
+    });
 });
 </script>
+@endpush
+
+@push('styles')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    .select2-container .select2-selection--single {
+        height: 38px;
+        border: 1px solid #d8dddf;
+        border-radius: 4px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 36px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 36px;
+    }
+</style>
 @endpush
